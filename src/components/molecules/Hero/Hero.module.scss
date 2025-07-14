@@ -1,0 +1,66 @@
+@import '../../../theme/index.scss';
+
+.heroContainer {
+    position: relative;
+    width: 100vw;
+    left: 50%;
+    margin-left: -50vw;
+
+    height: 60vh;             
+    background-size: cover;
+    background-position: center;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.overlay {
+    position: absolute;
+    inset: 0;                   
+    background: rgba(0, 0, 0, 0.5);
+}
+
+.content {
+    position: relative;         
+    display: flex;
+    align-items: center;
+    gap: 8rem;
+
+    width: 90%;
+    padding: 0 1rem;
+}
+
+.text {
+    color: #fff;
+    line-height: 1.4;
+
+    white-space: normal;
+    word-break: break-word;
+    max-width: 800px;
+}
+
+.iconRow {
+    display: flex;
+    gap: 8rem;
+}
+
+@media (max-width: 640px) {
+    .content {
+        flex-direction: column-reverse;
+        gap: 1.5rem;     
+        text-align: initial;
+        align-items: stretch;
+    }
+    .text {
+        /* texto alineado a la izquierda */
+        text-align: left;
+        align-self: flex-start;
+    }
+
+    .iconRow {
+        /* iconos a la derecha */
+        align-self: flex-end;
+        /* o alternativamente: margin-left: auto; */
+    }
+}

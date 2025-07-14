@@ -1,0 +1,12 @@
+.cardWrapper {
+  background-color: #ffffff;   
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;                     
+}
+
+@media (max-width: 720px) {
+  .cardWrapper {
+    gap: 0;
+  }
+}

@@ -1,0 +1,38 @@
+@import "../../../theme/index.scss";
+
+.servicesRow {
+  width: 100%;
+  display: flex;
+  justify-content: center;    
+  align-items: center;
+  gap: 7rem;
+  padding: 1rem;  
+  overflow-x: visible;
+}
+
+.servicesRow {
+  scrollbar-width: none;        
+  -ms-overflow-style: none;      
+}
+.servicesRow::-webkit-scrollbar {
+  display: none;                
+}
+
+.serviceItem {
+  flex: 0 0 auto;
+}
+
+@media (max-width: 640px) {
+  .servicesRow {
+    overflow-x: auto;            
+    -webkit-overflow-scrolling: touch;    
+    justify-content: flex-start;    
+    scroll-snap-type: x mandatory;
+    gap: 2rem;
+  }
+
+  .servicesRow > .serviceItem {
+    scroll-snap-align: start;
+  }
+}
+

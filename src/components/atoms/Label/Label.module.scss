@@ -1,0 +1,22 @@
+@use "src/theme/colors.scss" as *;
+
+.label {
+  font-weight: bold;
+  color: $secondary-text;
+}
+
+.success {
+  color: $verde-oscuro-1;
+}
+
+.warning {
+  color: $amarillo-1;
+}
+
+.danger {
+  color: $rojo-1;
+}
+
+.info {
+  color: $azul-1;
+}

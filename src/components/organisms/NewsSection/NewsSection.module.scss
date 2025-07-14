@@ -1,0 +1,82 @@
+@import "../../../theme/index.scss";
+
+.wrapper {
+    width: 100%;
+    margin: 0 auto;
+    padding: 2rem 12rem;
+    background: #fff;
+}
+
+.carousel {
+    /* nada */
+}
+
+.arrow {
+    display: none;        
+    position: initial;
+    top: auto;
+    left: auto;
+    right: auto;
+    background: rgba(0,0,0,0.4);
+    color: #fff;
+    border: none;
+    width: 2rem;
+    height: 2rem;
+    border-radius: 50%;
+    cursor: pointer;
+    flex-shrink: 0;       
+}
+
+.grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 2rem;
+
+    & > * { width: 100%; }
+}
+
+@media (max-width: 768px) {
+    .grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+/* === MÓVIL: carrusel con flechas a los lados === */
+@media (max-width: 640px) {
+    .wrapper {
+        padding: 2rem 0;
+    }
+
+    .carousel {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .arrow {
+        display: flex;            
+        align-items: center;
+        justify-content: center;
+    }
+
+    .grid {
+        display: flex;
+        flex-wrap: nowrap;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        scroll-snap-type: x mandatory;
+        gap: 1rem;
+        padding: 1rem 0;
+
+        scrollbar-width: none;
+    }
+    .grid::-webkit-scrollbar {
+        display: none;
+    }
+
+    .grid > * {
+        flex: 0 0 100%;           
+        scroll-snap-align: start;
+        width: auto;
+    }
+}

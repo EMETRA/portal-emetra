@@ -1,4 +1,8 @@
-@use "./colors.scss" as *;
-@use "./fonts.scss" as *;
-@use "./spacings.scss" as *;
-@use "./sizes.scss" as *;
+// @use "./colors.scss" as *;
+// @use "./fonts.scss" as *;
+// @use "./spacings.scss" as *;
+// @use "./sizes.scss" as *;
+@forward './colors.scss';
+@forward './fonts.scss';
+@forward './spacings.scss';
+@forward './sizes.scss';

@@ -1,3 +1,5 @@
+"use client";
+
 import React from "react";
 import { ButtonProps } from "./types";
 import styles from "./Button.module.scss";
@@ -14,6 +16,7 @@ import classNames from "classnames";
  */
 const Button: React.FC<ButtonProps> = ({
   className,
+  label,
   children,
   variant,
   ...props
@@ -21,13 +24,14 @@ const Button: React.FC<ButtonProps> = ({
   return (
     <button
       className={classNames(
-        styles.button,
-        variant && styles[variant],
-        className
+        styles.button, // Aplicación de estilos básicos del botón.
+        variant && styles[variant], // Si se proporciona una variante, aplicar estilos de variante.
+        className // Aplicar clases adicionales.
       )}
-      {...props}
+      {...props} // Pasar todas las demás props al elemento de botón.
     >
-      {children}
+      {label} {/* Renderizar el texto del botón.*/}
+      {children} {/* Renderizar los elementos hijos del botón. */}
     </button>
   );
 };

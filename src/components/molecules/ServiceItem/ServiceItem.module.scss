@@ -1,0 +1,15 @@
+@import "../../../theme/index.scss";
+
+.wrapper {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem; 
+    max-width: 180px; 
+    flex: 0 0 auto;
+}
+
+.label {
+    color: $azul-2;
+    font-weight: 600;
+    text-transform: uppercase;
+}

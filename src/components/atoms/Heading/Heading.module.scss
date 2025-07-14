@@ -1,0 +1,33 @@
+@import '../../../theme/index.scss';
+
+$extra-large-heading: 40px;
+$large-heading: 32px;
+$medium-heading: 28px;
+$small-heading: 24px;
+$extra-small-heading: 16px;
+
+.heading {
+    font-family: $fonts;
+    display: block;
+    text-align: center;
+}
+
+.Extra-Large {
+    font-size: $extra-large-heading;
+}
+
+.Large {
+    font-size: $large-heading;
+}
+
+.Medium {
+    font-size: $medium-heading;
+}
+
+.Small {
+    font-size: $small-heading;
+}
+
+.Extra-Small {
+    font-size: $extra-small-heading;
+}

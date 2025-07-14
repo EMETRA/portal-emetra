@@ -1,0 +1,15 @@
+@import "../../../theme/index.scss";
+
+.icon {
+    display: inline-block;
+    width: 32px;
+    height: 32px;
+    background-color: $azul-2;
+
+    mask-repeat: no-repeat;
+    mask-position: center;
+    mask-size: 100% 100%;
+    -webkit-mask-repeat: no-repeat;
+    -webkit-mask-position: center;
+    -webkit-mask-size: 100% 100%;
+}

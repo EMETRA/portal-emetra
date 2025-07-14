@@ -1,0 +1,49 @@
+@import "../../../theme/index.scss";
+
+.card {
+    display: flex;
+    flex-direction: column;
+    background: #fff;
+    border-radius: $card-radius;
+    // box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    overflow: hidden;
+    cursor: pointer;
+}
+
+.thumb {
+    position: relative;
+    width: 100%;
+    padding-top: 56.25%; 
+}
+
+.image {
+    border-top-left-radius: $card-radius;
+    border-top-right-radius: $card-radius;
+}
+
+.body {
+    padding: 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.title {
+    color: $azul-2;
+}
+
+.meta {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.icon {
+    flex-shrink: 0;
+    width: 16px;
+    height: 16px;
+}
+
+.metaText {
+    color: $quinary-text;
+}

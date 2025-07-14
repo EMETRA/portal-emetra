@@ -30,7 +30,7 @@ export const NewsCard: React.FC<NewsCardProps> = ({
         />
         </div>
         <div className={styles.body}>
-            <Heading variant="Small" className={styles.title}>
+            <Heading variant="Extra-Small" className={styles.title}>
                 {title}
             </Heading>
             <div className={styles.meta}>

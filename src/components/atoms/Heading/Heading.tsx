@@ -4,11 +4,11 @@ import styles from "./Heading.module.scss";
 import classNames from "classnames";
 
 const variantClass: Record<HeadingVariant, string> = {
-  "Extra-Large": styles.extraLarge,
-  Large:         styles.large,
-  Medium:        styles.medium,
-  Small:         styles.small,
-  "Extra-Small": styles.extraSmall,
+  "Extra-Large": styles["Extra-Large"], // Usa styles["clase-con-guiones"]
+  "Large": styles["Large"],
+  "Medium": styles["Medium"],
+  "Small": styles["Small"],
+  "Extra-Small": styles["Extra-Small"],
 };
 
 /**

@@ -1,0 +1,17 @@
+@use "src/theme/colors.scss" as *;
+@use "src/theme/sizes.scss" as *;
+@use "src/theme/spacings.scss" as *;
+
+.Container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: $card-gap;
+  padding-block: $page-block-gap;
+  width: 100%;
+}
+
+.Separator {
+  padding-inline: calc($navbar-horizontal-padding) !important;
+}

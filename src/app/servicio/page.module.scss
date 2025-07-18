@@ -1,3 +1,4 @@
+@import "../../theme/index.scss";
 .cardWrapper {
   background-color: #ffffff;   
   display: flex;
@@ -5,8 +6,26 @@
   gap: 2rem;                     
 }
 
+.faqQuestions{
+  display: flex;
+  flex-direction: column;
+  padding: 0 6rem;
+  color: $quinary-text;;
+}
+
+.faqQuestionsTitle {
+  margin-bottom: 2rem;
+  padding: 0 8rem;
+}
+
 @media (max-width: 720px) {
   .cardWrapper {
     gap: 0;
+  }
+  .faqQuestions {
+    padding: 0 0rem;
+  }
+  .faqQuestionsTitle {
+    padding: 0 1rem;
   }
 }

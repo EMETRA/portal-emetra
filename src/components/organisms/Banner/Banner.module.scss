@@ -1,0 +1,52 @@
+.banner {
+    position: relative;
+    width: 100%;
+    overflow: hidden;
+}
+
+.arrow {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background: transparent;
+    border: none;
+    padding: 0.5rem;
+    cursor: pointer;
+    z-index: 10;
+
+    svg {
+        width: 1.5rem;
+        height: 1.5rem;
+    }
+}
+
+/* Flechas */
+.prev {
+    left: 1rem;
+}
+.next {
+    right: 1rem;
+}
+
+.indicators {
+    position: absolute;
+    bottom: 1rem;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 0.5rem;
+    z-index: 10;
+}
+
+.dot {
+    width: 0.75rem;
+    height: 0.75rem;
+    border-radius: 50%;
+    background-color: rgba(255, 255, 255, 0.5);
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+
+    &.active {
+        background-color: rgba(255, 255, 255, 1);
+    }
+}

@@ -1,7 +1,5 @@
-"use client";
-
 import React from "react";
-import { IconProps } from "./types";
+import { IconMap, IconProps } from "./types";
 import styles from "./Icon.module.scss";
 import classNames from "classnames";
 
@@ -13,21 +11,15 @@ import classNames from "classnames";
  * @param {IconProps} props - Las propiedades adicionales para el ícono.
  * @returns {JSX.Element} - El componente de ícono renderizado.
  */
-const Icon: React.FC<IconProps> = ({
-  className,
-  name,
-  width = 50,
-  height = 50,
-  ...props
-}) => {
+const Icon: React.FC<IconProps> = ({ className, name, ...props }) => {
+  const SVGIcon = IconMap[name];
+  console.log("SVGIcon", SVGIcon);
   return (
-    <img
-      src={`/icons/${name}.svg`}
-      alt={`${name} icon`}
+    <SVGIcon
       className={classNames(className ? className : styles.icon)}
-      width={width}
-      height={height}
-      {...(props as any)}
+      width={50}
+      height={50}
+      {...props}
     />
   );
 };

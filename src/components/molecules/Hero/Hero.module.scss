@@ -1,4 +1,4 @@
-@import '../../../theme/index.scss';
+@use '../../../theme/index.scss' as *;
 
 .heroContainer {
     position: relative;
@@ -45,6 +45,13 @@
     gap: 8rem;
 }
 
+.overlayImage {
+    margin-top: 1rem;
+    max-width: 46rem;
+    width: 100%;
+    height: auto;
+}
+
 @media (max-width: 640px) {
     .content {
         flex-direction: column-reverse;
@@ -54,7 +61,7 @@
     }
     .text {
         /* texto alineado a la izquierda */
-        text-align: left;
+        text-align: left !important;
         align-self: flex-start;
     }
 
@@ -62,5 +69,9 @@
         /* iconos a la derecha */
         align-self: flex-end;
         /* o alternativamente: margin-left: auto; */
+    }
+
+    .overlayImage {
+        max-width: 16rem;
     }
 }

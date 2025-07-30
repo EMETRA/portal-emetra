@@ -3,7 +3,7 @@
 export interface BannerSlide {
   backgroundImage: string;
   text: string;
-  icons?: [string, string];
+  overlayImage?: string;
 }
 
 /** Props de Banner */

@@ -44,6 +44,8 @@ import Upload from "@/assets/icons/Upload.svg";
 import Back from "@/assets/icons/Back.svg";
 import Camion from "@/assets/icons/Camion.svg";
 import TucTuc from "@/assets/icons/TucTuc.svg";
+import Left from "@/assets/icons/left.svg";
+import Right from "@/assets/icons/right.svg";
 
 /**
  * Definición de los nombres para los tipos de Íconos.
@@ -93,7 +95,9 @@ type IconType =
   | "Vehiculo"
   | "Upload"
   | "TucTuc"
-  | "Back";
+  | "Back"
+  | "left"
+  | "right";
 
 /**
  * Interface para las propiedades de los íconos.
@@ -152,6 +156,8 @@ const IconMap: Record<IconType, React.FC<React.SVGProps<SVGSVGElement>>> = {
   Upload: Upload,
   TucTuc: TucTuc,
   Back: Back,
+  left: Left,
+  right: Right
 };
 
 export type { IconProps, IconType };

@@ -5,6 +5,7 @@ import styles from "./Banner.module.scss";
 import { BannerProps } from './types'
 import{ Hero } from "@molecules/Hero";
 import { Text } from "@atoms/Text";
+import { Icon } from "../../server/atoms/Icon";
 
 export const Banner: React.FC<BannerProps> = ({ slides }) => {
     const [idx, setIdx] = useState(0)
@@ -14,8 +15,6 @@ export const Banner: React.FC<BannerProps> = ({ slides }) => {
 
     const slide = slides[idx]
 
-    const iconsTuple: [string, string] =
-        slide.icons ?? (['EMETRA', 'PMT'] as [string, string])
 
     return (
         <div className={styles.banner}>
@@ -24,19 +23,17 @@ export const Banner: React.FC<BannerProps> = ({ slides }) => {
                 className={classNames(styles.arrow, styles.prev)}
                 aria-label="Anterior"
             >
-                <Text variant={"Small"}>Anterior</Text>
+                <Icon name="Up" color="white" style={{ transform: 'rotate(-90deg)', transformOrigin: 'center' }}/>
             </button>
 
             <div className={styles.slides} style={{ transform: `translateX(-${idx * 100}%)` }}>
                 {slides.map((slide, i) => {
-                    // forzamos icons tuple igual que antes
-                    const icons = (slide.icons ?? ['EMETRA','PMT']) as [string,string]
                     return (
                         <div key={i} className={styles.slide}>
                         <Hero
                             backgroundImage={slide.backgroundImage}
                             text={slide.text}
-                            icons={icons}
+                            overlayImage={slide.overlayImage}
                         />
                         </div>
                     )
@@ -48,7 +45,7 @@ export const Banner: React.FC<BannerProps> = ({ slides }) => {
                 className={classNames(styles.arrow, styles.next)}
                 aria-label="Siguiente"
             >
-                <Text variant={"Small"}>Siguiente</Text>
+                <Icon name="Up" color="white" style={{ transform: 'rotate(90deg)', transformOrigin: 'center' }}/>
             </button>
 
         </div>

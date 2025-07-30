@@ -1,4 +1,4 @@
-@import '../../../theme/index.scss';
+@use '../../../theme/index.scss' as *;
 
 $large-text: 16px;
 $medium-text: 14px;

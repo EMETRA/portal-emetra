@@ -13,7 +13,7 @@ import { Text } from "@atoms/Text";
 export const Hero: React.FC<HeroProps> = ({
     backgroundImage,
     text,
-    icons = ["EMETRA", "PMT"],
+    overlayImage,
     className,
     ...rest
 }) => (
@@ -30,8 +30,7 @@ export const Hero: React.FC<HeroProps> = ({
             </Text>            
         
             <div className={styles.iconRow}>
-                <Text variant="Small">{icons[0]}</Text>
-                <Text variant="Small">{icons[1]}</Text>
+                <img src={overlayImage} alt="Logos" className={styles.overlayImage}/>
             </div>
         </div>
     </div>

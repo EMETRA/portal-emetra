@@ -4,6 +4,15 @@
     overflow: hidden;
 }
 
+.slides {
+    display: flex;
+    transition: transform 0.5s ease-in-out;
+}
+
+.slide {
+    flex: 0 0 100%; 
+}
+
 .arrow {
     position: absolute;
     top: 50%;
@@ -20,7 +29,6 @@
     }
 }
 
-/* Flechas */
 .prev {
     left: 1rem;
 }
@@ -48,5 +56,23 @@
 
     &.active {
         background-color: rgba(255, 255, 255, 1);
+    }
+}
+
+@media (max-width: 768px) {
+    .arrow {
+        display: none;
+    }
+
+    .slides {
+        overflow-x: auto;                    
+        -webkit-overflow-scrolling: touch;   
+        scroll-snap-type: x mandatory;       
+        transition: none;
+    }
+
+    .slide {
+        scroll-snap-align: start;            
+        flex: 0 0 100%;                      
     }
 }

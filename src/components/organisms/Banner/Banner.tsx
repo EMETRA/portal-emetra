@@ -27,11 +27,21 @@ export const Banner: React.FC<BannerProps> = ({ slides }) => {
                 <Text variant={"Small"}>Anterior</Text>
             </button>
 
-            <Hero
-                backgroundImage={slide.backgroundImage}
-                text={slide.text}
-                icons={iconsTuple}
-            />
+            <div className={styles.slides} style={{ transform: `translateX(-${idx * 100}%)` }}>
+                {slides.map((slide, i) => {
+                    // forzamos icons tuple igual que antes
+                    const icons = (slide.icons ?? ['EMETRA','PMT']) as [string,string]
+                    return (
+                        <div key={i} className={styles.slide}>
+                        <Hero
+                            backgroundImage={slide.backgroundImage}
+                            text={slide.text}
+                            icons={icons}
+                        />
+                        </div>
+                    )
+                })}
+            </div>
 
             <button
                 onClick={next}
@@ -41,19 +51,6 @@ export const Banner: React.FC<BannerProps> = ({ slides }) => {
                 <Text variant={"Small"}>Siguiente</Text>
             </button>
 
-            <div className={styles.indicators}>
-                {slides.map((_, i) => (
-                <span
-                    key={i}
-                    className={classNames(
-                    styles.dot,
-                    i === idx && styles.active
-                    )}
-                    onClick={() => setIdx(i)}
-                    aria-label={`Ir al slide ${i + 1}`}
-                />
-                ))}
-            </div>
         </div>
     )
 }

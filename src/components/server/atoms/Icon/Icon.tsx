@@ -13,7 +13,6 @@ import classNames from "classnames";
  */
 const Icon: React.FC<IconProps> = ({ className, name, ...props }) => {
   const SVGIcon = IconMap[name];
-  console.log("SVGIcon", SVGIcon);
   return (
     <SVGIcon
       className={classNames(className ? className : styles.icon)}

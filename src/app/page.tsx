@@ -5,7 +5,7 @@ import { NavBar } from "@/components/server/molecules/NavBar";
 export default function Home() {
   return (
     <div className={styles.page}>
-      <NavBar />
+      <NavBar />a
     </div>
   );
 }

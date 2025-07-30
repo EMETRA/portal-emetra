@@ -1,0 +1,92 @@
+@use "../../../../theme/index.scss" as *;
+@use "../../../../theme/colors.scss" as *;
+
+.Container {
+  display: flex;
+  flex-direction: row;
+  padding-block: 0.7rem;
+  background-color: $navbar-background;
+  position: relative;
+  padding-inline: 1.25rem;
+}
+
+.Button {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  column-gap: 10px;
+  background-color: $navbar-background;
+  color: $azul-1;
+}
+
+.ButtonsContainer {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  flex-grow: 1;
+  padding-inline: 2rem;
+}
+
+.ActiveButton {
+  background-color: $azul-1;
+  color: $navbar-background;
+}
+
+.ImageContainer {
+  height: 50px;
+  width: fit-content;
+  padding-inline: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.NavLink {
+  text-decoration: none;
+  color: inherit;
+}
+
+.Hamburger {
+  display: none;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0.5rem;
+}
+
+@media (max-width: 936px) {
+  .ButtonsContainer {
+    display: flex;
+    flex-direction: column;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    background: $navbar-background;
+    width: 100vw;
+    z-index: 10;
+    opacity: 0;
+    transform: translateY(-10px);
+    transition: opacity 0.3s ease, transform 0.3s ease, visibility 0.3s;
+    pointer-events: none;
+    visibility: hidden;
+  }
+  .MenuOpen {
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: auto;
+    visibility: visible;
+  }
+  .Hamburger {
+    display: block;
+    margin-left: auto;
+  }
+  .Button {
+    width: 100%;
+  }
+
+  .NavLink {
+    width: 100%;
+  }
+}

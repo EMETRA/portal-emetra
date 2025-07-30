@@ -1,0 +1,41 @@
+@use "../../../../theme/index.scss" as *;
+@use "../../../../theme/colors.scss" as *;
+
+// Estilos generales de botón
+.button {
+  font-family: inherit;
+  text-align: center;
+  font-weight: bold;
+  background-color: $azul-1;
+  color: $background;
+  border-radius: 8px;
+  box-sizing: border-box;
+  outline: none;
+  border: none;
+  padding: 12px 24px;
+  cursor: pointer;
+}
+
+// Variante Success
+.success {
+  background-color: $verde-oscuro-1;
+  color: $background;
+}
+
+// Variante Warning
+.warning {
+  background-color: $amarillo-1;
+  color: #5c3527;
+}
+
+// Variante Danger
+.danger {
+  background-color: $rojo-1;
+  color: $background;
+}
+
+// Estilos de botón deshabilitado
+.button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}

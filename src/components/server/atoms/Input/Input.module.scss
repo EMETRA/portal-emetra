@@ -1,0 +1,62 @@
+@use "src/theme/colors.scss" as *;
+@use "src/theme/sizes.scss" as *;
+@use "src/theme/spacings.scss" as *;
+
+.Input {
+  font-family: inherit;
+  box-sizing: border-box;
+  outline: none;
+  background: $input-background;
+  border: none;
+  border-radius: 8px;
+  padding-inline: calc($navbar-horizontal-padding * 1.2);
+  padding-block: calc($navbar-vertical-padding * 2);
+  font-weight: bold;
+  width: 100%;
+  color: $secondary-text;
+
+  &::placeholder {
+    color: $tertiary-text;
+  }
+
+  &[type="date"]::-webkit-calendar-picker-indicator {
+    display: none;
+  }
+  &[type="date"]::-webkit-inner-spin-button,
+  &[type="date"]::-webkit-clear-button {
+    display: none;
+  }
+
+  &[type="datetime-local"]::-webkit-calendar-picker-indicator {
+    display: none;
+  }
+  &[type="datetime-local"]::-webkit-inner-spin-button,
+  &[type="datetime-local"]::-webkit-clear-button {
+    display: none;
+  }
+
+  &[disabled] {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}
+
+.Container {
+  display: flex;
+  position: relative;
+  align-items: center;
+
+  .Input {
+    padding-inline-start: calc($navbar-horizontal-padding * 1.2);
+    padding-inline-end: calc($navbar-horizontal-padding * 2 + 30px);
+  }
+}
+
+.Icon {
+  position: absolute;
+  cursor: pointer;
+  right: calc($navbar-horizontal-padding * 1);
+  color: $secondary-text;
+  width: 30px;
+  height: 30px;
+}

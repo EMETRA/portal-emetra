@@ -3,6 +3,7 @@
 import React from 'react'
 import { Banner } from '@/components/organisms/Banner'
 import type { BannerSlide } from '@/components/organisms/Banner/types'
+import { SectionTitle } from '@/components/server/molecules/SectionTitle'
 
 const slides: BannerSlide[] = [
   {
@@ -21,6 +22,7 @@ export default function Home() {
   return (
     <div>
       <Banner slides={slides} />
+      <SectionTitle>Noticias destacadas</SectionTitle>
     </div>
   )
 }

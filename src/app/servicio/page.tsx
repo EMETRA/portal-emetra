@@ -1,7 +1,7 @@
 'use cliente'
 
 import React from 'react'
-import { Banner, ServicesRow } from '@/components/organisms/index'
+import { Banner, ServicesRow, NotificationsCard } from '@/components/organisms/index'
 import type { BannerSlide } from '@/components/organisms/Banner/types'
 import { SectionTitle } from '@/components/server/molecules/SectionTitle'
 
@@ -27,6 +27,9 @@ export default function Home() {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         <ServicesRow />
       </div>
+
+      <NotificationsCard />
+
     </div>
   )
 }

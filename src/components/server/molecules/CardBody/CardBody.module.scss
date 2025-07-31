@@ -1,0 +1,5 @@
+@use "src/theme/spacings.scss" as *;
+
+.cardBody {
+  margin-top: spacings(md); // separa del header/tabs
+}

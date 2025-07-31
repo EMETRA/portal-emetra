@@ -1,0 +1,24 @@
+// src/components/atoms/CardContainer/CardContainer.module.scss
+@use "src/theme/colors.scss"    as *;
+@use "src/theme/spacings.scss"  as *;
+
+.cardContainer {
+  background-color: $card-background;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+
+  /* padding interno */
+  padding-inline: $card-padding-inline; // 30px
+  padding-block:  $card-padding-block;  // 24px
+  display: flex;
+  flex-direction: column;
+  gap: $card-gap;                       // 16px
+
+  /* centrar el card en la pantalla y limitar su ancho */
+  width: 100%;
+  max-width: 800px;                     // o el valor que prefieras
+  margin: 0 auto;                       // centra horizontalmente
+
+  /* opcional: para que no quede muy pegado arriba */
+  margin-block: 24px;                   // espacio arriba y abajo
+}

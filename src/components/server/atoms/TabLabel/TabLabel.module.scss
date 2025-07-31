@@ -1,0 +1,24 @@
+@use "src/theme/colors.scss" as *;
+@use "src/theme/spacings.scss" as *;
+
+.tabLabel {
+    flex: 1;
+    text-align: center;
+
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    padding-block: $navbar-vertical-padding;
+    padding-inline: $navbar-horizontal-padding;
+    font-size: 1rem;
+    color: $secondary-text;
+
+    &:hover { color: $azul-6; }
+}
+
+.active {
+    background-color: $verde-claro-2;
+    border-radius: 0.4rem;
+    color: $navbar-background;
+    font-weight: 600;
+}

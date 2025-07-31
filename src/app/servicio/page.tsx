@@ -1,9 +1,10 @@
 'use cliente'
 
 import React from 'react'
-import { Banner } from '@/components/organisms/Banner'
+import { Banner, ServicesRow } from '@/components/organisms/index'
 import type { BannerSlide } from '@/components/organisms/Banner/types'
 import { SectionTitle } from '@/components/server/molecules/SectionTitle'
+
 
 const slides: BannerSlide[] = [
   {
@@ -23,6 +24,9 @@ export default function Home() {
     <div>
       <Banner slides={slides} />
       <SectionTitle>Noticias destacadas</SectionTitle>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <ServicesRow />
+      </div>
     </div>
   )
 }

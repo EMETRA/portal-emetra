@@ -1,0 +1,35 @@
+
+.servicesRow {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 0 2rem;     
+  flex-wrap: nowrap;   
+
+  & > .serviceItem {
+    flex: 0 0 auto;
+    min-width: 6rem;   
+  }
+}
+
+@media (min-width: 640px) {
+  .servicesRow {
+    justify-content: center;     
+    overflow-x: visible;   
+    padding-left: 0rem;
+    padding-right: 0;
+  }
+}
+
+@media (max-width: 639px) {
+  .servicesRow {
+    justify-content: flex-start;
+    overflow-x: auto;      
+    padding: 0 1rem; 
+
+    -ms-overflow-style: none;  
+    scrollbar-width: none;     
+    scroll-snap-type: x mandatory;     
+  }
+
+}

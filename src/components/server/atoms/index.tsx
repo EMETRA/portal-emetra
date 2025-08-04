@@ -5,3 +5,4 @@ export * from "./Separator";
 export * from "./DividerVertical";
 export * from "./CardContainer";
 export * from "./TabLabel";
+export * from "./Input";

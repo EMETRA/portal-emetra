@@ -2,16 +2,16 @@
 @use "src/theme/spacings.scss" as *;
 
 .tabLabel {
-    flex: 1;
+    flex: none;
     text-align: center;
 
     background: transparent;
     border: none;
     cursor: pointer;
-    padding-block: $navbar-vertical-padding;
-    padding-inline: $navbar-horizontal-padding;
+    padding: 1.2rem 6rem;
     font-size: 1rem;
     color: $secondary-text;
+    margin-bottom: 0.5rem;;
 
     &:hover { color: $azul-6; }
 }
@@ -21,4 +21,15 @@
     border-radius: 0.4rem;
     color: $navbar-background;
     font-weight: 600;
+}
+
+/* MOBILE */
+@media (max-width: 640px) {
+  .tabLabel {
+    flex: 1;                       /* cada tab ocupa mismo espacio */
+    margin-inline: 0.25rem;        /* 4px entre ellas */
+    padding-block: 0.5rem;         /* 8px arriba/abajo */
+    padding-inline: 0.75rem;       /* 12px izq/der */
+    font-size: 0.9rem;
+  }
 }

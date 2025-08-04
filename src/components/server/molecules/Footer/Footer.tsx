@@ -23,7 +23,7 @@ const Footer: React.FC = () => {
           <Button className={classNames(styles.Button)}>Enviar</Button>
         </div>
       </form>
-      <div>
+      <div className={classNames(styles.Below)}>
         <div className={classNames(styles.Links)}>
           <Link href="/" className={classNames(styles.Link)}>
             Antecedentes
@@ -38,15 +38,15 @@ const Footer: React.FC = () => {
             Formulario
           </Link>
         </div>
-        <div className={classNames(styles.Links)}>
+        <div className={classNames(styles.Links, styles.Social)}>
           <Link href="/" className={classNames(styles.Link)}>
-            Facebook
+            <Icon name="Facebook" />
           </Link>
           <Link href="/" className={classNames(styles.Link)}>
-            X
+            <Icon name="Twitter" />
           </Link>
           <Link href="/" className={classNames(styles.Link)}>
-            Instagram
+            <Icon name="Instagram" />
           </Link>
         </div>
       </div>

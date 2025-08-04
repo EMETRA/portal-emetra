@@ -2,8 +2,8 @@
 
 import React, { useState } from "react";
 import {CardContainer}        from "../../server/atoms/index";
-import {Tabs, CardBody, UnsubscribeForm}        from "../../server/molecules/index";
-import {SubscribeForm} from "../../molecules/index";
+import {Tabs, CardBody }        from "../../server/molecules/index";
+import {SubscribeForm, UnsubscribeForm} from "../../molecules/index";
 const NotificationsCard: React.FC = () => {
   const [activeTab, setActiveTab] = useState<"subscribe" | "unsubscribe">("subscribe");
 

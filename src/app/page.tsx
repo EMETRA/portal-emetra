@@ -6,8 +6,6 @@ import { Footer } from "@/components/server/molecules/Footer";
 export default function Home() {
   return (
     <div className={styles.page}>
-      <NavBar />
-      <Footer />
     </div>
   );
 }

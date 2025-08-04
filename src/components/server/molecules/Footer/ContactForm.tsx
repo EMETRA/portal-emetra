@@ -1,6 +1,7 @@
 "use client";
 
-import { useFormState, useFormStatus } from "react-dom";
+import { useActionState } from "react";
+import { useFormStatus } from "react-dom";
 import { Button } from "../../atoms";
 import { Input } from "../../atoms/Input";
 import classNames from "classnames";
@@ -23,7 +24,7 @@ function SubmitButton() {
 
 const ContactForm: React.FC = () => {
   const initialState: FormState = {};
-  const [state, dispatch] = useFormState(submitContactForm, initialState);
+  const [state, dispatch] = useActionState(submitContactForm, initialState);
 
   return (
     <form className={classNames(styles.Form)} action={dispatch}>

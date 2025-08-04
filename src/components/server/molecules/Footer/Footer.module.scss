@@ -40,7 +40,7 @@
 .FormInput {
   display: flex;
   flex-direction: row;
-  align-items: center;
+  align-items: flex-start;
   justify-content: center;
   row-gap: 0.5rem;
   column-gap: 15px;
@@ -57,10 +57,61 @@
     min-width: 100%;
     max-width: 100%;
   }
+  
+  .FormInput {
+    width: 100%;
+  }
 }
 
 .Button {
   background-color: #0c0f22 !important;
+}
+
+.Message {
+  padding: 0.5rem;
+  border-radius: 4px;
+  margin-top: 0.5rem;
+  font-size: 0.875rem;
+  width: 100%;
+}
+
+.Success {
+  background-color: #d4edda;
+  color: #155724;
+  border: 1px solid #c3e6cb;
+}
+
+.Error {
+  background-color: #f8d7da;
+  color: #721c24;
+  border: 1px solid #f5c6cb;
+}
+
+.FieldError {
+  color: #721c24;
+  font-size: 0.875rem;
+  margin-top: 0.25rem;
+  width: 260px;
+  min-width: 260px;
+  max-width: 260px;
+  text-align: center;
+  
+  p {
+    margin: 0;
+  }
+}
+
+@media screen and (max-width: 768px) {
+  .FieldError {
+    min-width: 100%;
+    max-width: 100%;
+    width: 100%;
+  }
+}
+
+.InputError {
+  border-color: #dc3545 !important;
+  text-align: center;
 }
 
 .Links {
@@ -80,4 +131,9 @@
   justify-content: center;
   row-gap: 0.5rem;
   padding-block-start: 1rem;
+}
+
+.Field {
+  display: flex;
+  flex-direction: column;
 }

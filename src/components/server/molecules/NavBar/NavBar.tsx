@@ -15,8 +15,10 @@ const navItems: { name: string; icon: IconType; href: string }[] = [
   { name: "FAQ", icon: "Info", href: "/ayuda" },
 ];
 
+const normalize = (path: string) => path.replace(/\/$/, "");
+
 const NavBar: React.FC = () => {
-  const currentPath = usePathname();
+  const currentPath = usePathname() || "";
   const [menuOpen, setMenuOpen] = useState(false);
 
   return (
@@ -35,7 +37,6 @@ const NavBar: React.FC = () => {
         onClick={() => setMenuOpen((open) => !open)}
         aria-label="Abrir menú"
       >
-        {/* Usa tu icono de hamburguesa aquí */}
         <Icon name="Menu" />
       </button>
       <div
@@ -44,19 +45,24 @@ const NavBar: React.FC = () => {
           menuOpen && styles.MenuOpen
         )}
       >
-        {navItems.map((item) => (
-          <Link href={item.href} key={item.name} className={styles.NavLink}>
-            <Button
-              className={classNames(
-                styles.Button,
-                currentPath === item.href && styles.ActiveButton
-              )}
-            >
-              <Icon name={item.icon} />
-              {item.name}
-            </Button>
-          </Link>
-        ))}
+        {navItems.map((item) => {
+          const isActive =
+            currentPath && normalize(currentPath) === normalize(item.href);
+          console.log("item:", item.href, "isActive:", isActive);
+          return (
+            <Link href={item.href} key={item.name} className={styles.NavLink}>
+              <Button
+                className={classNames(
+                  styles.Button,
+                  isActive && styles.ActiveButton
+                )}
+              >
+                <Icon name={item.icon} />
+                {item.name}
+              </Button>
+            </Link>
+          );
+        })}
       </div>
     </div>
   );

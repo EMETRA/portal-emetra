@@ -2,6 +2,7 @@
 import React, { useCallback, useEffect, useState } from "react";
 import useEmblaCarousel from "embla-carousel-react";
 import styles from "./MultimediaCarrousel.module.scss";
+import { Icon } from "../../atoms";
 
 interface MultimediaCarrouselProps {
   children: React.ReactNode;
@@ -46,7 +47,7 @@ const MultimediaCarrousel: React.FC<MultimediaCarrouselProps> = ({
         disabled={!canScrollPrev}
         aria-label="Anterior"
       >
-        &#8592;
+        <Icon name="Down" />
       </button>
       <div className={styles.embla__viewport} ref={emblaRef}>
         <div className={styles.embla__container}>
@@ -61,7 +62,7 @@ const MultimediaCarrousel: React.FC<MultimediaCarrouselProps> = ({
         disabled={!canScrollNext}
         aria-label="Siguiente"
       >
-        &#8594;
+        <Icon name="Down" />
       </button>
     </div>
   );

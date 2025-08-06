@@ -15,13 +15,15 @@
 .embla__container {
   display: flex;
   gap: 2rem;
-  justify-content: center;
+  min-width: 0;
+  justify-content: flex-start;
 }
 
 .embla__slide {
   flex: 0 0 50%;
   display: flex;
   justify-content: center;
+  min-width: 0;
 }
 
 .embla__arrow {

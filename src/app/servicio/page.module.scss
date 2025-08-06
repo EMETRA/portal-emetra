@@ -1,8 +1,10 @@
+@use "src/theme/colors.scss" as *;
+
 .faqQuestions{
   display: flex;
   flex-direction: column;
   padding: 0 6rem;
-  color: $quinary-text;;
+  color: $quintary-text;
 }
 
 .faqQuestionsTitle {

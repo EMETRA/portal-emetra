@@ -3,7 +3,7 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import styles from "./Dropdown.module.scss";
 import classNames from "classnames";
-import { Heading, Icon } from "@atoms/index";
+import { Heading, Icon } from "../../server/atoms/index";
 import { DropdownProps } from "./types";
 
 /**
@@ -91,7 +91,14 @@ const Dropdown: React.FC<DropdownProps> = ({
         <Heading className={classNames(styles.Label)} variant="Extra-Small">
           {question}
         </Heading>
-        
+        <Icon
+          name="Down"
+          className={classNames(styles.DownIcon, {
+            [styles.Open]: isOpen,
+            [styles.Close]: !isOpen,
+          })}
+          color={"#4361EE"}
+        />
       </div>
       <div
         ref={contentRef}

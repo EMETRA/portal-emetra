@@ -1,4 +1,5 @@
-'use cliente'
+'use client'
+
 import styles from "./UnsubscribeForm.module.scss";
 import React, { useState } from "react";
 import {Input, Button}      from "../../server/atoms/index";

@@ -28,6 +28,12 @@
   min-width: 0;
 }
 
+@media (max-width: 1016px) {
+  .embla__slide {
+    flex: 0 0 100%;
+  }
+}
+
 .embla__arrow {
   width: 2.5rem;
   height: 2.5rem;

@@ -2,7 +2,6 @@ import Image from "next/image";
 import classNames from "classnames";
 import styles from "./Page.module.scss";
 import { Icon } from "@/components/server/atoms";
-import Video from "@/components/server/atoms/Video/Video";
 import MultimediaCard from "@/components/server/molecules/MultimediaCard/MultimediaCard";
 import MultimediaCarrousel from "@/components/server/organisms/MultimediaCarrousel/MultimediaCarrousel";
 
@@ -17,6 +16,49 @@ interface PageProps {
 
 export default async function NewPage({ params }: PageProps) {
   const { id } = await params;
+
+  const secciones = [
+    {
+      titulo: "Introducción",
+      subtitulos: [
+        {
+          subtitulo: "Resumen del evento",
+          contenido:
+            "Esta sección describe brevemente el evento y su importancia para la comunidad.",
+        },
+        {
+          subtitulo: "Contexto",
+          contenido:
+            "Aquí se explica el contexto general en el que ocurre el evento.",
+        },
+      ],
+    },
+    {
+      titulo: "Desarrollo",
+      subtitulos: [
+        {
+          subtitulo: "Detalles y participantes",
+          contenido:
+            "Se detallan los puntos principales tratados y los participantes destacados.",
+        },
+        {
+          subtitulo: "Momentos clave",
+          contenido:
+            "Descripción de los momentos más importantes del desarrollo.",
+        },
+      ],
+    },
+    {
+      titulo: "Conclusión",
+      subtitulos: [
+        {
+          subtitulo: "Resultados y próximos pasos",
+          contenido:
+            "Se resumen los resultados y se mencionan las acciones a seguir.",
+        },
+      ],
+    },
+  ];
 
   const recursos = [
     "Documento oficial del evento",
@@ -53,27 +95,43 @@ export default async function NewPage({ params }: PageProps) {
               </div>
             </div>
             <p>
-              Lorem ipsum dolor sit amet consectetur adipisicing elit.
-              Necessitatibus atque deleniti natus et eum exercitationem
-              dignissimos quos vero, ducimus optio consectetur nihil illum
-              perferendis facilis suscipit fuga error numquam deserunt. Eius
-              dolor voluptatem maiores officia non pariatur dicta deserunt in
-              blanditiis minus modi eos cumque minima molestiae, odio, unde quis
-              exercitationem? Quae culpa deserunt distinctio ut a reiciendis
-              quod iste! Dolor architecto animi perspiciatis maiores saepe porro
-              ullam, voluptatem officia tenetur quos odio quod est adipisci
-              tempore suscipit laborum, quae libero. Dolores nobis voluptatibus
-              architecto rem iure incidunt. Consectetur, placeat? Tenetur
-              numquam exercitationem nesciunt dicta rem illum eaque a, ipsam est
-              amet sunt, dignissimos aliquid. Distinctio quos dolorum error
-              praesentium, tempore optio, nihil aperiam voluptate impedit hic,
-              itaque reiciendis asperiores! Hic ad repudiandae minima impedit
-              modi suscipit quibusdam pariatur reiciendis reprehenderit
-              consequuntur aspernatur cum vitae possimus illo voluptas beatae,
-              magnam accusantium maxime fugit earum totam natus odio fuga.
-              Soluta, necessitatibus.
+              Lorem ipsum dolor sit amet consectetur adipisicing elit. Delectus
+              illum similique pariatur omnis inventore, dolor quidem unde nisi
+              aliquam officiis ipsum voluptatem totam, sint animi maxime nulla
+              aspernatur architecto. Perspiciatis. Dolorem, deleniti! Laudantium
+              nam autem recusandae porro rerum repellendus, debitis facilis
+              cumque eos, deleniti reiciendis atque iste hic eum in esse veniam
+              deserunt? Sequi consequatur id, accusantium saepe enim asperiores?
+              Sequi, expedita cupiditate mollitia, quaerat culpa obcaecati
+              quisquam, dolorum temporibus illo quae nisi error accusamus
+              voluptas! Nam obcaecati dicta, natus aspernatur ratione placeat
+              itaque iste quidem? Animi dicta earum repellendus? Quas esse
+              maxime, incidunt consequuntur, quis neque magnam consequatur est
+              ipsam fugiat ducimus quaerat praesentium, quam vitae nemo dolor
+              corrupti accusantium tenetur sint voluptates? Est odit maxime
+              doloribus quis repellendus.
             </p>
           </div>
+        </div>
+
+        <div className={classNames(styles.sections)}>
+          {secciones.map((seccion, idx) => (
+            <section key={idx} className={classNames(styles.section)}>
+              <h2 className={classNames(styles.sectionTitle)}>
+                {seccion.titulo}
+              </h2>
+              {seccion.subtitulos.map((sub, subIdx) => (
+                <div key={subIdx} className={classNames(styles.subsection)}>
+                  <h3 className={classNames(styles.sectionSubtitle)}>
+                    {sub.subtitulo}
+                  </h3>
+                  <p className={classNames(styles.sectionContent)}>
+                    {sub.contenido}
+                  </p>
+                </div>
+              ))}
+            </section>
+          ))}
         </div>
 
         <div className={classNames(styles.resourcesSection)}>

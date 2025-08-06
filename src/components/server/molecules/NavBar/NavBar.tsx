@@ -48,7 +48,6 @@ const NavBar: React.FC = () => {
         {navItems.map((item) => {
           const isActive =
             currentPath && normalize(currentPath) === normalize(item.href);
-          console.log("item:", item.href, "isActive:", isActive);
           return (
             <Link href={item.href} key={item.name} className={styles.NavLink}>
               <Button

@@ -3,6 +3,7 @@ import React, { useCallback, useEffect, useState } from "react";
 import useEmblaCarousel from "embla-carousel-react";
 import styles from "./MultimediaCarrousel.module.scss";
 import { Icon } from "../../atoms";
+import classNames from "classnames";
 
 interface MultimediaCarrouselProps {
   children: React.ReactNode;
@@ -40,29 +41,29 @@ const MultimediaCarrousel: React.FC<MultimediaCarrouselProps> = ({
   );
 
   return (
-    <div className={styles.embla}>
+    <div className={classNames(styles.embla)}>
       <button
-        className={styles.embla__arrow}
+        className={classNames(styles.embla__arrow, styles.left)}
         onClick={scrollPrev}
         disabled={!canScrollPrev}
         aria-label="Anterior"
       >
-        <Icon name="Down" />
+        <Icon name="Down" className={classNames(styles.Icon)} />
       </button>
-      <div className={styles.embla__viewport} ref={emblaRef}>
-        <div className={styles.embla__container}>
+      <div className={classNames(styles.embla__viewport)} ref={emblaRef}>
+        <div className={classNames(styles.embla__container)}>
           {React.Children.map(children, (child) => (
-            <div className={styles.embla__slide}>{child}</div>
+            <div className={classNames(styles.embla__slide)}>{child}</div>
           ))}
         </div>
       </div>
       <button
-        className={styles.embla__arrow}
+        className={classNames(styles.embla__arrow, styles.right)}
         onClick={scrollNext}
         disabled={!canScrollNext}
         aria-label="Siguiente"
       >
-        <Icon name="Down" />
+        <Icon name="Down" className={classNames(styles.Icon)} />
       </button>
     </div>
   );

@@ -3,7 +3,7 @@
 import React, {useState} from "react"
 import {CardContainer} from "../../server/atoms/index"
 import {Tabs, CardBody} from "../../server/molecules/index"
-import {SolvenciaForm, UnsubscribeForm} from "../../molecules/index";
+import {SolvenciaForm, ReciboForm} from "../../molecules/index";
 
 
 const SolvenciaCard: React.FC = () => {
@@ -20,7 +20,7 @@ const SolvenciaCard: React.FC = () => {
             <CardBody>
                 {activeTab === "solvencia"
                     ? <SolvenciaForm />
-                    : <div>Contenido para imprimir recibo de pago</div>}
+                    : <ReciboForm />}
             </CardBody>
         </CardContainer>
     )

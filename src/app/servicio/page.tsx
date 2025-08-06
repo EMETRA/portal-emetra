@@ -4,7 +4,10 @@ import React from 'react'
 import { Banner, ServicesRow, NotificationsCard } from '@/components/organisms/index'
 import type { BannerSlide } from '@/components/organisms/Banner/types'
 import { SectionTitle } from '@/components/server/molecules/SectionTitle'
-
+import type { FAQ } from "@/schema/faq";
+import { FAQ_Type } from "@/schema/faq";
+import FAQQuestions from '@/components/organisms/FAQ-Questions/FAQQuestions'
+import styles from './page.module.scss'
 
 const slides: BannerSlide[] = [
   {
@@ -18,7 +21,43 @@ const slides: BannerSlide[] = [
     overlayImage: "/images/Logos.png",
   },
 ]
-
+const loremQuestions: FAQ[] = [
+    {
+      id: 1,
+      tipo: FAQ_Type.PILOTOS,
+      enLanding: false,
+      pregunta: "Lorem ipsum dolor sit amet?",
+      respuesta: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam euismod, nisl eget aliquam ultricies, nunc nisl aliquet nunc, quis aliquam nisl nunc eu nisl."
+    },
+    {
+      id: 2,
+      tipo: FAQ_Type.PILOTOS,
+      enLanding: false,
+      pregunta: "Vestibulum auctor dapibus neque?",
+      respuesta: "Vestibulum auctor dapibus neque. Aenean euismod bibendum laoreet. Proin gravida dolor sit amet lacus accumsan et viverra justo commodo."
+    },
+    {
+      id: 3,
+      tipo: FAQ_Type.PILOTOS,
+      enLanding: false,
+      pregunta: "Cras mattis consectetur purus sit amet fermentum?",
+      respuesta: "Cras mattis consectetur purus sit amet fermentum. Donec sed odio dui. Nullam quis risus eget urna mollis ornare vel eu leo."
+    },
+    {
+      id: 4,
+      tipo: FAQ_Type.PILOTOS,
+      enLanding: false,
+      pregunta: "Maecenas sed diam eget risus varius blandit?",
+      respuesta: "Maecenas sed diam eget risus varius blandit sit amet non magna. Aenean lacinia bibendum nulla sed consectetur."
+    },
+    {
+      id: 5,
+      tipo: FAQ_Type.PILOTOS,
+      enLanding: false,
+      pregunta: "Donec ullamcorper nulla non metus auctor fringilla?",
+      respuesta: "Donec ullamcorper nulla non metus auctor fringilla. Nullam id dolor id nibh ultricies vehicula ut id elit. Etiam porta sem malesuada magna mollis euismod."
+    }
+  ];
 export default function Home() {
   return (
     <div>
@@ -28,8 +67,11 @@ export default function Home() {
         <ServicesRow />
       </div>
 
-      <NotificationsCard />
-
+      {/* <NotificationsCard /> */}
+      <FAQQuestions
+            questions={loremQuestions}
+            variant="No-Landing"
+            className={styles.faqQuestions} />
     </div>
   )
 }

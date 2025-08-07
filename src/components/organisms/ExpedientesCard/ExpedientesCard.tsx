@@ -3,7 +3,7 @@
 import React, {useState} from 'react'
 import {CardContainer} from '../../server/atoms/index'
 import {Tabs, CardBody} from '../../server/molecules/index'
-import {RegistroForm, ReciboForm} from '../../molecules/index'
+import {RegistroForm, ConsultaForm} from '../../molecules/index'
 
 const ExpedientesCard: React.FC = () => {
     const [activeTab, setActiveTab] = useState<"registrar" | "consultar">("registrar");
@@ -19,7 +19,7 @@ const ExpedientesCard: React.FC = () => {
             <CardBody>
                 {activeTab === "registrar"
                     ? <RegistroForm />
-                    : <div>Contenido para consultar expediente</div>}
+                    : <ConsultaForm/>}
             </CardBody>
         </CardContainer>
     )

@@ -5,5 +5,6 @@ export * from "./Dropdown"
 export * from "./SolvenciaForm";
 export * from "./ReciboForm";
 export * from "./RegistroForm";
+export * from "./ConsultaForm";
 export * from "./DataTable";
 export * from "./DataTable/types";

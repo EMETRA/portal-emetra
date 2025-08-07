@@ -6,3 +6,4 @@ export * from "./DividerVertical";
 export * from "./CardContainer";
 export * from "./TabLabel";
 export * from "./Input";
+export * from "./StatusBadge";

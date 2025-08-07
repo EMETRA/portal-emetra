@@ -1,7 +1,7 @@
 'use cliente'
 
 import React from 'react'
-import { Banner, ServicesRow, NotificationsCard, SolvenciaCard } from '@/components/organisms/index'
+import { Banner, ServicesRow, NotificationsCard, SolvenciaCard, ExpedientesCard } from '@/components/organisms/index'
 import type { BannerSlide } from '@/components/organisms/Banner/types'
 import { SectionTitle } from '@/components/server/molecules/SectionTitle'
 import type { FAQ } from "@/schema/faq";
@@ -68,7 +68,7 @@ export default function Home() {
       </div>
 
       {/* <NotificationsCard /> */}
-      <SolvenciaCard />
+      <ExpedientesCard />
       {/* <FAQQuestions
             questions={loremQuestions}
             variant="No-Landing"

@@ -32,7 +32,7 @@ const SolvenciaForm: React.FC = () => {
                         </div>
                         <div className={styles.formControl}>
                             <Text variant="Small" className={styles.TextStyle}>Ingrese Placa</Text>
-                            <Input id="numeroPlaca" type="text" name="numeroPlaca" placeholder="########"/>
+                            <Input id="tipPlaca" type="text" name="tipoPlaca" placeholder="########"/>
                         </div>
                     </div>
                 </div>

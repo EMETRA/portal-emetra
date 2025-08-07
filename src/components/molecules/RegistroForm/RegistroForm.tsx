@@ -1,14 +1,21 @@
 'use client'
 
-import React, {useState} from 'react'
-import {CardContainer} from '../../server/atoms/index'
+import React, {useState, useMemo} from 'react'
 import {Input, Button, Icon} from '../../server/atoms/index'
 import Select from '../../atoms/Select/Select'
 import styles from './RegistroForm.module.scss'
-import { Text } from '@/components/atoms'
+import { Text, Checkbox } from '@/components/atoms'
 import Heading from '../../server/atoms/Heading/Heading'
+import { DataTable, Column } from '@molecules/index'
 
-
+interface RemisionRow {
+    id: string
+    remision: string
+    estatus: string
+    numeroResolucion: string
+    boletaReformada: string
+    observaciones: string
+}
 
 const RegistroForm: React.FC = () => {
     const [juzgado, setJuzgado] = useState("");
@@ -18,19 +25,51 @@ const RegistroForm: React.FC = () => {
     const [tipoPlaca, setTipoPlaca] = useState("");
     const [numeroPlaca, setNumeroPlaca] = useState("");
 
-    const [placas, setPlacas] = useState<
-        Array<{ id: string; tipo: string; numero: string }>
-    >([])
+    const [misRemisiones] = useState<RemisionRow[]>([
+        {
+        id: '1',
+        remision: '225515151',
+        estatus: 'PENDIENTE',
+        numeroResolucion: '10555555',
+        boletaReformada: 'E-10507277',
+        observaciones: 'Deberá cancelar su totalidad en 5 días'
+        },
+        {
+        id: '2',
+        remision: '225515152',
+        estatus: 'FINALIZADO',
+        numeroResolucion: '10555556',
+        boletaReformada: 'E-10507278',
+        observaciones: 'Sin observaciones'
+        }
+    ])
 
-    const handleAgregarPlaca = () => {
-        if (!tipoPlaca || !numeroPlaca) return
-        setPlacas([
-        ...placas,
-        { id: Date.now().toString(), tipo: tipoPlaca, numero: numeroPlaca },
-        ])
-        setTipoPlaca('')
-        setNumeroPlaca('')
+    const [selectedRemisiones, setSelectedRemisiones] = useState<string[]>([])
+    const toggleSelectRemision = (row: RemisionRow) => {
+        setSelectedRemisiones(prev =>
+        prev.includes(row.id)
+            ? prev.filter(id => id !== row.id)
+            : [...prev, row.id]
+        )
     }
+
+    const remisionesColumns = useMemo<Column<RemisionRow>[]>(() => [
+        {
+        key: 'impugnar',
+        label: 'Impugnar',
+        render: row => (
+            <Checkbox
+            checked={selectedRemisiones.includes(row.id)}
+            onChange={() => toggleSelectRemision(row)}
+            />
+        )
+        },
+        { key: 'remision', label: 'Remisión' },
+        { key: 'estatus', label: 'Estatus' },
+        { key: 'numeroResolucion', label: 'Número de resolución' },
+        { key: 'boletaReformada', label: 'Boleta reformada' },
+        { key: 'observaciones', label: 'Observaciones' }
+    ], [selectedRemisiones])
 
     return (
         <form className={styles.formBody}>
@@ -154,6 +193,21 @@ const RegistroForm: React.FC = () => {
                                 <Text variant="Small" className={styles.TextStyle}>Ingrese Placa</Text>
                                 <Input id="tipPlaca" type="text" name="tipoPlaca" placeholder="########"/>
                             </div>
+                        </div>
+                        
+                        {/* Tabla de remisiones */}
+                        <div className={styles.section}>
+                            <Text variant='Medium' className={styles.placaText}>Agregar placa</Text>
+                            <div className={styles.tableContainer}>
+                                <DataTable<RemisionRow>
+                                    columns={remisionesColumns}
+                                    data={misRemisiones}
+                                />
+                            </div>                            
+                        </div>
+                        {/* Botón */}
+                        <div className={`${styles.row} ${styles.actions}`}>
+                            <Button onClick={() => setAddingPlate(true)}>Registrar</Button>
                         </div>
                     </div>                
                 </>)}

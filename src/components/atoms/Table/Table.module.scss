@@ -1,0 +1,71 @@
+.table {
+    width: 100%;
+    /* separa celdas para poder redondear esquinas */
+    border-collapse: separate;
+    border-spacing: 0;
+    /* borde general de la tabla */
+    border: 1px solid #ccc;
+    border-radius: 0.5rem;
+    overflow: hidden; /* recorta esquinas redondeadas */
+    font-family: inherit;
+}
+
+.head {
+    background-color: #fff;
+}
+
+.row {
+    /* sin zebra, sólo hover sutil */
+    &:hover {
+        background-color: #f9f9f9;
+    }
+}
+
+.headerCell {
+    padding: 0.75rem 1rem;
+    font-weight: 600;
+    text-align: left;
+    /* línea bajo header */
+    border-bottom: 1px solid #ccc;
+
+    &:first-child {
+        /* redondea esquina superior izquierda */
+        border-top-left-radius: 0.5rem;
+        text-align: center;
+    }
+    &:last-child {
+        /* redondea esquina superior derecha */
+        border-top-right-radius: 0.5rem;
+    }
+}
+
+.cell {
+    padding: 0.75rem 1rem;
+    /* línea inferior ligera */
+    border-bottom: 1px solid #eee;
+
+    &:first-child {
+        text-align: center;
+    }
+}
+
+/* Quita la línea inferior en la última fila y redondea las dos esquinas inferiores */
+.row:last-child {
+    .cell {
+        border-bottom: none;
+
+        &:first-child {
+            border-bottom-left-radius: 0.5rem;
+        }
+        &:last-child {
+            border-bottom-right-radius: 0.5rem;
+        }
+    }
+}
+
+.checkbox {
+    margin: 0 auto;
+    display: block;
+    width: 1rem;
+    height: 1rem;
+}

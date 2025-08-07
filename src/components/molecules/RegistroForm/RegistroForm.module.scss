@@ -99,8 +99,19 @@
     margin-top: 1.5rem;
     flex: 1;
     text-align: center;
+    color: #00309e;
+}
+.placaText{
+    color: $azul-2;
+    font-weight: 700;
+    text-align: left;
 }
 
+.tableContainer {
+  max-height: 300px;    
+  overflow-y: auto;
+  overflow-x: auto;    
+}
 /* Mobile */
 @media (max-width: 640px) {
     .row {

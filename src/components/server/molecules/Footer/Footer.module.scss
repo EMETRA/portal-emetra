@@ -1,0 +1,139 @@
+.Links {
+  display: flex;
+  flex-direction: row;
+  column-gap: 15px;
+  color: white;
+}
+
+.Link {
+  text-decoration: none;
+  color: inherit;
+  font-weight: normal;
+}
+
+.Container {
+  background-color: #0c0f22;
+  padding-inline: 5rem;
+  padding-block: 3rem;
+}
+
+.Form {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-around;
+  align-items: center;
+  color: black;
+  background-color: white;
+  width: 100%;
+  padding-block: 1rem;
+  border-radius: 10px;
+  flex-wrap: wrap;
+  padding-inline: 2rem;
+  row-gap: 1rem;
+}
+
+.FormContent {
+  display: flex;
+  flex-direction: column;
+}
+
+.FormInput {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  justify-content: center;
+  row-gap: 0.5rem;
+  column-gap: 15px;
+  flex-wrap: wrap;
+}
+
+.Input {
+  min-width: 260px;
+  max-width: 260px;
+}
+
+@media screen and (max-width: 768px) {
+  .Input {
+    min-width: 100%;
+    max-width: 100%;
+  }
+  
+  .FormInput {
+    width: 100%;
+  }
+}
+
+.Button {
+  background-color: #0c0f22 !important;
+}
+
+.Message {
+  padding: 0.5rem;
+  border-radius: 4px;
+  margin-top: 0.5rem;
+  font-size: 0.875rem;
+  width: 100%;
+}
+
+.Success {
+  background-color: #d4edda;
+  color: #155724;
+  border: 1px solid #c3e6cb;
+}
+
+.Error {
+  background-color: #f8d7da;
+  color: #721c24;
+  border: 1px solid #f5c6cb;
+}
+
+.FieldError {
+  color: #721c24;
+  font-size: 0.875rem;
+  margin-top: 0.25rem;
+  width: 260px;
+  min-width: 260px;
+  max-width: 260px;
+  text-align: center;
+  
+  p {
+    margin: 0;
+  }
+}
+
+@media screen and (max-width: 768px) {
+  .FieldError {
+    min-width: 100%;
+    max-width: 100%;
+    width: 100%;
+  }
+}
+
+.InputError {
+  border-color: #dc3545 !important;
+  text-align: center;
+}
+
+.Links {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-block-start: 1rem;
+  flex-wrap: wrap;
+  row-gap: 0.5rem;
+  text-align: center;
+}
+
+.Below {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  row-gap: 0.5rem;
+  padding-block-start: 1rem;
+}
+
+.Field {
+  display: flex;
+  flex-direction: column;
+}

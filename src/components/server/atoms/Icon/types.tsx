@@ -1,3 +1,5 @@
+import React from "react";
+
 // Inclusión de archivos de íconos.
 import Approve from "@/assets/icons/Approve.svg";
 import Arrow from "@/assets/icons/Arrow.svg";
@@ -44,8 +46,9 @@ import Upload from "@/assets/icons/Upload.svg";
 import Back from "@/assets/icons/Back.svg";
 import Camion from "@/assets/icons/Camion.svg";
 import TucTuc from "@/assets/icons/TucTuc.svg";
-import Left from "@/assets/icons/left.svg";
-import Right from "@/assets/icons/right.svg";
+import Facebook from "@/assets/icons/Facebook.svg";
+import Twitter from "@/assets/icons/Twitter.svg";
+import Instagram from "@/assets/icons/Instagram.svg";
 
 /**
  * Definición de los nombres para los tipos de Íconos.
@@ -96,8 +99,10 @@ type IconType =
   | "Upload"
   | "TucTuc"
   | "Back"
-  | "left"
-  | "right";
+  | "Facebook"
+  | "Twitter"
+  | "Instagram"
+  ;
 
 /**
  * Interface para las propiedades de los íconos.
@@ -156,8 +161,9 @@ const IconMap: Record<IconType, React.FC<React.SVGProps<SVGSVGElement>>> = {
   Upload: Upload,
   TucTuc: TucTuc,
   Back: Back,
-  left: Left,
-  right: Right
+  Facebook: Facebook,
+  Twitter: Twitter,
+  Instagram: Instagram,
 };
 
 export type { IconProps, IconType };

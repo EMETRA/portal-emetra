@@ -16,8 +16,8 @@
   align-items: center;
   justify-content: center;
   column-gap: 10px;
-  background-color: $navbar-background;
-  color: $azul-1;
+  background-color: $navbar-background !important;
+  color: $azul-1 !important;
 }
 
 .ButtonsContainer {
@@ -30,8 +30,8 @@
 }
 
 .ActiveButton {
-  background-color: $azul-1;
-  color: $navbar-background;
+  background-color: $azul-1 !important;
+  color: $navbar-background !important;
 }
 
 .ImageContainer {

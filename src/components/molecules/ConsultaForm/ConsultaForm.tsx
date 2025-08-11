@@ -28,7 +28,7 @@ interface RemisionRow {
 }
 
 const ConsultaForm: React.FC = () => {
-    const [tipoPlaca, setTipoPlaca] = useState("");
+    const [juzgado, setJuzgado] = useState("");
     const [resultados, setResultados] = useState(false);
 
     // Datos de ejemplo para las tablas
@@ -97,23 +97,23 @@ const ConsultaForm: React.FC = () => {
             <div className={styles.section}>
                 <div className={styles.row}>
                     <div className={styles.formControl}>
-                        <Text variant="Small" className={styles.TextStyle}>Tipo Placa</Text>
-                            <Select
-                                id="tipoPlaca"
-                                name="tipoPlaca"
-                                options={[
-                                    { value: "P", label: "P" },
-                                    { value: "M", label: "M" },
-                                    { value: "C", label: "C" },
-                                ]}
-                                value={tipoPlaca}
-                                onChange={e => setTipoPlaca(e.target.value)}
-                            />
+                        <Text variant="Small" className={styles.TextStyle}>Número de expediente</Text>
+                        <Input id="tipExpediente" type="text" name="tipoExpediente" placeholder="No. Expediente"/>
                     </div>
                     <div className={styles.formControl}>
-                        <Text variant="Small" className={styles.TextStyle}>Ingrese Placa</Text>
-                        <Input id="tipPlaca" type="text" name="tipoPlaca" placeholder="########"/>
-                    </div>
+                        <Text variant="Small" className={styles.TextStyle}>Juzgado</Text>
+                            <Select
+                                id="juzgado"
+                                name="juzgado"
+                                options={[
+                                    { value: "1", label: "1" },
+                                    { value: "2", label: "2" },
+                                    { value: "3", label: "3" },
+                                ]}
+                                value={juzgado}
+                                onChange={e => setJuzgado(e.target.value)}
+                            />
+                    </div>                    
                 </div>
             </div>
 
@@ -123,12 +123,14 @@ const ConsultaForm: React.FC = () => {
             </div>
             {resultados && (
                 <div className={styles.section}>
+                    <Text variant="Small" className={styles.TextStyle}>Información del expediente</Text>
                     <div className={styles.tableContainer}>
                         <DataTable<ExpedienteRow>
                             columns={expedienteCols}
                             data={expedienteData}
                         />
                     </div>
+                    <Text variant="Small" className={styles.TextStyle}>Información de remisiones</Text>
                     <div className={styles.tableContainer}>
                         <DataTable<RemisionRow>
                             columns={remisionesCols}

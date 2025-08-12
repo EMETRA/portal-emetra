@@ -1,0 +1,39 @@
+@use "../../theme/index.scss" as *;
+@use "../../theme/colors.scss" as *;
+
+.Page {
+  color: $azul-1;
+  padding-inline: 2rem;
+  padding-block-end: 2rem;
+  row-gap: 1rem;
+  display: flex;
+  flex-direction: column;
+}
+
+.Header {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  column-gap: 1rem;
+}
+
+.LogosRow {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 24px;
+
+  @media screen and (max-width: 816px) {
+    align-items: center;
+    justify-content: center;
+  }
+}
+
+.LogoImg {
+  height: 75px;
+  width: auto;
+  display: block;
+}

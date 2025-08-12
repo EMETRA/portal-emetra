@@ -1,0 +1,112 @@
+@use "../../../../theme/colors.scss" as *;
+
+.CalendarWrapper {
+  width: 100%;
+  max-width: 100%;
+}
+
+.Calendar {
+  width: 100%;
+  max-width: 100%;
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px #0001;
+  padding: 16px;
+  /* El padding y fondo siempre visibles */
+}
+
+.Header {
+  text-align: center;
+  font-weight: bold;
+  margin-bottom: 8px;
+  text-transform: capitalize;
+  width: 100%;
+  background: transparent;
+  padding: 0;
+}
+
+.CalendarScroll {
+  overflow-x: auto;
+  width: 100%;
+}
+
+.CalendarInner {
+  min-width: 1085px; // 7 * 155px
+}
+
+.Weekdays {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(155px, 1fr));
+  column-gap: 16px;
+  row-gap: 8px;
+  margin-bottom: 4px;
+}
+
+.Weekday {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  color: #888;
+  font-weight: 500;
+  border-radius: 4px;
+}
+
+.Grid {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(155px, 1fr));
+  column-gap: 16px;
+  row-gap: 8px;
+  min-width: 0;
+}
+
+.Blank {
+  width: 100%;
+}
+
+.EventList {
+  margin: 4px 0 0 0;
+  padding: 0;
+  list-style: none;
+  font-size: 10px;
+  color: #0070f3;
+  text-align: left;
+  width: 100%;
+  overflow-y: auto;
+  max-height: 54px;
+}
+
+.EventListItem {
+  margin: 0 0 12px 0;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  width: 100%;
+  min-width: 0;
+}
+
+.EventListItem:last-child {
+  margin-bottom: 0;
+}
+
+.EventBullet {
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  background: $verde-claro-1;
+  border-radius: 50%;
+  margin-right: 4px;
+  flex-shrink: 0;
+}
+
+.EventTitle {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+  display: block;
+  min-width: 0;
+  text-transform: uppercase;
+}

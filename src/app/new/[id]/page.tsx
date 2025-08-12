@@ -5,6 +5,8 @@ import { Icon } from "@/components/server/atoms";
 import MultimediaCard from "@/components/server/molecules/MultimediaCard/MultimediaCard";
 import MultimediaCarrousel from "@/components/server/organisms/MultimediaCarrousel/MultimediaCarrousel";
 import Map from "@/components/client/atoms/Map";
+import { events } from "@/examples/event";
+import { addMonths, isAfter, isBefore, parse, startOfDay } from "date-fns";
 
 interface PageProps {
   params: Promise<{
@@ -14,6 +16,9 @@ interface PageProps {
     [key: string]: string | string[] | undefined;
   }>;
 }
+
+const today = startOfDay(new Date());
+const twoMonthsLater = addMonths(today, 2);
 
 export default async function NewPage({ params }: PageProps) {
   const { id } = await params;
@@ -175,7 +180,36 @@ export default async function NewPage({ params }: PageProps) {
           />
         </MultimediaCarrousel>
       </main>
-      <Map />
+      <Map
+        events={events.data
+          .filter((e) => {
+            if (!e.extendedProps || e.extendedProps.status !== "ACTIVO")
+              return false;
+            const eventDate = parse(e.start, "dd/MM/yyyy", new Date());
+            return (
+              (isAfter(eventDate, today) ||
+                eventDate.getTime() === today.getTime()) &&
+              isBefore(eventDate, twoMonthsLater)
+            );
+          })
+          .filter(
+            (e) =>
+              typeof e.extendedProps.latitud === "number" &&
+              typeof e.extendedProps.longitud === "number"
+          )
+          .map((e) => ({
+            id: String(e.id),
+            name: e.title,
+            lat: e.extendedProps.latitud,
+            lng: e.extendedProps.longitud,
+            start: e.start,
+            end: e.end,
+            horai: e.horai,
+            horaf: e.horaf,
+            aforo: e.estimado,
+            parqueosDisponibles: e.parqueosDisponibles,
+          }))}
+      />
     </div>
   );
 }

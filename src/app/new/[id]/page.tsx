@@ -4,6 +4,7 @@ import styles from "./Page.module.scss";
 import { Icon } from "@/components/server/atoms";
 import MultimediaCard from "@/components/server/molecules/MultimediaCard/MultimediaCard";
 import MultimediaCarrousel from "@/components/server/organisms/MultimediaCarrousel/MultimediaCarrousel";
+import Map from "@/components/client/atoms/Map";
 
 interface PageProps {
   params: Promise<{
@@ -174,6 +175,7 @@ export default async function NewPage({ params }: PageProps) {
           />
         </MultimediaCarrousel>
       </main>
+      <Map />
     </div>
   );
 }

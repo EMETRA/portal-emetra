@@ -12,10 +12,13 @@
   border-radius: 8px;
   box-shadow: 0 2px 8px #0001;
   padding: 16px;
-  /* El padding y fondo siempre visibles */
 }
 
 .Header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
   text-align: center;
   font-weight: bold;
   margin-bottom: 8px;
@@ -31,7 +34,7 @@
 }
 
 .CalendarInner {
-  min-width: 1085px; // 7 * 155px
+  min-width: 1085px;
 }
 
 .Weekdays {
@@ -109,4 +112,44 @@
   display: block;
   min-width: 0;
   text-transform: uppercase;
+}
+
+.NavButton {
+  background: none;
+  border: none;
+  font-size: 1.3em;
+  color: #0070f3;
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  transition: background 0.2s;
+}
+
+.NavButton:hover {
+  background: #e6f0fa;
+}
+
+.Left {
+  transform: rotate(90deg);
+  height: 35px;
+  width: 35px;
+}
+
+.Right {
+  transform: rotate(-90deg);
+  height: 35px;
+  width: 35px;
+}
+
+.MonthLabel {
+  min-width: 120px;
+  display: inline-block;
+  text-align: center;
+  font-size: 1.1em;
+  font-weight: 600;
+  text-transform: capitalize;
+  margin: 0 8px;
+  letter-spacing: 0.5px;
 }

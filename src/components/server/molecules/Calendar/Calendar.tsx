@@ -1,9 +1,9 @@
 "use client";
-
-import React from "react";
+import React, { useState } from "react";
 import Cell from "@/components/server/atoms/CalendarCell/CalendarCell";
 import styles from "./Calendar.module.scss";
 import { events } from "@/examples/event";
+import { Icon } from "../../atoms";
 
 const daysShort = ["Dom", "Lun", "Mar", "Mié", "Jue", "Vie", "Sáb"];
 
@@ -29,23 +29,49 @@ const activeEventsByDate = events.data
 const Calendar: React.FC<{
   initialDate?: Date;
 }> = ({ initialDate = new Date() }) => {
-  const year = initialDate.getFullYear();
-  const month = initialDate.getMonth();
+  const [currentDate, setCurrentDate] = useState(initialDate);
+
+  const year = currentDate.getFullYear();
+  const month = currentDate.getMonth();
   const daysInMonth = getDaysInMonth(year, month);
 
   const firstDay = new Date(year, month, 1).getDay();
   const blanks = Array.from({ length: firstDay });
 
+  const handlePrevMonth = () => {
+    setCurrentDate(new Date(year, month - 1, 1));
+  };
+
+  const handleNextMonth = () => {
+    setCurrentDate(new Date(year, month + 1, 1));
+  };
+
   return (
     <div className={styles.CalendarWrapper}>
       <div className={styles.Calendar}>
         <div className={styles.Header}>
-          <span>
-            {initialDate.toLocaleString("es-ES", {
+          <button
+            className={styles.NavButton}
+            onClick={handlePrevMonth}
+            aria-label="Mes anterior"
+            type="button"
+          >
+            <Icon name="Down" className={styles.Left} />
+          </button>
+          <span className={styles.MonthLabel}>
+            {currentDate.toLocaleString("es-ES", {
               month: "long",
               year: "numeric",
             })}
           </span>
+          <button
+            className={styles.NavButton}
+            onClick={handleNextMonth}
+            aria-label="Mes siguiente"
+            type="button"
+          >
+            <Icon name="Down" className={styles.Right} />
+          </button>
         </div>
         <div className={styles.CalendarScroll}>
           <div className={styles.CalendarInner}>

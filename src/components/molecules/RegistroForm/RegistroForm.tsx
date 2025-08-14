@@ -19,12 +19,12 @@ interface RemisionRow {
 
 const RegistroForm: React.FC = () => {
     const [juzgado, setJuzgado] = useState("");
-    const [sexo, setSexo] = useState("");
-    const [addingPlate, setAddingPlate] = useState(false)
+/*     const [sexo, setSexo] = useState("");
+ */    const [addingPlate, setAddingPlate] = useState(false)
 
     const [tipoPlaca, setTipoPlaca] = useState("");
-    const [numeroPlaca, setNumeroPlaca] = useState("");
-
+/*     const [numeroPlaca, setNumeroPlaca] = useState("");
+ */
     const [misRemisiones] = useState<RemisionRow[]>([
         {
         id: '1',

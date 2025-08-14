@@ -1,3 +1,5 @@
+
+@use 'sass:color';
 @use 'src/theme/colors.scss';
 
 .formBody {
@@ -91,7 +93,7 @@
     cursor: pointer;
 
     &:hover {
-        background-color: darken(#00c853, 10%);
+       background-color: color.adjust(#00bc70, $lightness: -10%);
     }
 }
 

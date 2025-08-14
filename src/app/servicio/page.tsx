@@ -1,14 +1,11 @@
-'use cliente'
+'use client';
 
 import React from 'react'
-import { Banner, ServicesRow, NotificationsCard, SolvenciaCard, ExpedientesCard } from '@/components/organisms/index'
+import { Banner, ServicesRow, ExpedientesCard } from '@/components/organisms/index'
 import type { BannerSlide } from '@/components/organisms/Banner/types'
 import { SectionTitle } from '@/components/server/molecules/SectionTitle'
-import type { FAQ } from "@/schema/faq";
-import { FAQ_Type } from "@/schema/faq";
-import FAQQuestions from '@/components/organisms/FAQ-Questions/FAQQuestions'
-import styles from './page.module.scss'
-
+/* import type { FAQ } from "@/schema/faq";
+import { FAQ_Type } from "@/schema/faq"; */
 const slides: BannerSlide[] = [
   {
     backgroundImage: '/images/banner.jpg',
@@ -21,7 +18,7 @@ const slides: BannerSlide[] = [
     overlayImage: "/images/Logos.png",
   },
 ]
-const loremQuestions: FAQ[] = [
+/* const loremQuestions: FAQ[] = [
     {
       id: 1,
       tipo: FAQ_Type.PILOTOS,
@@ -57,7 +54,7 @@ const loremQuestions: FAQ[] = [
       pregunta: "Donec ullamcorper nulla non metus auctor fringilla?",
       respuesta: "Donec ullamcorper nulla non metus auctor fringilla. Nullam id dolor id nibh ultricies vehicula ut id elit. Etiam porta sem malesuada magna mollis euismod."
     }
-  ];
+  ]; */
 export default function Home() {
   return (
     <div>
@@ -66,13 +63,7 @@ export default function Home() {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         <ServicesRow />
       </div>
-
-      {/* <NotificationsCard /> */}
       <ExpedientesCard />
-      {/* <FAQQuestions
-            questions={loremQuestions}
-            variant="No-Landing"
-            className={styles.faqQuestions} /> */}
     </div>
   )
 }

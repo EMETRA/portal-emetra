@@ -9,7 +9,7 @@ import {
     Checkbox
 } from '../../atoms/Table/'
 
-import {Column, DataTableProps} from './types'
+import { DataTableProps } from './types'
 
 export function DataTable<T extends { id: string }>({
     columns,
@@ -22,10 +22,14 @@ export function DataTable<T extends { id: string }>({
         <Table>
             <TableHead>
                 <TableRow>
-                    {selectable && <TableHeaderCell style={{ width: '2.5rem' }}><Checkbox checked={false} onChange={() => {}}/></TableHeaderCell>}
+                    {selectable && (
+                        <TableHeaderCell style={{ width: '2.5rem' }}>
+                            <Checkbox checked={false} onChange={() => {}} />
+                        </TableHeaderCell>
+                    )}
                     {columns.map(col => (
                         <TableHeaderCell key={col.key}>
-                        {col.label}
+                            {col.label}
                         </TableHeaderCell>
                     ))}
                 </TableRow>
@@ -34,17 +38,19 @@ export function DataTable<T extends { id: string }>({
                 {data.map(row => (
                     <TableRow key={row.id}>
                         {selectable && (
-                        <TableCell>
-                            <Checkbox
-                            checked={selectedKeys.includes(row.id)}
-                            onChange={() => onToggleSelect?.(row)}
-                            />
-                        </TableCell>
+                            <TableCell>
+                                <Checkbox
+                                    checked={selectedKeys.includes(row.id)}
+                                    onChange={() => onToggleSelect?.(row)}
+                                />
+                            </TableCell>
                         )}
                         {columns.map(col => (
-                        <TableCell key={col.key}>
-                            {col.render ? col.render(row) : (row as any)[col.key]}
-                        </TableCell>
+                            <TableCell key={col.key}>
+                                {col.render
+                                    ? col.render(row)
+                                    : row[col.key as keyof T] as React.ReactNode}
+                            </TableCell>
                         ))}
                     </TableRow>
                 ))}

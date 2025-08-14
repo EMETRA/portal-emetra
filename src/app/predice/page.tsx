@@ -1,3 +1,4 @@
+/* eslint-disable @next/next/no-img-element */
 import { events } from "@/examples/event";
 import { addMonths, isAfter, isBefore, parse, startOfDay } from "date-fns";
 import Map from "@/components/client/atoms/Map";
@@ -5,7 +6,6 @@ import { Metadata } from "next";
 import Image from "next/image";
 import classNames from "classnames";
 import styles from "./Page.module.scss";
-import Cell from "@/components/server/atoms/CalendarCell/CalendarCell";
 import Calendar from "@/components/server/molecules/Calendar/Calendar";
 
 const today = startOfDay(new Date());

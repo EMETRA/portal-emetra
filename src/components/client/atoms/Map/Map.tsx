@@ -10,7 +10,7 @@ import { format, parse } from "date-fns";
 
 function formatDateTimeWithHour(dateStr?: string, hourStr?: string) {
   if (!dateStr) return "";
-  let date = parse(dateStr, "dd/MM/yyyy", new Date());
+  const date = parse(dateStr, "dd/MM/yyyy", new Date());
   if (hourStr) {
     const [h, m] = hourStr.split(":");
     date.setHours(Number(h), Number(m));

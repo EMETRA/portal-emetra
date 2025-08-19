@@ -1,0 +1,57 @@
+.Title {
+  color: #1700a5;
+  margin-block: 2rem;
+}
+
+.Heading {
+  color: #1700a5;
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+.Icon {
+  width: 2rem;
+  height: 2rem;
+  color: #1700a5;
+}
+
+.Services {
+  display: flex;
+  flex-direction: row-reverse;
+  align-items: center;
+  justify-content: center;
+  padding-inline: 3.5rem;
+  column-gap: 2.5rem;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+@media (max-width: 1510px) {
+  .Services {
+    flex-direction: column;
+    padding-inline: 1rem;
+  }
+}
+
+.VideosHeading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  flex: 1 1 0;
+  min-width: 0;
+  max-width: 100%;
+  width: 100%;
+  margin: 0 auto;
+  box-sizing: border-box;
+}
+
+.VideosTitle {
+  color: #1700a5;
+}
+
+.Services {
+  margin-top: 1.75rem;
+}

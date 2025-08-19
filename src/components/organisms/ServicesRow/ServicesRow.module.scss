@@ -1,35 +1,8 @@
-
 .servicesRow {
   display: flex;
-  align-items: center;
-  gap: 5rem;
-  padding: 0 2rem;     
-  flex-wrap: nowrap;   
   width: 100%;
-  & > .serviceItem {
-    flex: 0 0 auto;
-    min-width: 6rem;   
-  }
-}
-
-@media (min-width: 920px) {
-  .servicesRow {
-    justify-content: center;     
-    overflow-x: visible;   
-    padding-left: 0rem;
-    padding-right: 0rem;
-  }
-}
-
-@media (max-width: 920px) {
-  .servicesRow {
-    justify-content: flex-start;
-    overflow-x: auto;      
-    padding: 0 1rem; 
-    gap: 1rem;
-    -ms-overflow-style: none;  
-    scrollbar-width: none;     
-    scroll-snap-type: x mandatory;     
-  }
-
+  justify-content: space-between;
+  flex-wrap: wrap;
+  padding-inline: 2rem;
+  column-gap: 2rem;
 }

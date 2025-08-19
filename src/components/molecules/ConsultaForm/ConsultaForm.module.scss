@@ -92,7 +92,7 @@
   cursor: pointer;
 
   &:hover {
-    background-color: darken(#00c853, 10%);
+    background-color: color.scale(#00c853, $lightness: -10%);
   }
 }
 

@@ -1,3 +1,4 @@
+@use "sass:color";
 @use "../../theme/index.scss" as *;
 @use "../../theme/colors.scss" as *;
 
@@ -15,7 +16,37 @@
   flex-direction: row;
   align-items: center;
   justify-content: center;
-  column-gap: 1rem;
+  text-align: center;
+  gap: 0.5rem;
+}
+
+.AddEventRow {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 1.5rem;
+}
+
+.AddEventButton {
+  display: inline;
+  width: fit-content;
+  background: $verde-oscuro-1;
+  color: #fff;
+  border: none;
+  border-radius: 0.5rem;
+  padding: 0.75rem 1.5rem;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  text-decoration: none;
+  transition: background 0.2s;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+
+  &:hover,
+  &:focus {
+    background: color.scale($verde-oscuro-1, $lightness: -8%);
+    color: #fff;
+    text-decoration: none;
+  }
 }
 
 .LogosRow {

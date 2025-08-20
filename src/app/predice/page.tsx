@@ -7,6 +7,7 @@ import Image from "next/image";
 import classNames from "classnames";
 import styles from "./Page.module.scss";
 import Calendar from "@/components/server/molecules/Calendar/Calendar";
+import Link from "next/link";
 
 const today = startOfDay(new Date());
 const twoMonthsLater = addMonths(today, 2);
@@ -30,6 +31,10 @@ const Page: React.FC = () => {
         />
         <h1>PREDICE</h1>
       </div>
+
+      <Link href="/predice/nuevo" className={classNames(styles.AddEventButton)}>
+        Agregar evento
+      </Link>
       <Calendar />
       <Map
         events={events.data

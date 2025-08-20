@@ -4,6 +4,7 @@ import Cell from "@/components/server/atoms/CalendarCell/CalendarCell";
 import styles from "./Calendar.module.scss";
 import { events } from "@/examples/event";
 import { Icon } from "../../atoms";
+import Link from "next/link";
 
 const daysShort = ["Dom", "Lun", "Mar", "Mié", "Jue", "Vie", "Sáb"];
 
@@ -105,7 +106,8 @@ const Calendar: React.FC<{
                               className={styles.EventBullet}
                               aria-hidden="true"
                             />
-                            <span
+                            <Link
+                              href={`/predice/${ev.id}`}
                               className={styles.EventTitle}
                               dangerouslySetInnerHTML={{ __html: ev.title }}
                             />

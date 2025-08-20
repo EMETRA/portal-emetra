@@ -72,12 +72,8 @@ const loremQuestions: FAQ[] = [
 export default function Home() {
   return (
     <div>
-      <Banner slides={slides} />
-      <SectionTitle>Noticias destacadas</SectionTitle>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        <ServicesRow />
-      </div>
-
+      <SectionTitle>Juzgado de Tránsito</SectionTitle>
+      {/* <SolvenciaCard /> */}
       {/* <NotificationsCard /> */}
       <ExpedientesCard />
       {/* <FAQQuestions

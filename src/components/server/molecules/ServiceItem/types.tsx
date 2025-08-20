@@ -4,7 +4,8 @@ import React from "react";
 /**
  * Props de ServiceItem (dos iconos + etiqueta).
  */
-export interface ServiceItemProps extends React.HTMLAttributes<HTMLDivElement> {
+export interface ServiceItemProps
+  extends React.AnchorHTMLAttributes<HTMLAnchorElement> {
   /** Nombre del primer ícono */
   iconA: IconType;
   /** Nombre del segundo ícono */
@@ -12,4 +13,5 @@ export interface ServiceItemProps extends React.HTMLAttributes<HTMLDivElement> {
   /** Texto del servicio */
   label: string;
   className?: string;
+  href?: string;
 }

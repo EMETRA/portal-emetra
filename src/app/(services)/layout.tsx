@@ -23,9 +23,5 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  return (
-    <>
-      <Banner slides={slides} />
-    </>
-  );
+  return <>{children}</>;
 }

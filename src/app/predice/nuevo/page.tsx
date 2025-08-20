@@ -76,10 +76,10 @@ const Page: React.FC = () => {
     setParqueos(parqueos.filter((_, i) => i !== idx));
   };
 
-  const handleParqueoChange = (
+  const handleParqueoChange = <K extends keyof Parqueo>(
     idx: number,
-    field: keyof Parqueo,
-    value: any
+    field: K,
+    value: Parqueo[K]
   ) => {
     setParqueos((prev) =>
       prev.map((p, i) =>

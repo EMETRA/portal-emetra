@@ -1,3 +1,6 @@
+/* eslint-disable @next/next/no-img-element */
+/* eslint-disable jsx-a11y/alt-text */
+
 "use client";
 import React from "react";
 import Link from "next/link";
@@ -95,4 +98,3 @@ const CalendarWidget: React.FC = () => {
 };
 
 export default CalendarWidget;
-7;

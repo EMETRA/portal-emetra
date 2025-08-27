@@ -46,7 +46,8 @@
       "@schema": ["./src/schema/index.ts"],
       "@schema/*": ["./src/schema/*"],
       "@functions": ["./src/functions/index.ts"],
-      "@functions/*": ["./src/functions/*"]
+      "@functions/*": ["./src/functions/*"],
+      "@assets/*": ["./src/assets/*"]
     },
     "target": "ES2017"
   },

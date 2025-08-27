@@ -8,3 +8,4 @@ export * from "./RegistroForm";
 export * from "./ConsultaForm";
 export * from "./DataTable";
 export * from "./DataTable/types";
+export * from "./LogosWall"

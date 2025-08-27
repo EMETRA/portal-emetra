@@ -4,3 +4,5 @@ export * from './NotificationsCard';
 export * from './SolvenciaCard';
 export * from './ExpedientesCard';
 export * from './SumateHome';
+export * from './SumateAntecedentes';
+export * from './SumateInfo';

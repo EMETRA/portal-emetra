@@ -1,0 +1,38 @@
+.fullImagePage {
+  position: relative;
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+
+    img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      position: absolute;
+      inset: 0;
+      top: 0;
+      left: 0;
+    }
+  
+    .desktop-img {
+      display: block;
+    }
+  
+    .mobile-img {
+      display: none;
+    }
+  
+    @media (max-width: 768px) {
+      .desktop-img {
+        display: none;
+      }
+  
+      .mobile-img {
+        display: block;
+      }
+    }
+  }
+  

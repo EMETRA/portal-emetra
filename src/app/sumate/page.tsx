@@ -1,10 +1,10 @@
 import React from 'react';
-import { SumateHome } from '@/components/organisms';
+import { SumateHome, SumateAntecedentes, SumateInfo } from '@/components/organisms';
 
 const SumatePage: React.FC = () => {
     return (
         <main>
-            <SumateHome />
+            <SumateInfo />
         </main>
     );
 };

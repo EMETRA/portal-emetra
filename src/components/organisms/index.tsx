@@ -8,3 +8,4 @@ export * from './SumateAntecedentes';
 export * from './SumateInfo';
 export * from './SumateInst';
 export * from './SumateUni';
+export * from './SumateHow';

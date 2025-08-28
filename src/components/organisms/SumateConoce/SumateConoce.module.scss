@@ -1,0 +1,95 @@
+.container {
+    display: flex;
+    flex-direction: row;
+    height: 100vh;
+    padding: 2rem;
+    overflow: hidden;
+    padding-top: 6.5rem;
+    @media (max-width: 1024px) {
+        flex-direction: column;
+        height: auto;
+        padding: 0rem;
+        padding-top: 5rem;
+    }
+}
+
+.left {
+    display: flex;
+    flex-direction: column;
+    gap: 2vh;
+    width: 50%;
+    height: 100vh;
+
+    @media (max-width: 1024px) {
+        width: 100%;
+        height: auto;
+        display: none;
+    }
+}
+
+.imageBox {
+    object-fit: cover;
+    height: 41vh;
+}
+
+.right {
+    width: 45vw;
+    display: flex;
+    flex-direction: column;
+    padding-left: 4rem;
+    overflow: hidden;
+    @media (max-width: 1024px) {
+        width: 100%;
+        padding-top: 1rem;
+        padding-inline: 2rem;
+    }
+}
+
+
+.imageBoxMob {
+    display: none;
+    @media (max-width: 1024px) {
+        width: 100%; 
+        display: block;
+    }
+}
+
+.title1 {
+    font-size: 4vw;
+    font-weight: 800;
+    color: #919191;
+    margin: 0px !important;
+    @media (max-width: 1024px) {
+        font-size: 2.5vh;
+    }
+}
+.title2 {
+    font-size: 4vw;
+    font-weight: 800;
+    color: #919191;
+    margin: 0px !important;
+    @media (max-width: 1024px) {
+        font-size: 2.5vh;
+        // text-align: end;
+    }
+}
+
+.subtitle {
+    font-weight: 700;
+    margin: 1rem 0;
+    font-size: 1.5vw;
+    @media (max-width: 1024px) {
+        font-size: 2vh;
+    }
+}
+
+.paragraph {
+    margin-bottom: 1rem;
+    color: #919191;
+    line-height: 1.6;
+    font-size: 1.1vw;
+
+    @media (max-width: 1024px) {
+        font-size: 1.7vh;
+    }
+}

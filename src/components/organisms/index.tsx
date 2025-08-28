@@ -9,3 +9,4 @@ export * from './SumateInfo';
 export * from './SumateInst';
 export * from './SumateUni';
 export * from './SumateHow';
+export * from './SumateConoce';

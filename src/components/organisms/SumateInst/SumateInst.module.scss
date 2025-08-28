@@ -1,0 +1,30 @@
+.section {
+    margin: 0 auto;
+    display: grid;
+    grid-template-rows: auto 1fr;
+    padding-top: 8rem;
+    min-height: 100svh; 
+}
+
+.title {
+    margin: 16px;
+    font-weight: 800;
+    color: #919191;
+    font-size: clamp(20px, 3vw, 28px);
+}
+
+.fullBleed {
+    position: relative;
+    width: 100vw;
+    left: 50%;
+    right: 50%;
+    margin-left: -50vw;
+    margin-right: -50vw;                   
+    overflow: hidden;
+}
+
+@media (max-width: 768px) {
+    .title{
+        margin-top: -2rem;        
+    } 
+}

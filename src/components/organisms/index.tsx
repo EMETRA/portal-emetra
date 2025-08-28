@@ -6,3 +6,5 @@ export * from './ExpedientesCard';
 export * from './SumateHome';
 export * from './SumateAntecedentes';
 export * from './SumateInfo';
+export * from './SumateInst';
+export * from './SumateUni';

@@ -11,3 +11,4 @@ export * from './SumateUni';
 export * from './SumateHow';
 export * from './SumateConoce';
 export * from './FullPageSnap';
+export * from './SumateInscribete';

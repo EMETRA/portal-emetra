@@ -5,36 +5,17 @@
     overflow-y: auto;
     scroll-snap-type: y mandatory;
     overscroll-behavior: contain;
-
-    // position: relative;
-    // height: 90svh;                 /* corrige barras en iOS */
-    // width: 100%;
-    // overflow-y: auto;
-    // overflow-x: hidden;
-
-    // /* Scroll snap vertical nativo */
-    // scroll-snap-type: y mandatory;
-    // scroll-behavior: smooth;
-    // -webkit-overflow-scrolling: touch;
-    // overscroll-behavior-y: contain;  /* evita “rebotar” al body */
-
-    // /* quita scrollbars visuales si quieres */
-    // scrollbar-width: none;
-    // &::-webkit-scrollbar { width: 0; height: 0; }
+    scrollbar-width: none;
+    /* IE/Edge antiguos */
+    -ms-overflow-style: none;
 }
 
 /* cada sección/página */
 .page {
-    position: relative;   /* crea contenedor para absolutos internos */
+    position: relative;   
     block-size: 100%;
     min-block-size: 0;
-    overflow: hidden;     /* evita que el footer o badges se “salgan” a la siguiente sección */
+    overflow: hidden;     
     scroll-snap-align: var(--snap-align, start);
     scroll-snap-stop: var(--snap-stop, always);
-    // height: 100svh;
-    // min-height: 100svh;
-    // scroll-snap-align: var(--snap-align, start);
-    // scroll-snap-stop: var(--snap-stop, always); /* completa el encaje */
-    // display: grid;           /* útil para centrar contenidos si quieres */
-    // align-content: stretch;
 }

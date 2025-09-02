@@ -10,7 +10,12 @@ const nextConfig = {
     prependData: `@use "./src/theme/index.scss" as *;`,
   },
   images: {
-    domains: ["localhost"],
+    // domains: ["localhost"],
+    remotePatterns: [
+      { protocol: "http", hostname: "localhost", port: "3000", pathname: "/**" },
+      { protocol: "https", hostname: "localhost", pathname: "/**" },
+
+    ],
   },
   webpack: (config) => {
     config.module.rules.push({

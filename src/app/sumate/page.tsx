@@ -1,6 +1,6 @@
 'use client';
 import React from 'react';
-import { SumateHome, SumateAntecedentes, SumateInfo, SumateInst, SumateUni, SumateHow, SumateConoce, FullPageSnap} from '@/components/organisms';
+import { SumateHome, SumateAntecedentes, SumateInfo, SumateInst, SumateUni, SumateHow, SumateConoce, FullPageSnap, SumateInscribete} from '@/components/organisms';
 
 
 const SumatePage: React.FC = () => {
@@ -11,7 +11,8 @@ const SumatePage: React.FC = () => {
         <SumateInst key="SumateInst"/>,
         <SumateUni key="SumateUni"/>,
         <SumateHow key="SumateHow"/>,
-        <SumateConoce key="SumateConoce"/>
+        <SumateConoce key="SumateConoce"/>,
+        <SumateInscribete key="SumateInscribete"/>
     ]
     return (
         <FullPageSnap sections={sections}

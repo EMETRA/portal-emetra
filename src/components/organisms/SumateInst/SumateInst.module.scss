@@ -1,8 +1,11 @@
 .section {
+    block-size: 100%;
+    min-block-size: 0;
+    box-sizing: border-box;
+
     display: grid;
     grid-template-rows: auto 1fr;
     padding-top: 8rem;
-    min-height: 100svh; 
 }
 
 .title {

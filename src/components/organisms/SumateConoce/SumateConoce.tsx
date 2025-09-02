@@ -10,8 +10,12 @@ const SumateConoce = () => {
     return (
         <section className={styles.container}>
             <div className={styles.left}>
-                <img src={toUrl(image1)} alt="Imagen 1" className={styles.imageBox} />
-                <img src={toUrl(image2)} alt="Imagen 2" className={styles.imageBox} />
+                <div className={styles.imageSlot}>
+                    <img src={toUrl(image1)} alt="" className={styles.image} />
+                </div>
+                <div className={styles.imageSlot}>
+                    <img src={toUrl(image2)} alt="" className={styles.image} />
+                </div>
             </div>
             <img src={toUrl(image2)} alt="Imagen 1" className={styles.imageBoxMob} />
             <div className={styles.right}>

@@ -1,25 +1,30 @@
 .container {
-    display: flex;
-    flex-direction: row;
-    height: 100vh;
-    padding: 2rem;
+    block-size: 100%;
+    min-block-size: 0;
+    box-sizing: border-box;
+
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: clamp(16px, 4vw, 48px);
+    padding: clamp(16px, 4vw, 48px);
+
+    /* que nada “se salga” del page */
     overflow: hidden;
-    padding-top: 4.5rem;
     @media (max-width: 1024px) {
-        flex-direction: column;
-        height: auto;
+        grid-template-columns: 1fr;
+        grid-template-rows: auto 1fr;
         padding: 0rem;
-        padding-top: 5rem;
     }
 }
 
 .left {
-    display: flex;
-    flex-direction: column;
-    gap: 2vh;
-    width: 50%;
-    height: 100vh;
+    block-size: 100%;
+    min-block-size: 0;
 
+    display: grid;
+    grid-template-rows: 1fr 1fr;
+    gap: 2px;
+    align-items: stretch; 
     @media (max-width: 1024px) {
         width: 100%;
         height: auto;
@@ -28,15 +33,35 @@
 }
 
 .imageBox {
-    object-fit: cover;
-    height: 41vh;
+    display: block;          
+    inline-size: 100%;
+    block-size: 100%;        
+    object-fit: contain;     
+    object-position: center; 
+}
+
+.imageSlot {
+    inline-size: 100%;
+    block-size: 100%;
+    overflow: hidden;      
+    display: grid;
+    place-items: center;   
+}
+
+.image {
+    display: block;        
+    max-inline-size: 100%;  
+    max-block-size: 100%;  
+    width: auto;
+    height: auto;
+    object-fit: contain;   
+    object-position: center;
 }
 
 .right {
-    width: 45vw;
-    display: flex;
-    flex-direction: column;
-    padding-left: 4rem;
+    min-block-size: 0;
+    display: grid;
+    align-content: start;
     overflow: hidden;
     @media (max-width: 1024px) {
         width: 100%;
@@ -48,8 +73,11 @@
 
 .imageBoxMob {
     display: none;
+    inline-size: 100%;
+    block-size: clamp(180px, 35svh, 320px);
+    object-fit: cover;
     @media (max-width: 1024px) {
-        width: 100%; 
+        // width: 100%; 
         display: block;
     }
 }

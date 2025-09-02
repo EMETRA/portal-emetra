@@ -31,7 +31,6 @@ const SumateInst = () => {
                 columns={columns} 
                 rows={rows} 
                 rowColors={rowColors} 
-                className={styles.fullBleed}
             />
         </section>
     );

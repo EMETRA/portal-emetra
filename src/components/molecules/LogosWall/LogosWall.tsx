@@ -66,10 +66,6 @@ function Track({ logos, speed = 120 }: TrackProps) {
 
         return () => {
             ro.disconnect();
-            // imgs.forEach(img => {
-            //     img.removeEventListener("load", update);
-            //     img.removeEventListener("error", update);
-            // });
         };
     }, [logos, speed]);
 

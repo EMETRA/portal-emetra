@@ -10,3 +10,4 @@ export * from './SumateInst';
 export * from './SumateUni';
 export * from './SumateHow';
 export * from './SumateConoce';
+export * from './FullPageSnap';

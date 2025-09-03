@@ -1,6 +1,6 @@
 .viewport {
-    --snap-h: 90svh; 
-    block-size: var(--snap-h);
+    // --snap-h: 100svh; 
+    block-size: 100%;
 
     overflow-y: auto;
     scroll-snap-type: y mandatory;

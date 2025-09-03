@@ -38,12 +38,13 @@ function scrollToIndex(index: number) {
 }
 
 const sumateItems: { label: string; index: number }[] = [
+  { label: "INICIO", index: 0 },
   { label: "ANTECEDENTES", index: 1 },
-  { label: "PROYECTO SÚMATE", index: 6 },
+  { label: "PROYECTO SÚMATE", index: 3 },
   { label: "CÓMO SUMARTE", index: 5 },
-  { label: "UNIVERSIDADES", index: 4 },
-  { label: "INSTITUCIONES", index: 3 },
-  { label: "FORMULARIO", index: 7 },
+  { label: "INSTITUCIONES", index: 4 },
+  { label: "UNIVERSIDADES", index: 6 },  
+  { label: "CONTACTO", index: 7 },
 ];
 
 

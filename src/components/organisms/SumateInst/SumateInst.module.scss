@@ -5,7 +5,6 @@
 
     display: grid;
     grid-template-rows: auto 1fr;
-    padding-top: 8rem;
 }
 
 .title {
@@ -15,15 +14,6 @@
     font-size: clamp(20px, 3vw, 28px);
 }
 
-.fullBleed {
-    position: relative;
-    width: 100vw;
-    left: 50%;
-    right: 50%;
-    margin-left: -50vw;
-    margin-right: -50vw;                   
-    overflow: hidden;
-}
 
 @media (max-width: 768px) {
     .title{

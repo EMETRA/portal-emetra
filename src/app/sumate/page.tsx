@@ -1,7 +1,7 @@
 'use client';
 import React from 'react';
 import { SumateHome, SumateAntecedentes, SumateInfo, SumateInst, SumateUni, SumateHow, SumateConoce, FullPageSnap, SumateInscribete} from '@/components/organisms';
-import { SumateNavBar } from '@/components/molecules';
+// import { SumateNavBar } from '@/components/molecules';
 import logo from '@assets/logos/LogoSumate.png';
 const SumatePage: React.FC = () => {
     const sections = [
@@ -16,7 +16,7 @@ const SumatePage: React.FC = () => {
     ]
     return (
         <div style={{ position: 'relative' }}>
-            <div style={{  position: 'absolute', insetInline: 0, top: 0,  height: 'var(--page-top-gap, 72px)', zIndex: 10, pointerEvents: 'auto'}}>
+            {/* <div style={{  position: 'absolute', insetInline: 0, top: 0,  height: 'var(--page-top-gap, 72px)', zIndex: 10, pointerEvents: 'auto'}}>
                 <SumateNavBar
                     logo={typeof logo === 'string' ? logo : (logo as any).src}
                     items={[
@@ -31,7 +31,7 @@ const SumatePage: React.FC = () => {
                         { label: 'FORMULARIO INSCRIPCIÓN', index: 7 },
                     ]}
                     />
-            </div>
+            </div> */}
             <FullPageSnap sections={sections}
                 snapAlign='start'
                 snapStopAlways={true}

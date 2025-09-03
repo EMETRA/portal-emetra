@@ -4,15 +4,15 @@ import styles from './LogosWall.module.scss';
 import type { Logo, TrackProps, LogoWallProps } from './types';
 
 function useRowsCount(): number {
-    const get = () =>
-        (typeof window !== 'undefined' && window.innerWidth <= 768) ? 4 : 3;
-
-    const [rows, setRows] = useState(get());
+    const [rows, setRows] = useState<number>(3);
 
     useEffect(() => {
-        const onResize = () => setRows(get());
-        window.addEventListener('resize', onResize);
-        return () => window.removeEventListener('resize', onResize);
+        const compute = () => {
+            setRows(window.innerWidth <= 720 ? 4 : 3);
+        };
+        compute();
+        window.addEventListener('resize', compute);
+        return () => window.removeEventListener('resize', compute);
     }, []);
 
     return rows;
@@ -26,7 +26,7 @@ function chunkLogos(logos: Logo[], rows: number): Logo[][] {
     return buckets;
 }
 
-function Track({ logos, speed = 120 }: TrackProps) {           
+function Track({ logos, speed = 120, preload = 8 }: TrackProps) {           
     const trackRef = useRef<HTMLDivElement | null>(null);
     const repeated = useMemo<Logo[]>(() => [...logos, ...logos], [logos]);
 
@@ -71,11 +71,25 @@ function Track({ logos, speed = 120 }: TrackProps) {
 
     return (
         <div className={styles.track} ref={trackRef}>
-        {repeated.map((l, i) => (
+        {/* {repeated.map((l, i) => (
             <div className={styles.logoItem} key={`${l.alt || 'logo'}-${i}`}>
                 <img src={l.src} alt={l.alt || 'logo'} loading="lazy" />
             </div>
-        ))}
+        ))} */}
+        {repeated.map((l, i) => {
+            const eager = i < preload; // ← los primeros N (de la pista duplicada)
+            return (
+            <div className={styles.logoItem} key={`${l.alt || 'logo'}-${i}`}>
+                <img
+                src={l.src}
+                alt={l.alt || 'logo'}
+                loading={eager ? 'eager' : 'lazy'}
+                decoding="async"
+                fetchPriority={eager ? 'high' : 'auto'}
+                />
+            </div>
+            );
+        })}
         </div>
     );
 }
@@ -88,7 +102,7 @@ export default function LogoWall({ logos, centerBadgeSrc }: LogoWallProps) {
     const speed = isMobile ? 60 : 120; 
     
     const positionsDesktop: string[] = ['14%', '42%', '70%'];      
-    const positionsMobile: string[]  = ['14%', '24%', '60%', '70%'];
+    const positionsMobile: string[]  = ['7%', '20%', '60%', '70%'];
 
     return (
         <div className={styles.wall}>

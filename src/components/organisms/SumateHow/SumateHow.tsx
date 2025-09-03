@@ -4,13 +4,11 @@ import imageMobile from '@/assets/images/How-mobile.png';
 
 const SumateHow: React.FC = () => {
     return (
-        <div>
-            <FullImage
-                desktopImageUrl={imageDesktop}
-                mobileImageUrl={imageMobile}
-                alt="Imagen de cómo sumarte"
-            />
-        </div>
+        <FullImage
+            desktopImageUrl={imageDesktop}
+            mobileImageUrl={imageMobile}
+            alt="Imagen de cómo sumarte"
+        />
     );
 };
 

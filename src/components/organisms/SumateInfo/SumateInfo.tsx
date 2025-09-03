@@ -5,13 +5,11 @@ import { FullImage } from '@/components/molecules';
 
 const SumateInfo: React.FC = () => {
     return (
-        <div>
-            <FullImage
-                desktopImageUrl={imageDesktop}
-                mobileImageUrl={imageMobile}
-                alt="Portada de Súmate"
-            />
-        </div>
+        <FullImage
+            desktopImageUrl={imageDesktop}
+            mobileImageUrl={imageMobile}
+            alt="Portada de Súmate"
+        />
     );
 };
 

@@ -109,7 +109,7 @@ const NavBar: React.FC = () => {
           
           if (isSumate && item.name === "SÚMATE") {
             return (
-              <div key={item.name} className={classNames(styles.Dropdown, sumateOpen && styles.DropdownOpen)}>
+              <div key={item.name} ref={sumateRef} className={classNames(styles.Dropdown, sumateOpen && styles.DropdownOpen)}>
                 <Button className={classNames(styles.Button, styles.ActiveButton, styles.DropdownToggle)}
                   onClick={() => setSumateOpen((open) => !open)}
                   aria-expanded={sumateOpen}

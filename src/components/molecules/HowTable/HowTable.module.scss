@@ -3,19 +3,10 @@
     height: 100%; 
     display: flex; 
     flex-direction: column;
+    box-sizing: border-box;
+    overflow-x: hidden;
 }  
 
-.fullBleed {
-    position: relative;
-    width: 100vw;
-    max-width: 100%;
-    left: 50%;
-    right: 50%;
-    height: 100%;
-    margin-left: -50vw;
-    margin-right: -50vw;
-    overflow: hidden; 
-}
 
 .table {
     width: 100%;

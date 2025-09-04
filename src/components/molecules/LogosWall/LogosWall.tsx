@@ -102,7 +102,7 @@ export default function LogoWall({ logos, centerBadgeSrc }: LogoWallProps) {
     const speed = isMobile ? 60 : 120; 
     
     const positionsDesktop: string[] = ['14%', '42%', '70%'];      
-    const positionsMobile: string[]  = ['7%', '20%', '60%', '70%'];
+    const positionsMobile: string[]  = ['8%', '18%', '60%', '70%'];
 
     return (
         <div className={styles.wall}>

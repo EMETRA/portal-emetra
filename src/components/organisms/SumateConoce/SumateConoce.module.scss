@@ -74,10 +74,8 @@
 .imageBoxMob {
     display: none;
     inline-size: 100%;
-    block-size: clamp(180px, 35svh, 320px);
     object-fit: cover;
     @media (max-width: 1024px) {
-        // width: 100%; 
         display: block;
     }
 }
@@ -118,6 +116,6 @@
     font-size: 1.1vw;
 
     @media (max-width: 1024px) {
-        font-size: 1.7vh;
+        font-size: 1.6vh;
     }
 }

@@ -12,10 +12,11 @@
     font-weight: 800;
     color: #919191;
     font-size: clamp(20px, 3vw, 28px);
+    padding: 2rem;
 }
 
 @media (max-width: 768px) {
     .title{
-        margin-top: -2rem;        
+        padding: 1rem;       
     } 
 }

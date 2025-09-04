@@ -5,34 +5,51 @@ import { SumateHome, SumateAntecedentes, SumateInfo, SumateInst, SumateUni, Suma
 const SumatePage: React.FC = () => {
     const hostRef = useRef<HTMLDivElement>(null);
     useLayoutEffect(() => {
+        const host = hostRef.current;
+        if (!host) return;
+
+        const getViewportHeight = () => {
+            const vv = window.visualViewport;
+            // Preferimos el menor para evitar que “asome” contenido
+            const candidates = [
+            vv?.height ?? Infinity,
+            window.innerHeight,
+            document.documentElement.clientHeight,
+            ].filter(Boolean) as number[];
+            return Math.min(...candidates);
+        };
+
         const setHeight = () => {
-            const host = hostRef.current;
-            if (!host) return;
-
-            const vh = window.visualViewport?.height ?? window.innerHeight;
-
-            const top = host.getBoundingClientRect().top;
-
-            const h = Math.max(0, vh - top);
+            const vh  = getViewportHeight();
+            const top = host.getBoundingClientRect().top; // distancia bajo el NavBar
+            const h   = Math.max(0, Math.ceil(vh - top) + 2); // +2px evita peeks por redondeo
             host.style.setProperty('--snap-h', `${h}px`);
         };
 
-        const raf = () => requestAnimationFrame(setHeight);
-        raf();
+        setHeight();
 
-        window.addEventListener('resize', setHeight);
-        window.addEventListener('orientationchange', setHeight);
+        const onResize = () => setHeight();
+        window.addEventListener('resize', onResize);
+        window.addEventListener('orientationchange', onResize);
+        window.addEventListener('pageshow', onResize);
 
-        const ro = new ResizeObserver(setHeight);
+        const vv = window.visualViewport;
+        vv?.addEventListener?.('resize', onResize);
+        vv?.addEventListener?.('scroll', onResize); 
+
+        const ro = new ResizeObserver(onResize);
         ro.observe(document.body);
 
         return () => {
-            window.removeEventListener('resize', setHeight);
-            window.removeEventListener('orientationchange', setHeight);
+            window.removeEventListener('resize', onResize);
+            window.removeEventListener('orientationchange', onResize);
+            window.removeEventListener('pageshow', onResize);
+            vv?.removeEventListener?.('resize', onResize);
+            vv?.removeEventListener?.('scroll', onResize);
             ro.disconnect();
         };
     }, []);
-    
+
     const sections = [
         <SumateHome key="home"/>,
         <SumateAntecedentes key="SumateAntecedentes"/>,

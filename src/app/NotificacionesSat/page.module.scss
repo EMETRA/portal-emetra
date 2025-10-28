@@ -1,0 +1,15 @@
+.Container{
+  margin-inline: auto;
+  padding-inline: 1vw;      /* márgenes laterales fluidos */
+  max-width: 72rem;         /* tope ancho legible, no en px */
+  width: 100%;
+}
+
+
+.Title {
+  color: #1700a5;
+  margin-block: 2rem;
+  font-size: xx-large;
+  font-weight: 100;
+  margin-inline: 2vw;
+}

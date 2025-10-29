@@ -11,4 +11,6 @@ export * from "./DataTable/types";
 export * from "./LogosWall";
 export * from "./fullimage";
 export * from "./HowTable";
+export * from "./SatSocialSection";
+export * from "./VehicleQueryCard";
 // export * from "./SumateNavBar";

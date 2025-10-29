@@ -1,0 +1,41 @@
+.Wrapper{
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;   /* líneas a los lados */
+  align-items: center;
+  column-gap: var(--twl-gap, 1.2rem);    /* fallback si no pasas prop */
+}
+
+/* Línea */
+.line{
+  height: var(--twl-line-thickness, 2px);    /* fallback */
+  background: var(--twl-line-color, #62b44b);/* fallback (verde) */
+  border-radius: 999px;
+}
+
+/* Título */
+.title{
+  margin: 0;
+  color: #18196b;                 /* azul de tus capturas */
+  letter-spacing: 0.35em;         /* tracking “C O N S U L T A” */
+  font-weight: 400;
+  text-align: center;
+  white-space: nowrap;            /* evita quiebres en desktop */
+}
+
+/* Mayúsculas opcional */
+.uppercase .title{
+  text-transform: uppercase;
+}
+
+/* ===== Mobile: líneas arriba/abajo ===== */
+@media (max-width: 48rem){
+  .Wrapper{
+    grid-template-columns: 1fr;
+    grid-template-rows: auto auto auto;
+    row-gap: .75rem;
+  }
+  .title{
+    white-space: normal;          /* permite salto si el texto es largo */
+    letter-spacing: 0.28em;       /* un poco menos de tracking para caber mejor */
+  }
+}

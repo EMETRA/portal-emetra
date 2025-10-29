@@ -39,3 +39,26 @@
   opacity: 0.5;
   cursor: not-allowed;
 }
+
+.outline {
+  background-color: transparent;
+  color: #1d0199;                    /* texto azul como en tu UI */
+  border: 2px solid $verde-oscuro-1; /* verde del borde */
+  border-radius: 12px;               /* más redondeado (como la captura) */
+  transition: background-color .15s ease, box-shadow .15s ease, transform .06s ease;
+}
+
+.outline:hover {
+  background-color: rgba($verde-oscuro-1, .08);  /* sutil hover */
+}
+
+.outline:active { transform: translateY(1px); }
+
+/* Accesibilidad: foco visible */
+.button:focus-visible {
+  outline: 2px solid rgba($verde-oscuro-1, .6);
+  outline-offset: 2px;
+}
+
+/* Utilidad opcional: ancho completo */
+.fullWidth { width: 100%; display: block; }

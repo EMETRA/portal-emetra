@@ -1,36 +1,42 @@
 @use "@/theme/colors.scss" as *;
 
-/* hereda del atom Card, aquí solo afinamos */
+/* Card */
 .Card{
   border: .1rem solid $brand-green;
   border-radius: 1rem;
-  padding: 2rem 4vw;
+  padding-block: 1rem;
+  padding-inline: 1rem;
 }
 
-/* fila superior */
-.Row{
+.firstBlock{
   display: grid;
-  grid-template-columns: 1fr max(18rem, 22vw);
+  grid-template-columns: 1fr max-content;
+  grid-auto-rows: auto;
+  column-gap: 1rem;
+  row-gap: .6rem;
   align-items: end;
-  gap: 1rem;
+  padding-inline: 6rem;
+
 }
 
+/* Col 1, fila 1 */
 .Field{ display: grid; gap: .6rem; }
-
 .Label{
   letter-spacing: .06em;
-  color: $muted;
+  color: #000000;
+  text-align: left;
 }
-
 .Input{
   background: hsl(220 30% 97%);
   border: .1rem solid hsl(220 20% 90%);
   border-radius: .8rem;
+  width: 100%;
 }
 
-/* botón CTA */
+/* Col 2, fila 1 */
 .CTA{
-  inline-size: 100%;
+  inline-size: max-content;
+  white-space: nowrap;
   padding: 1rem 1.4rem;
   border: none;
   border-radius: .8rem;
@@ -42,34 +48,67 @@
 }
 .CTA:active{ transform: translateY(.05rem); }
 
-/* hints debajo del input */
+/* Fila 2: ocupa ambas columnas */
 .Hints{
-  display: flex;
-  flex-wrap: wrap;
-  gap: .6rem;
-  align-items: center;
-  color: $muted;
-  font-size: .95rem;
-  margin-block: .8rem 1.2rem;
+  grid-column: 1 / -1;           
+  display: grid;
+  grid-template-columns: 1fr;    
+  row-gap: .35rem;
+  font-size: .9rem;
+  margin-top: 0.1rem;             
 }
+
+.block{
+  display: inline-flex;
+  align-items: center;
+  gap: .35rem;
+}
+
+.hintsBody{
+  display: flex;                 
+  flex-wrap: wrap;
+  gap: .35rem .5rem;
+  align-items: center;
+  min-width: 0;                  
+}
+
 .Link{
   color: $primary-blue;
   text-decoration: none;
   font-weight: 700;
+  font-size: small;
+  text-decoration: underline;
 }
 .Link:hover{ text-decoration: underline; }
-.Muted{ opacity: .9; }
 
-/* pasos */
+.Muted{ color: hsl(220 10% 35%); font-size: 0.7rem; }
+
+.Badges{
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: .3rem;
+}
+
+.tipe_Badge{
+  display: inline-block;
+  padding: .15rem .45rem;
+  border-radius: 7px;
+  background: hsl(220 15% 94%);
+  border: 1px solid hsl(220 15% 88%);
+  line-height: 1.2;
+  white-space: nowrap;
+  font-size: x-small;
+}
+
+/* ======= PASOS ======= */
+.secondBlock{ padding-inline: 1rem; }
+
 .Steps{
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 2rem 4vw;
   padding-block: 1.2rem;
-  border-top: .1rem solid $brand-green-weak;
-  border-bottom: .1rem solid $brand-green-weak;
 }
-
 .Step{
   text-align: center;
   padding-block: 1.2rem;
@@ -97,9 +136,51 @@
   line-height: 1.5;
 }
 
-/* responsive */
+/* ===== Mobile refinements ===== */
 @media (max-width: 60rem){
-  .Row{ grid-template-columns: 1fr; }
+  .firstBlock{
+    grid-template-columns: 1fr;
+    padding-inline: 1rem;
+    row-gap: .5rem;
+  }
   .CTA{ inline-size: 100%; }
-  .Steps{ grid-template-columns: 1fr; }
+
+  .Hints{
+    row-gap: .25rem;       
+    font-size: .9rem;
+  }
+
+  .block{    
+    justify-content: center;
+  }
+
+  .hintsBody{
+    display: inline;       
+    white-space: normal;   
+  }
+  .hintsBody .Muted{
+    display: inline;       
+  }
+
+  .Steps{
+    display: flex;
+    flex-direction: column;
+    gap: 0rem;
+  }
+
+  .Badges{
+    display: inline;       
+  }
+
+  .tipe_Badge{
+    display: inline-block;      
+    vertical-align: baseline;
+    margin-right: .35rem;       
+    margin-bottom: .2rem;      
+    padding: .12rem .42rem;     
+    font-size: 11px;           
+  }
+  .tipe_Badge:last-child{ margin-right: 0; }
+
+  .Muted{ font-size: 0.75rem; }
 }

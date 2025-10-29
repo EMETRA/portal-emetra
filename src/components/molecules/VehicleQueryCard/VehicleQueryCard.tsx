@@ -1,8 +1,7 @@
 import React from "react";
-import {Card, Text} from "@components/atoms/index"
-import {Input} from "@/components/server/atoms"
-import styles from "./VehicleQueryCard.module.scss"
-import classNames from "classnames";
+import { Card, Text } from "@components/atoms";
+import { Input } from "@/components/server/atoms";
+import styles from "./VehicleQueryCard.module.scss";
 
 type Props = {
   plate: string;
@@ -10,41 +9,54 @@ type Props = {
   onSubmit: () => void;
 };
 
-
 export default function VehicleQueryCard({ plate, onChange, onSubmit }: Props) {
-    return (
-        <Card className={styles.Card}>
-            {/* fila: label + input + botón */}
-            <div className={styles.Row}>
-                <div className={styles.Field}>
-                    <Text variant="Small" className={styles.Label}>
-                        PLACA CONSULTADA
-                    </Text>
-                    <Input
-                        type="text"
-                        value={plate}
-                        onChange={(e) => onChange(e.currentTarget.value)}
-                        placeholder="C-123ABC"
-                        className={styles.Input}
-                        aria-label="Placa"
-                    />
+  return (
+    <Card className={styles.Card}>
+        <div className={styles.firstBlock}>
+            {/* Col 1, fila 1: label + input */}
+            <div className={styles.Field}>
+                <Text variant="Small" className={styles.Label}>
+                    PLACA CONSULTADA
+                </Text>
+                <Input
+                    type="text"
+                    value={plate}
+                    onChange={(e) => onChange(e.currentTarget.value)}
+                    placeholder="C-123ABC"
+                    className={styles.Input}
+                    aria-label="Placa"
+                />
+            </div>
+
+            {/* Col 2, fila 1: botón */}
+            <button className={styles.CTA} onClick={onSubmit} type="button">Consultar ahora </button>
+
+            {/* Fila 2: Hints — ocupa ambas columnas */}
+            <div className={styles.Hints}>
+                <div className={styles.block}>
+                    <a className={styles.Link} href="#">Cambiar placa </a>
+                    <span aria-hidden>·</span>
                 </div>
 
-                <button className={styles.CTA} onClick={onSubmit} type="button">
-                    Consultar ahora
-                </button>
+                <div className={styles.hintsBody}>
+                    <span className={styles.Muted}>
+                        Tipos válidos: P, A, C, M, O, U, E, CD, CI, MI, TCR, TC, EXT, CC, DIS.{" "}
+                    </span>
+                    <span className={styles.Muted}>Formatos: </span>
+                    <span className={styles.tipe_Badge}>TIPO-1XXX</span>
+                    <span className={styles.tipe_Badge}>TIPO-11XXX</span>
+                    <span className={styles.tipe_Badge}>TIPO-111XXX</span>
+                    <span className={styles.Muted}> (sin vocales)</span>
+                    <span className={styles.Muted}>Ej.: </span>
+                    <span className={styles.tipe_Badge}>P-18RT</span>
+                    <span className={styles.tipe_Badge}>M-11CRS</span>
+                    <span className={styles.tipe_Badge}>O-111RT</span>   
+                </div>
             </div>
+        </div>
 
-            {/* hints debajo */}
-            <div className={styles.Hints}>
-                <a className={styles.Link} href="#">Cambiar placa</a>
-                <span aria-hidden>·</span>
-                <span className={styles.Muted}>
-                    Tipos válidos: P, A, C, M, O, U, E, CD, CI, MI, TCR, TC, EXT, CC, DIS
-                </span>
-            </div>
-
-            {/* pasos */}
+        {/* pasos */}
+        <div className={styles.secondBlock}>
             <div className={styles.Steps}>
                 <Step n={1} title="Consulta">
                     Ingresa tu placa y verifica tus remisiones.
@@ -56,20 +68,31 @@ export default function VehicleQueryCard({ plate, onChange, onSubmit }: Props) {
                     Descarga tu comprobante digital al instante.
                 </Step>
             </div>
-        </Card>
-    );
+        </div>
+    </Card>
+  );
 }
 
-function Step({ n, title, children }: { n:number; title:string; children: React.ReactNode }) {
-    return (
-        <div className={styles.Step}>
-            <span className={styles.Badge}>{n}</span>
+function Step({
+  n,
+  title,
+  children,
+}: {
+  n: number;
+  title: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <div className={styles.Step}>
+      <span className={styles.Badge}>{n}</span>
 
-            <h3 className={styles.StepTitle}>
-                <Text variant="Large" className={styles.StepTitleText}>{title}</Text>
-            </h3>
+      <h3 className={styles.StepTitle}>
+        <Text variant="Large" className={styles.StepTitleText}>
+          {title}
+        </Text>
+      </h3>
 
-            <Text className={styles.StepDesc}>{children}</Text>
-        </div>
-    );
+      <Text className={styles.StepDesc}>{children}</Text>
+    </div>
+  );
 }

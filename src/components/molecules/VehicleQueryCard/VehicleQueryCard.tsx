@@ -10,21 +10,40 @@ type Props = {
 };
 
 export default function VehicleQueryCard({ plate, onChange, onSubmit }: Props) {
+  const [isEditing, setIsEditing] = React.useState(false);
+  const inputRef = React.useRef<HTMLInputElement | null>(null);
+
+  const toggleEdit = (e?: React.MouseEvent) => {
+    e?.preventDefault();
+    setIsEditing((prev) => {
+      const next = !prev;
+      if (!prev) {
+        requestAnimationFrame(() => {
+          inputRef.current?.focus();
+          inputRef.current?.select();
+        });
+      }
+      return next;
+    });
+  };
+
   return (
     <Card className={styles.Card}>
         <div className={styles.firstBlock}>
-            {/* Col 1, fila 1: label + input */}
             <div className={styles.Field}>
                 <Text variant="Small" className={styles.Label}>
-                    PLACA CONSULTADA
+                  PLACA CONSULTADA
                 </Text>
                 <Input
-                    type="text"
-                    value={plate}
-                    onChange={(e) => onChange(e.currentTarget.value)}
-                    placeholder="C-123ABC"
-                    className={styles.Input}
-                    aria-label="Placa"
+                  ref={inputRef}
+                  type="text"
+                  value={plate}
+                  onChange={(e) => isEditing && onChange(e.currentTarget.value)}
+                  placeholder="C-123ABC"
+                  className={styles.Input}
+                  aria-label="Placa"
+                  disabled={!isEditing}
+                  readOnly={!isEditing}
                 />
             </div>
 
@@ -34,7 +53,11 @@ export default function VehicleQueryCard({ plate, onChange, onSubmit }: Props) {
             {/* Fila 2: Hints — ocupa ambas columnas */}
             <div className={styles.Hints}>
                 <div className={styles.block}>
-                    <a className={styles.Link} href="#">Cambiar placa </a>
+                    <a className={styles.Link} onClick={toggleEdit} aria-pressed={isEditing}
+                      aria-label={isEditing ? "Terminar edición de placa" : "Cambiar placa"}
+                    >
+                      {isEditing ? "Listo" : "Cambiar placa"}
+                    </a>
                     <span aria-hidden>·</span>
                 </div>
 

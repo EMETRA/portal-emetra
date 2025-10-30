@@ -4,20 +4,28 @@ import classNames from "classnames";
 import styles from "./page.module.scss";
 import {SatTitle, Text} from '@/components/atoms/index';
 import {Button} from '@/components/server/atoms/index';
-import { SatSocialSection, VehicleQueryCard } from '@/components/molecules/index';
+import { SatSocialSection, VehicleQueryCard, SatHeader } from '@/components/molecules/index';
 
 const NotificacionesSatPage: React.FC = () => {
     const [plate, setPlate] = useState("C-869BQS");
     return(
-        <>
         <div className={classNames(styles.Container)}>
+            <SatHeader
+                logoSrc="/images/MuniGuate.png"
+                logoAlt="MuniGuate"
+                logoHref="/"
+                actions={[
+                    { label: "1551 Call Center", href: "#", icon: "/icons/callcenter-blue.svg" },
+                    { label: "123 CBM",          href: "#", icon: "/icons/firefighters-blue.svg" },
+                ]}
+            />
             <SatTitle as="h4" lineColor="#62B44B" lineThickness="2px" gap="5rem">
                 Consulta<br/>vehículo
             </SatTitle>
             <VehicleQueryCard
                 plate={plate}
                 onChange={setPlate}
-                onSubmit={() => {/* llamar a tu backend */}}
+                onSubmit={() => {/* llamar a backend */}}
             />
             <div className={styles.Actions}>
                 <Button variant="outline" fullWidth className={styles.full}>
@@ -46,8 +54,6 @@ const NotificacionesSatPage: React.FC = () => {
             </footer>
 
         </div>
-            
-        </>
     )
 }
 

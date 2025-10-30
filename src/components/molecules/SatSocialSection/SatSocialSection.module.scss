@@ -1,73 +1,90 @@
 @use "@/theme/colors.scss" as *;
 
-.Section{
+/* ===== contenedor ===== */
+.Section {
+  padding-inline: .5rem;
+  margin-top: 1.25rem;
+}
+
+/* ===== fila sin Bootstrap ===== */
+.Row {
+  display: flex;
+  flex-wrap: wrap;                 /* móvil: apila */
+  justify-content: center;         /* centra el conjunto */
+  align-items: flex-start;
+  column-gap: min(4vw, 2rem);      /* separación lateral entre columnas */
+  row-gap: 1.25rem;                /* separación vertical al apilar */
+}
+
+/* columnas: por defecto 100% (móvil) */
+.Col {
+  flex: 1 1 100%;
   display: grid;
-  grid-template-columns: 1fr 1fr;         /* desktop: 2 columnas */
-  gap: min(8vw, 6rem);
-  align-items: start;
   justify-items: center;
-  padding-inline: 1rem;
-  margin-top: 2rem;
+  row-gap: .75rem;
+  text-align: center;
+  justify-content: center;
 }
 
-.col{
-  inline-size: 100%;
-  display: grid;
-  justify-items: center;                  /* centra título y grilla */
-  row-gap: 1rem;
+/* desktop/tablet: 60/40 (equivalente a col-md-7/5) */
+@media (min-width: 768px) {
+  .Row { flex-wrap: nowrap; }
+  .Row > [data-info="caja_redes"]    { flex: 0 0 58.333%; max-width: 58.333%; }
+  .Row > [data-info="caja_contacto"] { flex: 0 0 41.667%; max-width: 41.667%; }
 }
 
+/* ===== títulos ===== */
 .title{
   margin: 0;
   color: $primary-blue;
   font-weight: 800;
   letter-spacing: .06em;
-  text-align: center;
-  font-size: x-large;
+  font-size: 1.25rem;              /* más pequeño */
 }
 
-/* ====== grilla de iconos ====== */
+/* ===== grillas compactas ===== */
 .iconRow{
   width: 100%;
   display: grid;
   justify-items: center;
   align-items: start;
-  gap: 1.25rem 1.75rem;
+  gap: .75rem 1rem;                 /* ↓ separación entre tarjetas */
 }
 
-.icons4{ grid-template-columns: repeat(4, 120px); }
-.icons3{ grid-template-columns: repeat(3, 120px); }
+/* 4 y 3 columnas pero angostas (compactas) */
+.icons4 { grid-template-columns: repeat(4, 96px); }
+.icons3 { grid-template-columns: repeat(3, 96px); }
 
 .iconSlot{
-  inline-size: 120px;
+  inline-size: 96px;                /* ↓ ancho de celda */
   text-decoration: none;
   display: grid;
   justify-items: center;
   align-items: start;
-  row-gap: .45rem;
+  row-gap: .35rem;
   color: inherit;
 }
 
 .icon{
-  inline-size: 56px;                
-  block-size: 56px;
+  inline-size: 44px;                /* ↓ tamaño del icono */
+  block-size: 44px;
   border: 2px solid $brand-green;
-  border-radius: 12px;
+  border-radius: 10px;
   display: grid;
   place-items: center;
   background: transparent;
   box-sizing: border-box;
-  padding: 4px;                     
+  padding: 4px;
   transition: box-shadow .15s ease, transform .06s ease, background-color .15s ease;
 }
-
-.icon > img{
+.icon img{
   max-inline-size: 100%;
   max-block-size: 100%;
   object-fit: contain;
   display: block;
 }
 
+/* estados */
 .iconSlot:hover .icon{
   background-color: rgba($brand-green,.06);
   box-shadow: 0 0 0 3px rgba($brand-green,.16) inset;
@@ -75,18 +92,16 @@
 .iconSlot:active .icon{ transform: translateY(1px); }
 
 .caption{
-  font-size: .85rem;
+  font-size: .78rem;                /* ↓ caption */
   color: $brand-green;
   font-weight: 700;
-  text-align: center;
   line-height: 1.1;
 }
 
-/* ====== responsive ====== */
-@media (max-width: 60rem){
-  .Section{ grid-template-columns: 1fr; gap: 2rem; }     /* apila secciones */
-  .icons4{ grid-template-columns: repeat(4, minmax(64px,1fr)); }
-  .icons3{ grid-template-columns: repeat(3, minmax(64px,1fr)); }
-  .icon{ inline-size: 64px; block-size: 64px; border-radius: 12px; padding: 8px; }
-  .title{ font-size: large;}
+/* ===== responsive adicional ===== */
+@media (max-width: 480px){
+  .icons4 { grid-template-columns: repeat(4, minmax(64px, 1fr)); }
+  .icons3 { grid-template-columns: repeat(3, minmax(64px, 1fr)); }
+  .icon   { inline-size: 40px; block-size: 40px; }
+  .title  { font-size: 1.1rem; }
 }

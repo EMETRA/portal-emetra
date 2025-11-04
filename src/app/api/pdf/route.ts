@@ -1,261 +1,292 @@
-// src/app/api/pdf/route.ts
-import { PDFDocument, StandardFonts, rgb } from "pdf-lib";
+import puppeteer, { type Browser } from "puppeteer";
 
 export const runtime = "nodejs";
 
-// A4 en puntos (pt)
-const A4 = { w: 595.28, h: 841.89 };
+type Body = {
+  notification_no?: string;
+  fecha_notificacion?: string;
+  hora_notificacion?: string;
+  plate?: string;
+  modelo?: string;
+  marca?: string;
+  n_infraccion?: string;
+  articulo?: string;
+  fecha_infraccion?: string;
+  monto?: string;
+  lugar?: string;
+  hora_hecho?: string;
+  detalle_remision_url?: string;
+  shield_url?: string;
+  firma_url?: string;
+  firmante_nombre?: string;
+  firmante_cargo?: string;
+  footer_left_url?: string;
+  footer_right_url?: string;
+};
 
-// Helper para envolver párrafos
-function wrapText(
-  text: string,
-  maxWidth: number,
-  font: any,
-  fontSize: number
-): string[] {
-  const words = text.split(/\s+/);
-  const lines: string[] = [];
-  let line = "";
+function htmlTemplate(origin: string, data: Required<Body>) {
+  return `<!doctype html>
+    <html lang="es">
+    <head>
+      <meta charset="utf-8" />
+      <meta name="viewport" content="width=device-width, initial-scale=1" />
+      <title>Notificación</title>
+      <style>
+        body { font-family: "Arial"; color: #111; font-size: 12pt; line-height: 1.5; }
+        .wrap { width: 100%; }
+        .header{ display:flex; align-items:center; justify-content:space-between; height: 80px; margin-bottom: 10px; }
+        .title { text-align: center; margin-top: 12px; margin-bottom: 16px; }
+        .title h1 { font-size: 15pt; margin: 0 0 8px 0; font-weight: 700; }
+        .title h2, .title h3 { font-size: 12.5pt; margin: 0; font-weight: 700; }
+        .small { font-size: 11pt; font-weight: 700; color: #121212; line-height: 1}
 
-  for (const word of words) {
-    const test = line ? `${line} ${word}` : word;
-    const width = font.widthOfTextAtSize(test, fontSize);
-    if (width <= maxWidth) line = test;
-    else {
-      if (line) lines.push(line);
-      line = word;
+        .escudo { width: 60px; height: auto; object-fit: contain; margin: 0; }
+        p { text-align: justify; margin: 0 0 10px 0; }
+        .firma { text-align: center; margin-top: 18px; }
+        .firma img { width: 200px; height: auto; }
+        .firmante { font-weight: 700; margin-top: 6px; }
+        .cargo { margin-top: 2px; }
+        .footer { display: flex; justify-content: space-between; align-items:flex-end; margin-top: 24px; min-height: 48px;  }
+        .footer img{ height: 56px; width: auto; object-fit: contain; display: block; }
+        .Footer2 {height: 86px !important; width: auto;}
+      </style>
+    </head>
+    <body>
+      <div class="wrap">
+        <!-- Encabezado -->
+        <div class="header">
+          <div class="small">Notificación No. ${data.notification_no}</div>
+          <img class="escudo" src="${data.shield_url}" alt="Escudo" />
+        </div>
+
+        <div class="title">
+          <h1>NOTIFICACIÓN ELECTRÓNICA</h1><br/>
+          <h2>POLICÍA MUNICIPAL DE TRÁNSITO</h2>
+          <h3>CIUDAD DE GUATEMALA</h3>
+        </div>
+
+        <!-- Párrafos -->
+        <p>
+          En el Municipio de Guatemala, del Departamento de Guatemala, el día ${data.fecha_notificacion}, a las
+          ${data.hora_notificacion}, se notifica al propietario del vehículo con número de placa ${data.plate}.
+          Modelo: ${data.modelo} / Marca: ${data.marca}. Infracción cometida en tránsito N-${data.n_infraccion},
+          Artículo ${data.articulo}. Fecha de la infracción: ${data.fecha_infraccion}.. Monto ${data.monto}.
+          Lugar ${data.lugar}, Hora ${data.hora_hecho}.
+        </p>
+
+        <p>
+          Por medio de la presente cédula de notificación que contiene el estado de cuenta de infracciones y que se ha
+          entregado al propietario del vehículo en el presente correo. Se adjuntan documentos que justifican la imposición
+          de la multa en el siguiente link <a href=${data.detalle_remision_url}>ver detalle remision</a> .
+        </p>
+
+        <p>
+          Usted tiene el plazo establecido en la Ley de Tránsito para efectuar el pago correspondiente en cajas municipales,
+          vía electrónica, bancos del sistema y sistema POS, según la reforma a la Ley de Tránsito contenida en el Decreto
+          33-2024, emitido por el Congreso de la República de Guatemala.
+        </p>
+
+        <p>
+          Procedimiento para la impugnación: los establecidos en el artículo 186 del Reglamento de Tránsito Acuerdo
+          Gubernativo 273-98, y Reforma del artículo 31 de la Ley de Tránsito. Plazo para presentar recurso: no mayor de
+          quince (15) días posteriores a la fecha de la presente notificación.
+        </p>
+
+        <p>Notificación electrónica, de conformidad con el Acuerdo COM-32-2022 y sus reformas.</p>
+
+        <!-- Firma -->
+        <div class="firma">
+          <img src="${data.firma_url}" alt="Firma" />
+          <div class="firmante">${data.firmante_nombre}</div>
+          <div class="cargo">${data.firmante_cargo}</div>
+        </div>
+
+        <!-- Footer con imágenes -->
+        <div class="footer">
+          <img src="${data.footer_left_url}"  alt="Footer izquierdo" onerror="this.hidden=true">
+          <img src="${data.footer_right_url}" alt="Footer derecho" class="Footer2" onerror="this.hidden=true">
+        </div>
+      </div>
+    </body>
+    </html>
+  `;
+}
+type Gender = "m" | "f";
+
+function numeroEnLetras(n: number, gender: Gender = "m"): string {
+  if (!Number.isFinite(n) || n < 0 || n > 999999) return String(n);
+
+  const u = ["cero","uno","dos","tres","cuatro","cinco","seis","siete","ocho","nueve"];
+  const e = ["","once","doce","trece","catorce","quince","dieciséis","diecisiete","dieciocho","diecinueve"];
+  const d = ["","diez","veinte","treinta","cuarenta","cincuenta","sesenta","setenta","ochenta","noventa"];
+  const c = ["","ciento","doscientos","trescientos","cuatrocientos","quinientos","seiscientos","setecientos","ochocientos","novecientos"];
+
+  const ajustaUno = (txt: string): string => {
+    if (gender === "f") {
+      return txt.replace(/\buno\b$/, "una")
+                .replace(/veintiuno$/, "veintiuna")
+                .replace(/ y uno\b$/, " y una");
+    }
+    return txt.replace(/\buno\b$/, "un")
+              .replace(/veintiuno$/, "veintiún")
+              .replace(/ y uno\b$/, " y un");
+  };
+
+  const tres = (x: number): string => {
+    if (x === 0) return "";
+    if (x === 100) return "cien";
+    const centenas = Math.floor(x / 100);
+    const decenasUnidades = x % 100;
+
+    let res = "";
+    if (centenas) res += c[centenas] + (decenasUnidades ? " " : "");
+
+    if (decenasUnidades === 0) return res.trim();
+    if (decenasUnidades < 10) return (res + u[decenasUnidades]).trim();
+    if (decenasUnidades > 10 && decenasUnidades < 20) return (res + e[decenasUnidades - 10]).trim();
+
+    const dec = Math.floor(decenasUnidades / 10);
+    const uni = decenasUnidades % 10;
+
+    if (dec === 1 && uni === 0) return (res + "diez").trim();
+    if (dec === 2 && uni > 0) return (res + "veinti" + (uni === 1 ? "uno" : u[uni])).trim();
+
+    return (res + d[dec] + (uni ? " y " + (uni === 1 ? "uno" : u[uni]) : "")).trim();
+  };
+
+  const miles = Math.floor(n / 1000);
+  const resto = n % 1000;
+
+  let out = "";
+  if (miles) out += (miles === 1 ? "mil" : tres(miles) + " mil") + (resto ? " " : "");
+  out += tres(resto);
+
+  return ajustaUno(out.trim());
+}
+
+function fechaALetras(fecha: string): string {
+  // acepta: "DD de <mes> de YYYY" | "YYYY-MM-DD" | "DD-MM-YYYY" | "DD/MM/YYYY"
+  const meses = ["enero","febrero","marzo","abril","mayo","junio","julio","agosto","septiembre","octubre","noviembre","diciembre"];
+
+  const reEsp = /^(\d{1,2})\s+de\s+([a-záéíóú]+)\s+de\s+(\d{4})$/i;
+  const m1 = fecha.match(reEsp);
+  let d: number|undefined, m: number|undefined, y: number|undefined;
+
+  if (m1) {
+    d = parseInt(m1[1],10);
+    m = meses.findIndex(mm => mm === m1[2].toLowerCase()) + 1;
+    y = parseInt(m1[3],10);
+  } else {
+    const reISO = /^(\d{4})[-/](\d{1,2})[-/](\d{1,2})$/;
+    const reLat = /^(\d{1,2})[-/](\d{1,2})[-/](\d{4})$/;
+    if (reISO.test(fecha)) {
+      const [,yy,mm,dd] = fecha.match(reISO)!;
+      y = +yy; m = +mm; d = +dd;
+    } else if (reLat.test(fecha)) {
+      const [,dd,mm,yy] = fecha.match(reLat)!;
+      d = +dd; m = +mm; y = +yy;
     }
   }
-  if (line) lines.push(line);
-  return lines;
+
+  if (!d || !m || !y || m < 1 || m > 12) return fecha; // fallback
+
+  const diaTxt = numeroEnLetras(d, "m"); // "tres"
+  const anioTxt = anioALetras(y);        // "dos mil veinticinco"
+  return `${diaTxt} de ${meses[m-1]} de ${anioTxt}`;
+}
+
+function anioALetras(y: number): string {
+  // 0..9999
+  return numeroEnLetras(y, "m");
+}
+
+function horaALetras(hhmm: string): string {
+  // "HH:MM" 24h → "diez horas con quince minutos"
+  const m = /^(\d{1,2}):(\d{2})$/.exec(hhmm);
+  if (!m) return hhmm;
+
+  let h = parseInt(m[1],10);
+  const min = parseInt(m[2],10);
+
+  const horaTxt = numeroEnLetras(h === 1 ? 1 : h, "f"); // "una" hora, "diez" horas
+  const minuTxt = numeroEnLetras(min === 1 ? 1 : min, "m");
+
+  const palabraHora = h === 1 ? "hora" : "horas";
+  const palabraMin = min === 1 ? "minuto" : "minutos";
+
+  if (min === 0) return `${horaTxt} ${palabraHora} en punto`;
+  return `${horaTxt} ${palabraHora} con ${minuTxt} ${palabraMin}`;
 }
 
 export async function POST(req: Request) {
+  let browser: Browser | null = null;
+
   try {
-    const body = await req.json().catch(() => ({}));
+    const body = (await req.json().catch(() => ({}))) as Body;
     const { origin } = new URL(req.url);
 
-    // ===== Datos (con defaults) =====
-    const data = {
+    // Defaults
+    const data: Required<Body> = {
       notification_no: body.notification_no ?? "2300824",
-      fecha_notificacion: body.fecha_notificacion ?? "30 de octubre de 2025",
-      hora_notificacion: body.hora_notificacion ?? "11:02",
-      placa: body.plate ?? "C-869BQS",
+      fecha_notificacion: fechaALetras(body.fecha_notificacion ?? "30 de octubre de 2025"),
+      hora_notificacion: horaALetras(body.hora_notificacion ?? "11:02"),
+      plate: body.plate ?? "C-869BQS",
       modelo: body.modelo ?? "1995",
       marca: body.marca ?? "FORD",
       n_infraccion: body.n_infraccion ?? "13200086",
       articulo: body.articulo ?? "183-01",
       fecha_infraccion: body.fecha_infraccion ?? "24-05-2025",
-      monto: body.monto ?? "Q434.85",
+      monto: body.monto ?? "434.85",
       lugar: body.lugar ?? "AVENIDA 39 CALLE Zona 3",
       hora_hecho: body.hora_hecho ?? "11:07",
       detalle_remision_url: body.detalle_remision_url ?? "https://ejemplo/remision/ABC",
-      shield_url: body.shield_url ?? `${origin}/images/escudo.png`,
+      shield_url: body.shield_url ?? `${origin}/images/EscudoMuni.png`,
       firma_url: body.firma_url ?? `${origin}/images/firma.png`,
       firmante_nombre: body.firmante_nombre ?? "Carlos Antonio Lemus Guerra",
       firmante_cargo: body.firmante_cargo ?? "Intendente",
+      footer_left_url:  (body as any).footer_left_url  ?? `${origin}/images/footer_left.png`,
+      footer_right_url: (body as any).footer_right_url ?? `${origin}/images/footer_right.png`,
     };
 
-    // ===== Crear PDF =====
-    const pdfDoc = await PDFDocument.create();
-    const page = pdfDoc.addPage([A4.w, A4.h]);
+    const html = htmlTemplate(origin, data);
 
-    const fontRegular = await pdfDoc.embedFont(StandardFonts.TimesRoman);
-    const fontBold = await pdfDoc.embedFont(StandardFonts.TimesRomanBold);
+    // Lanzar Chromium. Para entornos restringidos, añade args no-sandbox.
+    browser = await puppeteer.launch({
+      // executablePath: process.env.PUPPETEER_EXECUTABLE_PATH, // si usas uno del sistema
+      args: ["--no-sandbox", "--disable-setuid-sandbox"], // seguro en contenedores
+    });
+    const page = await browser.newPage();
 
-    // Márgenes
-    const M = {
-      top: 24 * 2.8346,
-      right: 18 * 2.8346,
-      bottom: 24 * 2.8346,
-      left: 18 * 2.8346,
-    };
-    let cursorY = A4.h - M.top;
-
-    // ===== Encabezado =====
-    const smallSize = 11;
-    page.drawText(`Notificación No. ${data.notification_no}`, {
-      x: M.left,
-      y: cursorY,
-      size: smallSize,
-      font: fontBold,
-      color: rgb(0.07, 0.07, 0.07),
+    // Carga del contenido
+    await page.setContent(html, {
+      waitUntil: ["load", "domcontentloaded", "networkidle0"],
     });
 
-    // Escudo (si hay)
-    try {
-      const resp = await fetch(data.shield_url);
-      if (resp.ok) {
-        const bytes = new Uint8Array(await resp.arrayBuffer());
-        const img = /\.(jpe?g)$/i.test(data.shield_url)
-          ? await pdfDoc.embedJpg(bytes)
-          : await pdfDoc.embedPng(bytes);
-        const shieldW = 100;
-        const scale = shieldW / img.width;
-        const shieldH = img.height * scale;
-        page.drawImage(img, {
-          x: A4.w - M.right - shieldW,
-          y: cursorY - shieldH + 8,
-          width: shieldW,
-          height: shieldH,
-        });
-      }
-    } catch {
-      /* ignora fallos de imagen */
-    }
-
-    // Títulos centrados
-    const title1 = "NOTIFICACIÓN ELECTRÓNICA";
-    const title2 = "POLICÍA MUNICIPAL DE TRÁNSITO";
-    const title3 = "CIUDAD DE GUATEMALA";
-    const title1Size = 15,
-      title2Size = 12.5,
-      title3Size = 12.5;
-
-    const drawCentered = (text: string, size: number, font: any, y: number) => {
-      const width = font.widthOfTextAtSize(text, size);
-      const x = (A4.w - width) / 2;
-      page.drawText(text, { x, y, size, font, color: rgb(0.07, 0.07, 0.07) });
-    };
-
-    cursorY -= 20;
-    drawCentered(title1, title1Size, fontBold, cursorY);
-    cursorY -= 18;
-    drawCentered(title2, title2Size, fontBold, cursorY);
-    cursorY -= 16;
-    drawCentered(title3, title3Size, fontBold, cursorY);
-    cursorY -= 22;
-
-    // ===== Párrafos =====
-    const bodySize = 12.5;
-    const maxTextWidth = A4.w - M.left - M.right;
-
-    const par1 =
-      `En el Municipio de Guatemala, del Departamento de Guatemala, el día ${data.fecha_notificacion}, a las ` +
-      `${data.hora_notificacion}, se notifica al propietario del vehículo con número de placa ${data.placa}. ` +
-      `Modelo: ${data.modelo} / Marca: ${data.marca}. Infracción cometida en tránsito N-${data.n_infraccion}, ` +
-      `Artículo ${data.articulo}. Fecha de la infracción: ${data.fecha_infraccion}. Monto ${data.monto}. ` +
-      `Lugar ${data.lugar}, Hora ${data.hora_hecho}.`;
-
-    const par2 =
-      `Por medio de la presente cédula de notificación que contiene el estado de cuenta de infracciones y que se ha ` +
-      `entregado al propietario del vehículo en el presente correo. Se adjuntan documentos que justifican la imposición ` +
-      `de la multa. Consulte aquí: ${data.detalle_remision_url}.`;
-
-    const par3 =
-      `Usted tiene el plazo establecido en la Ley de Tránsito para efectuar el pago correspondiente en cajas municipales, ` +
-      `vía electrónica, bancos del sistema y sistema POS, según la reforma a la Ley de Tránsito contenida en el Decreto ` +
-      `33-2024, emitido por el Congreso de la República de Guatemala.`;
-
-    const par4 =
-      `Procedimiento para la impugnación: los establecidos en el artículo 186 del Reglamento de Tránsito Acuerdo ` +
-      `Gubernativo 273-98, y Reforma del artículo 31 de la Ley de Tránsito. Plazo para presentar recurso: no mayor de ` +
-      `quince (15) días posteriores a la fecha de la presente notificación.`;
-
-    const par5 = `Notificación electrónica, de conformidad con el Acuerdo COM-32-2022 y sus reformas.`;
-
-    const drawParagraph = (text: string) => {
-      const lines = wrapText(text, maxTextWidth, fontRegular, bodySize);
-      for (const line of lines) {
-        page.drawText(line, { x: M.left, y: cursorY, size: bodySize, font: fontRegular });
-        cursorY -= 15;
-      }
-      cursorY -= 6;
-    };
-
-    [par1, par2, par3, par4, par5].forEach(drawParagraph);
-
-    // ===== Firma =====
-    cursorY -= 10;
-    try {
-      const r2 = await fetch(data.firma_url);
-      if (r2.ok) {
-        const bytes = new Uint8Array(await r2.arrayBuffer());
-        const img = /\.(jpe?g)$/i.test(data.firma_url)
-          ? await pdfDoc.embedJpg(bytes)
-          : await pdfDoc.embedPng(bytes);
-        const signW = 200;
-        const scale = signW / img.width;
-        const signH = img.height * scale;
-        const x = (A4.w - signW) / 2;
-        page.drawImage(img, { x, y: cursorY - signH, width: signW, height: signH });
-        cursorY -= signH + 4;
-      }
-    } catch {
-      /* ignora */
-    }
-
-    const nameWidth = fontBold.widthOfTextAtSize(data.firmante_nombre, bodySize);
-    page.drawText(data.firmante_nombre, {
-      x: (A4.w - nameWidth) / 2,
-      y: cursorY,
-      size: bodySize,
-      font: fontBold,
-    });
-    cursorY -= 16;
-
-    const roleWidth = fontRegular.widthOfTextAtSize(data.firmante_cargo, bodySize);
-    page.drawText(data.firmante_cargo, {
-      x: (A4.w - roleWidth) / 2,
-      y: cursorY,
-      size: bodySize,
-      font: fontRegular,
-    });
-    cursorY -= 24;
-
-    // ===== Footer =====
-    const footerLeftLine1 = "Municipalidad de Guatemala";
-    const footerLeftLine2 = "21 calle 6-77, zona 1";
-    page.drawText(footerLeftLine1, {
-      x: M.left,
-      y: M.bottom + 28,
-      size: bodySize,
-      font: fontBold,
-      color: rgb(0.16, 0.16, 0.54),
-    });
-    page.drawText(footerLeftLine2, {
-      x: M.left,
-      y: M.bottom + 12,
-      size: bodySize,
-      font: fontRegular,
-      color: rgb(0.16, 0.16, 0.54),
+    // Generar PDF (A4, márgenes, fondos)
+    const pdfBuffer = await page.pdf({
+      format: "A4",
+      printBackground: true,
+      margin: { top: "14mm", right: "8mm", bottom: "1mm", left: "8mm" },
     });
 
-    const sloganLine1 = "Juntos transformamos";
-    const sloganLine2 = "la ciudad para vivir mejor";
-    const slogan1Width = fontBold.widthOfTextAtSize(sloganLine1, bodySize);
-    const slogan2Width = fontRegular.widthOfTextAtSize(sloganLine2, bodySize);
-    page.drawText(sloganLine1, {
-      x: A4.w - M.right - slogan1Width,
-      y: M.bottom + 28,
-      size: bodySize,
-      font: fontBold,
-      color: rgb(0.4, 0.4, 0.4),
-    });
-    page.drawText(sloganLine2, {
-      x: A4.w - M.right - slogan2Width,
-      y: M.bottom + 12,
-      size: bodySize,
-      font: fontRegular,
-      color: rgb(0.4, 0.4, 0.4),
-    });
+    await page.close();
+    await browser.close();
+    browser = null;
 
-    // ===== Guardar y responder =====
-    const pdfBytes: Uint8Array = await pdfDoc.save(); // Uint8Array
+    const blob = new Blob([pdfBuffer], { type: "application/pdf" });
 
-    // ArrayBuffer "limpio" para satisfacer BodyInit
-    const cleanArrayBuffer: ArrayBuffer = pdfBytes.slice().buffer;
-
-
-    return new Response(cleanArrayBuffer, {
+    return new Response(blob, {
       headers: {
         "Content-Type": "application/pdf",
-        "Content-Disposition": "inline; filename=notificacion.pdf",
+        "Content-Disposition": 'inline; filename="notificacion.pdf"',
         "Cache-Control": "no-store",
       },
     });
   } catch (e) {
     console.error(e);
+    if (browser) {
+      try { await browser.close(); } catch {}
+    }
     return new Response(JSON.stringify({ error: "No se pudo generar el PDF" }), {
       status: 500,
       headers: { "Content-Type": "application/json" },

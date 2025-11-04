@@ -1,0 +1,114 @@
+$brand: #65b32e;
+$brand-ink: #1e3a1a;
+$ink: #111;
+$muted: #6b7280;
+$bg: #f6f8f9;
+$card: #ffffff;
+
+.wrap {
+  display: grid;
+  gap: 20px;
+  padding: 32px 16px;
+  background: $bg;
+
+  @media (min-width: 1024px) {
+    padding: 48px 24px 72px;
+    place-items: center;
+  }
+}
+
+.hero {
+  width: 100%;
+  max-width: 980px;
+  text-align: center;
+}
+
+.title {
+  font-weight: 800;
+  letter-spacing: .04em;
+  color: $ink;
+  margin: 4px 0 6px;
+  font-size: clamp(22px, 2.8vw, 34px);
+  text-transform: uppercase;
+}
+
+.subtitle { color: $muted; font-size: 15px; margin: 0; }
+
+.card {
+  width: 100%;
+  max-width: 980px;
+  background: $card;
+  border: 1px solid #e5e7eb;
+  border-radius: 18px;
+  padding: 22px;
+  box-shadow: 0 10px 18px rgba(0, 0, 0, 0.03), 0 1px 0 rgba(0, 0, 0, 0.02);
+}
+
+.form { display: grid; gap: 14px; }
+
+.label {
+  font-weight: 700;
+  color: $ink;
+}
+
+.fileRow {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.fileInput {
+  appearance: none;
+  padding: 10px 12px;
+  border-radius: 12px;
+  border: 1px solid #d1d5db;
+  background: #fff;
+  font-size: 14px;
+
+  &:focus {
+    outline: none;
+    border-color: $brand;
+    box-shadow: 0 0 0 3px rgba(101, 179, 46, 0.25);
+  }
+}
+
+.fileMeta { color: $muted; font-size: 13px; margin-top: -2px; }
+
+.actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+.primaryBtn {
+  appearance: none;
+  border: 0;
+  border-radius: 12px;
+  padding: 10px 18px;
+  font-weight: 800;
+  letter-spacing: .02em;
+  background: $brand;
+  color: white;
+  cursor: pointer;
+  transition: transform .05s ease, filter .15s ease;
+
+  &:hover { filter: brightness(1.03); }
+  &:active { transform: translateY(1px); }
+  &:disabled { opacity: .6; cursor: not-allowed; }
+}
+
+.ghostBtn {
+  appearance: none;
+  border-radius: 12px;
+  border: 1px solid #d1d5db;
+  background: transparent;
+  color: $ink;
+  padding: 10px 14px;
+  font-weight: 700;
+  cursor: pointer;
+
+  &:hover { border-color: $brand; color: $brand-ink; }
+}
+
+.smallNote { color: $muted; font-size: 12.5px; }

@@ -11,6 +11,148 @@ import NewsCarrousel from "@/components/organisms/NewsCarrousel/NewsCarrousel";
 import { FAQ, FAQ_Type } from "@/schema";
 import { FAQQuestions } from "@/components/organisms/FAQ-Questions";
 
+type NewsState = "draft" | "published" | "archived";
+type NewsVisibility = "public" | "private";
+
+type News = {
+  id: string;
+  titulo: string;
+  slug: string;
+  idioma: string;
+  estado: NewsState;
+  visibilidad: NewsVisibility;
+  fecha_publicacion: string | null;
+  resumen?: string;
+  portada_url?: string | null;
+  autor?: string;
+  etiquetas?: string[];
+  created_at?: string;
+  updated_at?: string;
+};
+
+type PaginatedNewsResponse = {
+  items: News[];
+  total: number;
+  page: number;
+  limit: number;
+};
+
+async function getNewsMock(params?: {
+  estado?: NewsState;
+  visibilidad?: NewsVisibility;
+  idioma?: string;
+  q?: string;
+  page?: number;
+  limit?: number;
+}): Promise<PaginatedNewsResponse> {
+  const limit = params?.limit ?? 8;
+
+  const sample: News[] = [
+    {
+      id: "1",
+      titulo: "Noticia 1",
+      slug: "noticia-1",
+      idioma: "es",
+      estado: "published",
+      visibilidad: "public",
+      fecha_publicacion: "2025-08-19T10:00:00.000Z",
+      portada_url: "/images/Evento.jpg",
+    },
+    {
+      id: "2",
+      titulo: "Noticia 2",
+      slug: "noticia-2",
+      idioma: "es",
+      estado: "published",
+      visibilidad: "public",
+      fecha_publicacion: "2025-08-18T10:00:00.000Z",
+      portada_url: "/images/Evento.jpg",
+    },
+    {
+      id: "3",
+      titulo: "Noticia 3",
+      slug: "noticia-3",
+      idioma: "es",
+      estado: "published",
+      visibilidad: "public",
+      fecha_publicacion: "2025-08-17T10:00:00.000Z",
+      portada_url: "/images/Evento.jpg",
+    },
+    {
+      id: "4",
+      titulo: "Noticia 4",
+      slug: "noticia-4",
+      idioma: "es",
+      estado: "published",
+      visibilidad: "public",
+      fecha_publicacion: "2025-08-16T10:00:00.000Z",
+      portada_url: "/images/Evento.jpg",
+    },
+    {
+      id: "5",
+      titulo: "Noticia 5",
+      slug: "noticia-5",
+      idioma: "es",
+      estado: "published",
+      visibilidad: "public",
+      fecha_publicacion: "2025-08-15T10:00:00.000Z",
+      portada_url: "/images/Evento.jpg",
+    },
+    {
+      id: "6",
+      titulo: "Noticia 6",
+      slug: "noticia-6",
+      idioma: "es",
+      estado: "published",
+      visibilidad: "public",
+      fecha_publicacion: "2025-08-14T10:00:00.000Z",
+      portada_url: "/images/Evento.jpg",
+    },
+    {
+      id: "7",
+      titulo: "Noticia 7",
+      slug: "noticia-7",
+      idioma: "es",
+      estado: "published",
+      visibilidad: "public",
+      fecha_publicacion: "2025-08-13T10:00:00.000Z",
+      portada_url: "/images/Evento.jpg",
+    },
+    {
+      id: "8",
+      titulo: "Noticia 8",
+      slug: "noticia-8",
+      idioma: "es",
+      estado: "published",
+      visibilidad: "public",
+      fecha_publicacion: "2025-08-12T10:00:00.000Z",
+      portada_url: "/images/Evento.jpg",
+    },
+  ];
+
+  return {
+    items: sample.slice(0, limit),
+    total: sample.length,
+    page: 1,
+    limit,
+  };
+}
+
+function formatISODateToEsPretty(iso: string | null): string {
+  if (!iso) return "";
+  const d = new Date(iso);
+  const dtf = new Intl.DateTimeFormat("es-GT", {
+    day: "2-digit",
+    month: "long",
+    year: "numeric",
+  });
+  const s = dtf.format(d); 
+  const [dia, , mes, , anio] = s.split(" ");
+  const mesCap = mes.charAt(0).toUpperCase() + mes.slice(1);
+  return `${dia} de ${mesCap}, ${anio}`;
+}
+
+
 const slides: BannerSlide[] = [
   {
     backgroundImage: "/images/banner.jpg",
@@ -67,7 +209,16 @@ const loremQuestions: FAQ[] = [
   },
 ];
 
-export default function Home() {
+export default async function Home() {
+  const news = await getNewsMock({ 
+    estado: "published",
+    visibilidad: "public",
+    idioma: "es",
+    page: 1,
+    limit: 8,
+   });
+
+
   return (
     <div className={styles.page}>
       <Banner slides={slides} />
@@ -113,56 +264,15 @@ export default function Home() {
       </Separator>
 
       <NewsCarrousel>
-        <NewCard
-          id="1"
-          title="Noticia 1"
-          date="19 de Agosto, 2025"
-          image="/images/Evento.jpg"
-        />
-        <NewCard
-          id="2"
-          title="Noticia 2"
-          date="18 de Agosto, 2025"
-          image="/images/Evento.jpg"
-        />
-        <NewCard
-          id="3"
-          title="Noticia 3"
-          date="17 de Agosto, 2025"
-          image="/images/Evento.jpg"
-        />
-        <NewCard
-          id="4"
-          title="Noticia 4"
-          date="16 de Agosto, 2025"
-          image="/images/Evento.jpg"
-        />
-        <NewCard
-          id="5"
-          title="Noticia 5"
-          date="15 de Agosto, 2025"
-          image="/images/Evento.jpg"
-        />
-        <NewCard
-          id="6"
-          title="Noticia 6"
-          date="14 de Agosto, 2025"
-          image="/images/Evento.jpg"
-        />
-        <NewCard
-          id="7"
-          title="Noticia 7"
-          date="13 de Agosto, 2025"
-          image="/images/Evento.jpg"
-        />
-
-        <NewCard
-          id="8"
-          title="Noticia 8"
-          date="12 de Agosto, 2025"
-          image="/images/Evento.jpg"
-        />
-        {/* ...más cards */}
+        {news.items.map((newsItem) => (
+          <NewCard
+            key={newsItem.id}
+            id={newsItem.id}
+            title={newsItem.titulo}
+            date={formatISODateToEsPretty(newsItem.fecha_publicacion)}
+            image={newsItem.portada_url || "/images/Evento.jpg"}
+          />
+        ))}
       </NewsCarrousel>
       <Separator>
         <h1 className={classNames(styles.Title)}>Preguntas Frecuentes</h1>

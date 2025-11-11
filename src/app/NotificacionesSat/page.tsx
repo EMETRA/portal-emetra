@@ -8,7 +8,7 @@ import { VehicleQueryCard } from '@/components/molecules/index';
 
 const NotificacionesSatPage: React.FC = () => {
     const [plate, setPlate] = useState("C-869BQS");
-    const [loading, setLoading] = useState(false);
+    const [, setLoading] = useState(false);
     const previewPDF = async () => {
         try {
             setLoading(true);

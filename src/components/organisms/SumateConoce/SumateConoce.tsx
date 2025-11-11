@@ -1,7 +1,7 @@
+/* eslint-disable @next/next/no-img-element */
 import styles from './SumateConoce.module.scss';
 import image1 from "@assets/images/imgConoce1.jpeg";
 import image2 from "@assets/images/imgConoce2.jpeg";
-import { Text } from '@/components/atoms';
 
 type ImportedImg = string | {src: string};
 const toUrl = (img: ImportedImg) => typeof img === 'string' ? img : img.src;

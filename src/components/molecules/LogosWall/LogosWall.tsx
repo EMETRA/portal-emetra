@@ -1,4 +1,5 @@
 'use client'
+/* eslint-disable @next/next/no-img-element */
 import React, { useEffect, useState, useMemo, useRef } from 'react';
 import styles from './LogosWall.module.scss';
 import type { Logo, TrackProps, LogoWallProps } from './types';

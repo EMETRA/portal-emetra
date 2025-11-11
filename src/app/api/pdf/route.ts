@@ -205,7 +205,7 @@ function horaALetras(hhmm: string): string {
   const m = /^(\d{1,2}):(\d{2})$/.exec(hhmm);
   if (!m) return hhmm;
 
-  let h = parseInt(m[1],10);
+  const h = parseInt(m[1],10);
   const min = parseInt(m[2],10);
 
   const horaTxt = numeroEnLetras(h === 1 ? 1 : h, "f"); // "una" hora, "diez" horas
@@ -244,7 +244,9 @@ export async function POST(req: Request) {
       firma_url: body.firma_url ?? `${origin}/images/firma.png`,
       firmante_nombre: body.firmante_nombre ?? "Carlos Antonio Lemus Guerra",
       firmante_cargo: body.firmante_cargo ?? "Intendente",
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       footer_left_url:  (body as any).footer_left_url  ?? `${origin}/images/footer_left.png`,
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       footer_right_url: (body as any).footer_right_url ?? `${origin}/images/footer_right.png`,
     };
 

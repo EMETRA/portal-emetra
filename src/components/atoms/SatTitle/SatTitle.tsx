@@ -23,12 +23,12 @@ export default function SatTitle({
   lineThickness,
   gap,
 }: Props) {
-  const Tag = as as any;
+  const Tag = as as React.ElementType;
 
   const styleVars: React.CSSProperties = {
-    ...(lineColor ? { ["--twl-line-color" as any]: lineColor } : {}),
-    ...(lineThickness ? { ["--twl-line-thickness" as any]: lineThickness } : {}),
-    ...(gap ? { ["--twl-gap" as any]: gap } : {}),
+    ...(lineColor ? { ["--twl-line-color" as string]: lineColor } : {}),
+    ...(lineThickness ? { ["--twl-line-thickness" as string]: lineThickness } : {}),
+    ...(gap ? { ["--twl-gap" as string]: gap } : {}),
   };
 
   return (

@@ -5,11 +5,7 @@ import styles from "./Page.module.scss";
 import { Icon } from "@/components/server/atoms";
 import MultimediaCard from "@/components/server/molecules/MultimediaCard/MultimediaCard";
 import MultimediaCarrousel from "@/components/server/organisms/MultimediaCarrousel/MultimediaCarrousel";
-
-const API_BASE_URL =
-  process.env.NEXT_PUBLIC_API_BASE_URL ??
-  process.env.API_BASE_URL ??
-  "http://localhost:4001";
+import { API_BASE_URL } from "@/lib/config";
 
 interface PageProps {
   params: Promise<{

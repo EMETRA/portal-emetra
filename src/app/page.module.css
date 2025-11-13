@@ -56,3 +56,10 @@
 .Services {
   margin-top: 1.75rem;
 }
+
+.noNewsMessage {
+  text-align: center;
+  color: #1700a5;
+  margin-block: 2rem;
+  font-weight: 500;
+}

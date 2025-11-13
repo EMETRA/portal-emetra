@@ -1,16 +1,18 @@
+'use client'
 import React from "react";
 import { Card, Text } from "@components/atoms";
 import { Input } from "@/components/server/atoms";
 import styles from "./VehicleQueryCard.module.scss";
 
 type Props = {
-  plate: string;
-  onChange: (v: string) => void;
-  onSubmit: () => void;
+  initialPlate: string;
 };
 
-export default function VehicleQueryCard({ plate, onChange, onSubmit }: Props) {
+export default function VehicleQueryCard({ initialPlate = "" }: Props) {
+  const [plate, setPlate] = React.useState(initialPlate);
   const [isEditing, setIsEditing] = React.useState(false);
+  const [loading, setLoading] = React.useState(false);
+  const [message, setMessage] = React.useState<string | null>(null);
   const inputRef = React.useRef<HTMLInputElement | null>(null);
 
   const toggleEdit = (e?: React.MouseEvent) => {
@@ -27,6 +29,74 @@ export default function VehicleQueryCard({ plate, onChange, onSubmit }: Props) {
     });
   };
 
+  const previewPDF = async () => {
+    try {
+      setLoading(true);
+      setMessage(null);
+
+      //Consultar remisiones
+      const consulta = await fetch("/api/sat/consulta", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ plate }),
+      });
+
+      if (!consulta.ok) {
+        const errorData = await consulta.json();
+        setMessage(errorData.message || "Error al consultar remisiones");
+        return;
+      }
+
+      const consultaJson = await consulta.json().catch(() => null);
+
+      if (consultaJson?.error || consultaJson?.success === false || !consultaJson?.data || consultaJson.data.length === 0) {
+        setMessage(
+          consultaJson?.message ||
+            "No se encontraron remisiones pendientes de notificación"
+        );
+        return;
+      }
+
+      //Generar PDF
+      const pdfRes = await fetch("/api/sat/getpdf", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ plate }),
+      });
+
+      if (!pdfRes.ok) {
+        const errorData = await pdfRes.json().catch(() => null);
+        setMessage(
+          errorData?.message || "No se pudo obtener la notificación en PDF"
+        );
+        return;
+      }
+
+      const pdfData = await pdfRes.json();
+      console.log("PDF data:", pdfData);
+
+
+      // console.log("Generando PDF para placa:", plate);
+      const res = await fetch("/api/sat/pdf", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(pdfData),
+      });
+
+      if (!res.ok) {
+        console.error("No se pudo generar el PDF");
+        return;
+      }
+
+      const blob = await res.blob();
+      const url = URL.createObjectURL(blob);
+      window.open(url, "_blank", "noopener,noreferrer");
+      setTimeout(() => URL.revokeObjectURL(url), 60_000);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <Card className={styles.Card}>
         <div className={styles.firstBlock}>
@@ -38,17 +108,17 @@ export default function VehicleQueryCard({ plate, onChange, onSubmit }: Props) {
                   ref={inputRef}
                   type="text"
                   value={plate}
-                  onChange={(e) => isEditing && onChange(e.currentTarget.value)}
+                  onChange={(e) => isEditing && setPlate(e.currentTarget.value)}
                   placeholder="C-123ABC"
                   className={styles.Input}
                   aria-label="Placa"
-                  disabled={!isEditing}
+                  disabled={!isEditing || loading}
                   readOnly={!isEditing}
                 />
             </div>
 
             {/* Col 2, fila 1: botón */}
-            <button className={styles.CTA} onClick={onSubmit} type="button">Consultar ahora </button>
+            <button className={styles.CTA} onClick={previewPDF} type="button"> {loading ? "Consultando..." : "Consultar ahora"} </button>
 
             {/* Fila 2: Hints — ocupa ambas columnas */}
             <div className={styles.Hints}>

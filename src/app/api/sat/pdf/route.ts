@@ -24,34 +24,29 @@ type Body = {
   footer_right_url?: string;
 };
 
-function htmlTemplate(origin: string, data: Required<Body>) {
-  return `<!doctype html>
-    <html lang="es">
-    <head>
-      <meta charset="utf-8" />
-      <meta name="viewport" content="width=device-width, initial-scale=1" />
-      <title>Notificación</title>
-      <style>
-        body { font-family: "Arial"; color: #111; font-size: 12pt; line-height: 1.5; }
-        .wrap { width: 100%; }
-        .header{ display:flex; align-items:center; justify-content:space-between; height: 80px; margin-bottom: 10px; }
-        .title { text-align: center; margin-top: 12px; margin-bottom: 16px; }
-        .title h1 { font-size: 15pt; margin: 0 0 8px 0; font-weight: 700; }
-        .title h2, .title h3 { font-size: 12.5pt; margin: 0; font-weight: 700; }
-        .small { font-size: 11pt; font-weight: 700; color: #121212; line-height: 1}
+type Remision = {
+  PLACA: string;
+  MODELO: number;
+  MARCA: string;
+  ARTICULOS: string;
+  MONTO: number;
+  FECHA: string;
+  LUGAR: string;
+  SERIE_REMISION: string;
+  HORA: string;
+  id_notificacion: number;
+};
 
-        .escudo { width: 60px; height: auto; object-fit: contain; margin: 0; }
-        p { text-align: justify; margin: 0 0 10px 0; }
-        .firma { text-align: center; margin-top: 18px; }
-        .firma img { width: 200px; height: auto; }
-        .firmante { font-weight: 700; margin-top: 6px; }
-        .cargo { margin-top: 2px; }
-        .footer { display: flex; justify-content: space-between; align-items:flex-end; margin-top: 24px; min-height: 48px;  }
-        .footer img{ height: 56px; width: auto; object-fit: contain; display: block; }
-        .Footer2 {height: 86px !important; width: auto;}
-      </style>
-    </head>
-    <body>
+type RemisionesResponse = {
+  success: boolean;
+  placa: string;
+  remisiones: Remision[];
+  recursos: Record<string, unknown>;
+
+};
+
+function htmlTemplate(origin: string, data: Required<Body>) {
+  return `
       <div class="wrap">
         <!-- Encabezado -->
         <div class="header">
@@ -69,7 +64,7 @@ function htmlTemplate(origin: string, data: Required<Body>) {
         <p>
           En el Municipio de Guatemala, del Departamento de Guatemala, el día ${data.fecha_notificacion}, a las
           ${data.hora_notificacion}, se notifica al propietario del vehículo con número de placa ${data.plate}.
-          Modelo: ${data.modelo} / Marca: ${data.marca}. Infracción cometida en tránsito N-${data.n_infraccion},
+          Modelo: ${data.modelo} / Marca: ${data.marca}. Infracción cometida en tránsito ${data.n_infraccion},
           Artículo ${data.articulo}. Fecha de la infracción: ${data.fecha_infraccion}.. Monto ${data.monto}.
           Lugar ${data.lugar}, Hora ${data.hora_hecho}.
         </p>
@@ -107,8 +102,6 @@ function htmlTemplate(origin: string, data: Required<Body>) {
           <img src="${data.footer_right_url}" alt="Footer derecho" class="Footer2" onerror="this.hidden=true">
         </div>
       </div>
-    </body>
-    </html>
   `;
 }
 type Gender = "m" | "f";
@@ -222,45 +215,86 @@ export async function POST(req: Request) {
   let browser: Browser | null = null;
 
   try {
-    const body = (await req.json().catch(() => ({}))) as Body;
+    const body = (await req.json().catch(() => ({}))) as RemisionesResponse;
     const { origin } = new URL(req.url);
 
-    // Defaults
-    const data: Required<Body> = {
-      notification_no: body.notification_no ?? "2300824",
-      fecha_notificacion: fechaALetras(body.fecha_notificacion ?? "30 de octubre de 2025"),
-      hora_notificacion: horaALetras(body.hora_notificacion ?? "11:02"),
-      plate: body.plate ?? "C-869BQS",
-      modelo: body.modelo ?? "1995",
-      marca: body.marca ?? "FORD",
-      n_infraccion: body.n_infraccion ?? "13200086",
-      articulo: body.articulo ?? "183-01",
-      fecha_infraccion: body.fecha_infraccion ?? "24-05-2025",
-      monto: body.monto ?? "434.85",
-      lugar: body.lugar ?? "AVENIDA 39 CALLE Zona 3",
-      hora_hecho: body.hora_hecho ?? "11:07",
-      detalle_remision_url: body.detalle_remision_url ?? "https://ejemplo/remision/ABC",
-      shield_url: body.shield_url ?? `${origin}/images/EscudoMuni.png`,
-      firma_url: body.firma_url ?? `${origin}/images/firma.png`,
-      firmante_nombre: body.firmante_nombre ?? "Carlos Antonio Lemus Guerra",
-      firmante_cargo: body.firmante_cargo ?? "Intendente",
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      footer_left_url:  (body as any).footer_left_url  ?? `${origin}/images/footer_left.png`,
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      footer_right_url: (body as any).footer_right_url ?? `${origin}/images/footer_right.png`,
-    };
+    const now = new Date();
+    const fechaRaw = `${String(now.getDate()).padStart(2, "0")}-${String(
+      now.getMonth() + 1
+    ).padStart(2, "0")}-${now.getFullYear()}`; // 13-11-2025
+    const horaRaw = `${String(now.getHours()).padStart(2, "0")}:${String(
+      now.getMinutes()
+    ).padStart(2, "0")}`;
 
-    const html = htmlTemplate(origin, data);
+    const dataList: Required<Body>[] = body.remisiones.map((remision) => {
+      const numeroSerie = remision.SERIE_REMISION.replace(/[^0-9]/g, "");
+      return {
+        notification_no: remision.id_notificacion.toString(),
+        fecha_notificacion: fechaALetras(fechaRaw),
+        hora_notificacion: horaALetras(horaRaw),
 
-    // Lanzar Chromium. Para entornos restringidos, añade args no-sandbox.
+        plate: remision.PLACA,
+        modelo: remision.MODELO.toString(),
+        marca: remision.MARCA,
+
+        n_infraccion: remision.SERIE_REMISION,
+        articulo: remision.ARTICULOS,
+        fecha_infraccion: remision.FECHA,
+        monto: remision.MONTO.toString(),
+
+        lugar: remision.LUGAR,
+        hora_hecho: remision.HORA,
+
+        detalle_remision_url: `https://consulta.muniguate.com/emetra/detalle.php?s=${numeroSerie}&r=${remision.id_notificacion.toString()}&id=1`,
+        shield_url: `${origin}/images/EscudoMuni.png`,
+        firma_url: `${origin}/images/firma.png`,
+        firmante_nombre: "Carlos Antonio Lemus Guerra",
+        firmante_cargo: "Intendente",
+        footer_left_url: `${origin}/images/footer_left.png`,
+        footer_right_url: `${origin}/images/footer_right.png`,
+      };
+    });
+
+    const pagesHtml = dataList.map((data) => htmlTemplate(origin,data)).join("");
+
+    const fullHtml = `<!DOCTYPE html>
+      <html>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <title>Notificación</title>
+        <style>
+          body { font-family: "Arial"; color: #111; font-size: 12pt; line-height: 1.5; }
+          .wrap { width: 100%; box-sizing: border-box; page-break-before: always; break-before: page;}
+          .wrap:first-of-type { page-break-before: auto; break-before: auto;}
+          .header{ display:flex; align-items:center; justify-content:space-between; height: 80px; margin-bottom: 10px; }
+          .title { text-align: center; margin-top: 12px; margin-bottom: 16px; }
+          .title h1 { font-size: 15pt; margin: 0 0 8px 0; font-weight: 700; }
+          .title h2, .title h3 { font-size: 12.5pt; margin: 0; font-weight: 700; }
+          .small { font-size: 11pt; font-weight: 700; color: #121212; line-height: 1}
+
+          .escudo { width: 60px; height: auto; object-fit: contain; margin: 0; }
+          p { text-align: justify; margin: 0 0 10px 0; }
+          .firma { text-align: center; margin-top: 18px; }
+          .firma img { width: 200px; height: auto; }
+          .firmante { font-weight: 700; margin-top: 6px; }
+          .cargo { margin-top: 2px; }
+          .footer { display: flex; justify-content: space-between; align-items:flex-end; margin-top: 24px; min-height: 48px;  }
+          .footer img{ height: 56px; width: auto; object-fit: contain; display: block; }
+          .Footer2 {height: 86px !important; width: auto;}
+        </style>
+        <body>
+          ${pagesHtml}
+        </body>
+      </html>
+    `;
+
     browser = await puppeteer.launch({
-      // executablePath: process.env.PUPPETEER_EXECUTABLE_PATH, // si usas uno del sistema
-      args: ["--no-sandbox", "--disable-setuid-sandbox"], // seguro en contenedores
+      args: ["--no-sandbox", "--disable-setuid-sandbox"], 
     });
     const page = await browser.newPage();
 
     // Carga del contenido
-    await page.setContent(html, {
+    await page.setContent(fullHtml, {
       waitUntil: ["load", "domcontentloaded", "networkidle0"],
     });
 

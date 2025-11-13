@@ -1,6 +1,3 @@
-"use client";
-
-import React from "react";
 import { SolvenciaCard } from "@/components/organisms/index";
 import { SectionTitle } from "@/components/server/molecules/SectionTitle";
 export default function Page() {

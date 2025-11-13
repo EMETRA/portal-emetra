@@ -42,6 +42,12 @@
     flex-wrap: wrap;
 }
 
+.column {
+    display: flex;
+    flex-direction: column;
+
+}
+
 .TextStyle {
     text-align: left;
     font-weight: 700;

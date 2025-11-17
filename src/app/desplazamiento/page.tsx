@@ -1,16 +1,19 @@
-'use client';
+"use client";
 
-import { MapView } from '@/components/templates/MapView';
-import { routes } from '@/data/routesData';
-
+import { LoadingSpinner } from "@/components/server/atoms/LoadingSpinner";
+import { MapView } from "@/components/templates/MapView";
+import { useRoutes } from "@/data/remote/route/useRoutes";
 
 const Page: React.FC = () => {
+  const { routes, loading, error } = useRoutes();
+  if (loading) return <LoadingSpinner variant="page-wide" />;
+  if (error) return <p>Error: {error}</p>;
 
-    return (
-        <>
-            <MapView routes={routes} />
-        </>
-    );
+  return (
+    <>
+      <MapView routes={routes} />
+    </>
+  );
 };
 
 export default Page;

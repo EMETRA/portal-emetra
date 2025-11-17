@@ -1,17 +1,4 @@
-export interface Route {
-    id: number;
-    name: string;
-    state: 'Libre' | 'Medio' | 'Alto' | 'Sin datos';
-    time: number;
-    distance: number;
-    coordinates: [number, number][];
-    days?: {
-        day: string;
-        time: number;
-    }[],
-    today?: number;
-    update?: string; 
-}
+import { Route } from "@/components/templates/MapView/MapView";
 
 export const routes: Route[] = [
     {

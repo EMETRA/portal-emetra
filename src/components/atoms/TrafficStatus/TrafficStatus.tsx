@@ -11,6 +11,8 @@ export default function TrafficStatus({state}: TrafficStatusProps) {
                 return styles.alto;
             case 'Medio':
                 return styles.medio;
+            case 'Normal':
+                return styles.normal;
             case 'Libre':
                 return styles.libre;
             default:

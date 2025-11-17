@@ -1,4 +1,5 @@
 export interface TimeCardProps {
-    time?: number;
-    hour?: string;
-};
+  time?: number;
+  hour?: string;
+  averageTime?: number;
+}

@@ -1,6 +1,6 @@
-import { Route } from "@/data/routesData";
+import { Route } from "@/components/templates/MapView/MapView";
 
 export interface MapModalProps {
-    route: Route;
-    onClose: () => void;
+  route: Route;
+  onClose: () => void;
 }

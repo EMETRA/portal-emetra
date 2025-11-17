@@ -2,7 +2,7 @@
 import React, { useState } from "react";
 import Cell from "@/components/server/atoms/CalendarCell/CalendarCell";
 import styles from "./Calendar.module.scss";
-import { events } from "@/examples/event";
+import { events } from "@/data/local/examples/event";
 import { Icon } from "../../atoms";
 import Link from "next/link";
 

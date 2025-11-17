@@ -1,5 +1,5 @@
 'use client';
-import React, { useRef, useCallback } from 'react';
+import React, { useRef } from 'react';
 import styles from './FullPageSnap.module.scss';
 
 type FullPageSnapProps = {
@@ -23,8 +23,8 @@ export default function FullPageSnap({
             ref={ref}
             className={`${styles.viewport} ${className ?? ''}`}
             style={{
-                ['--snap-align' as any]: snapAlign,
-                ['--snap-stop'  as any]: snapStopAlways ? 'always' : 'normal',
+                ['--snap-align' as string]: snapAlign,
+                ['--snap-stop'  as string]: snapStopAlways ? 'always' : 'normal',
             }}
             >
             {sections.map((node, i) => (

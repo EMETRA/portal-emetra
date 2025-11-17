@@ -1,6 +1,5 @@
 import React from 'react';
 import styles from './HowTable.module.scss';
-import { assert } from 'console';
 import type { Cell, HowTableProps } from './types';
 
 
@@ -21,7 +20,7 @@ export default function HowTable({ columns, rows, rowColors = [], className }: H
     const singleCol = colCount === 1 ? styles.singleCol :'';
     return (
         <div className={`${styles.wrapper} ${className || ''}`}>
-            <div className={`${styles.table} ${singleCol}`} style={{ ['--cols' as any]: colCount }}>
+            <div className={`${styles.table} ${singleCol}`} style={{ ['--cols' as string]: colCount }}>
                 <div className={styles.header}>
                     {columns.map((col, i) => (
                         <div key={i} className={styles.headerCell}>

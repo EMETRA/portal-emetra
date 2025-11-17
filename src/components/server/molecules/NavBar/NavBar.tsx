@@ -5,7 +5,7 @@ import classNames from "classnames";
 import styles from "./NavBar.module.scss";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useState, useEffect, useRef, use } from "react";
+import { useState, useEffect, useRef } from "react";
 
 const navItems: { name: string; icon: IconType; href: string }[] = [
   { name: "INICIO", icon: "DPI", href: "/" },

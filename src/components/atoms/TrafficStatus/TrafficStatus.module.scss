@@ -4,6 +4,12 @@
   border-color: #f87171;
 }
 
+.lento {
+  background-color: rgba(239, 68, 68, 0.2);
+  color: #b91c1c;
+  border-color: #f87171;
+}
+
 .medio {
   background-color: rgba(249, 115, 22, 0.2);
   color: #c2410c;
@@ -41,7 +47,6 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 0.5rem;
 }
 
 .icon {

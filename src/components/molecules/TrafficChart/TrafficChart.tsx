@@ -17,14 +17,21 @@ export default function TrafficChart({ data }: TrafficChartProps) {
   // Agrupar por día y sumar tiempos
   const aggregatedData = Object.values(
     data.reduce((acc, curr) => {
-      const day = curr.day.trim(); // evita espacios
+      const day = curr.day.trim();
+
       if (!acc[day]) {
-        acc[day] = { day, tiempo: 0 };
+        acc[day] = { day, tiempoTotal: 0, count: 0 };
       }
-      acc[day].tiempo += Math.round(curr.time);
+
+      acc[day].tiempoTotal += Math.round(curr.time);
+      acc[day].count++;
+
       return acc;
-    }, {} as Record<string, { day: string; tiempo: number }>)
-  );
+    }, {} as Record<string, { day: string; tiempoTotal: number; count: number }>)
+  ).map((item) => ({
+    day: item.day,
+    tiempo: item.count > 0 ? item.tiempoTotal / item.count : 0,
+  }));
 
   const maxTime = Math.max(...aggregatedData.map((d) => d.tiempo));
 
@@ -42,7 +49,11 @@ export default function TrafficChart({ data }: TrafficChartProps) {
             {aggregatedData.map((entry, index) => (
               <Cell
                 key={`cell-${index}`}
-                fill={entry.tiempo === maxTime ? "#ef4444" : "#60a5fa"}
+                fill={
+                  entry.tiempo === maxTime && aggregatedData.length > 1
+                    ? "#ef4444"
+                    : "#60a5fa"
+                }
               />
             ))}
           </Bar>

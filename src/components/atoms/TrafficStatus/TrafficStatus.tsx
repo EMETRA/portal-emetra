@@ -9,6 +9,8 @@ export default function TrafficStatus({state}: TrafficStatusProps) {
         switch (state) {
             case 'Alto':
                 return styles.alto;
+            case 'Lento':
+                return styles.lento;
             case 'Medio':
                 return styles.medio;
             case 'Normal':
@@ -22,7 +24,7 @@ export default function TrafficStatus({state}: TrafficStatusProps) {
 
     return (
         <div className={classNames(styles.container, getTrafficColor(state))}>
-            <div className="elements">
+            <div className={styles.elements}>
                 <TrafficCone className={classNames(styles.icon)} />
                 &nbsp;
                 <span>{ state }</span>

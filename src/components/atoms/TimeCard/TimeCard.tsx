@@ -83,7 +83,7 @@ export default function TimeCard({ time, hour, averageTime }: TimeCardProps) {
           >
             {`(${Math.abs(difference)} minutos más ${
               difference < 0 ? "lento" : "rápido"
-            } que lo usual)`}
+            } de lo habitual)`}
           </p>
         )}
         {hour && <p className={classNames(styles.note)}>{formatHour(hour)}</p>}

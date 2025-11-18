@@ -12,7 +12,7 @@ import { MapModal } from "@/components/organisms/MapModal";
 export interface Route {
   id: number;
   name: string;
-  state: "Libre" | "Medio" | "Alto" | "Sin datos";
+  state: "Libre" | "Medio" | "Alto" | "Sin datos" | "Lento" | "Normal";
   time: number;
   distance: number;
   coordinates: [number, number][];
@@ -48,6 +48,24 @@ export default function MapView({ routes }: MapViewProps) {
 
   return (
     <div className={classNames(styles.container)}>
+      <div className={styles.legend}>
+        <div className={styles.legendItem}>
+          <span
+            className={styles.colorDot}
+            style={{ backgroundColor: "#314ce7ff" }}
+          />
+          Inicio
+        </div>
+
+        <div className={styles.legendItem}>
+          <span
+            className={styles.colorDot}
+            style={{ backgroundColor: "#ee1b1bff" }}
+          />
+          Fin
+        </div>
+      </div>
+
       <MapContainer
         center={center}
         zoom={12}

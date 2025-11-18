@@ -38,17 +38,52 @@ const ReciboForm: React.FC = () => {
             placa: placa.trim().toUpperCase(),
         };
         try{
-            const res = await fetch('api/solvencia/recibo', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(payload)
-            })
-            const data = await res.json();
-            setMessage(data.message);
-            setMessageType(data.success ? 'success' : 'error');
-
+            // const res = await fetch('/api/solvencia/recibo', {
+            //     method: 'POST',
+            //     headers: { 'Content-Type': 'application/json' },
+            //     body: JSON.stringify(payload)
+            // })
+            // const data = await res.json();
+            // setMessage(data.message);
+            // setMessageType(data.success ? 'success' : 'error');
+            const data = {
+                success: true,
+                recibo: "12345678",
+            }
             if(data.success){
                 //generar pdf recibo
+                console.log('Recibo más reciente:', data.recibo);
+
+                const resData = await fetch('/api/solvencia/get-data', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                        documento: data.recibo,
+                        serie: 'E/E', 
+                    }),
+                });
+
+                const json = await resData.json();
+
+                if (json.success) {
+                    console.log('Datos para PDF:', json.data);
+                    const pdfRes = await fetch('/api/solvencia/recibo-pdf', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(json.data)
+                    })
+
+                    const pdfBlob = await pdfRes.blob()
+                    const pdfUrl = URL.createObjectURL(pdfBlob)
+                    const a = document.createElement('a')
+                    a.href = pdfUrl,
+                    a.download = `recibo_${placa}.pdf`
+                    a.click()
+                    URL.revokeObjectURL(pdfUrl)   
+                } else {
+                    setMessage(json.message ?? 'No se pudieron obtener los datos del recibo.');
+                    setMessageType('error');
+                }
             }
 
         }catch{

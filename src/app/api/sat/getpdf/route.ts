@@ -50,7 +50,7 @@ export async function POST(req: NextRequest) {
             },
         });
     } catch (err) {
-        console.error("Error en /api/sat/getpdf:", err);
+        console.error("Error en api interna:", err);
         return new Response(
             JSON.stringify({
                 error: true,

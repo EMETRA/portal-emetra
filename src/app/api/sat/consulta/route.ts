@@ -54,7 +54,7 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json(data, { status: 200 });
   } catch (err) {
-    console.error("Error en /api/solvencia/consulta:", err);
+    console.error("Error en api interna:", err);
     return NextResponse.json(
       { error: true, message: "Error interno en la consulta de solvencia" },
       { status: 500 }

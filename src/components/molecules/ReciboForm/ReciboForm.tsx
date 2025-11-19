@@ -38,18 +38,18 @@ const ReciboForm: React.FC = () => {
             placa: placa.trim().toUpperCase(),
         };
         try{
-            // const res = await fetch('/api/solvencia/recibo', {
-            //     method: 'POST',
-            //     headers: { 'Content-Type': 'application/json' },
-            //     body: JSON.stringify(payload)
-            // })
-            // const data = await res.json();
-            // setMessage(data.message);
-            // setMessageType(data.success ? 'success' : 'error');
-            const data = {
-                success: true,
-                recibo: "12345678",
-            }
+            const res = await fetch('/api/solvencia/recibo', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            })
+            const data = await res.json();
+            setMessage(data.message);
+            setMessageType(data.success ? 'success' : 'error');
+            // const data = {
+            //     success: true,
+            //     recibo: "12345678",
+            // }
             if(data.success){
                 //generar pdf recibo
                 console.log('Recibo más reciente:', data.recibo);

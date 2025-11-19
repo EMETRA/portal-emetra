@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { json } from 'zod';
 
 export const runtime = 'nodejs';
 
@@ -16,18 +17,28 @@ function normalizaNumero(str: string): string {
     return out;
 }
 
+type DetalleIntereses = {
+  tipo_cobro: number;
+  cobro: number;
+  cuenta_cobro: number;
+  cuenta: string;
+  intereses: string;
+} | null;
+
+
 export async function POST(req: NextRequest) {
     try {
         const body = await req.json();
-        const documento = body.documento;
+        const rawdocumento = body.documento;
         const serie = body.serie ?? 'E/E';
 
-        if (!documento) {
+        if (!rawdocumento) {
             return NextResponse.json(
                 { success: false, message: 'documento es requerido' },
                 { status: 400 },
             );
         }
+        const documento = String(rawdocumento).trim();
 
         const dtoRecibo = { serie, documento };
 
@@ -56,7 +67,7 @@ export async function POST(req: NextRequest) {
         });
 
         if (!remRes.ok) {
-            console.error('Error en api', remRes.status, remRes.statusText);
+            console.error('Error en api 1', remRes.status, remRes.statusText);
             return NextResponse.json(
                 { success: false, message: 'Error consultando remisiones del recibo.' },
                 { status: 500 },
@@ -71,7 +82,7 @@ export async function POST(req: NextRequest) {
         });
 
         if (!ctasRes.ok) {
-            console.error('Error en api', ctasRes.status, ctasRes.statusText);
+            console.error('Error en api 2', ctasRes.status, ctasRes.statusText);
             return NextResponse.json(
                 { success: false, message: 'Error consultando cuentas del recibo.' },
                 { status: 500 },
@@ -86,7 +97,7 @@ export async function POST(req: NextRequest) {
         });
 
         if (!intRes.ok) {
-            console.error('Error en api', intRes.status, intRes.statusText);
+            console.error('Error en api 3', intRes.status, intRes.statusText);
             return NextResponse.json(
                 { success: false, message: 'Error consultando intereses del recibo.' },
                 { status: 500 },
@@ -101,7 +112,7 @@ export async function POST(req: NextRequest) {
         });
 
         if (!descRes.ok) {
-            console.error('Error en api', descRes.status, descRes.statusText);
+            console.error('Error en api 4', descRes.status, descRes.statusText);
             return NextResponse.json(
                 { success: false, message: 'Error consultando descuentos del recibo.' },
                 { status: 500 },
@@ -112,7 +123,17 @@ export async function POST(req: NextRequest) {
         const encabezadoRaw = await encRes.json();
         const remisionesRaw = await remRes.json();
         const cuentasRaw = await ctasRes.json();
-        const interesesRaw = await intRes.json();
+        const interesesText = await intRes.text();
+        let interesesRaw: DetalleIntereses = null;
+        const trimmed = interesesText.trim();
+        if (trimmed !== '' && trimmed !== 'null') {
+            try {
+                interesesRaw = JSON.parse(trimmed) as DetalleIntereses;
+            } catch (e) {
+                console.error('Error parseando JSON de intereses:', e, 'texto:', interesesText);
+                interesesRaw = null;
+            }
+        }
         const descuentosRaw = await descRes.json();
 
         // 3) Normalizar encabezado a array
@@ -190,13 +211,19 @@ export async function POST(req: NextRequest) {
 
         // 8) Nota de crédito total
         let notaCredito = 0;
+        console.log('[NOTA CREDITO] remisiones para nota de crédito:', remisiones);
         for (const [sr] of remisiones) {
+            console.log('[NOTA CREDITO] Consultando nota crédito para sr:', sr);
+            if (!sr || typeof sr !== 'string' || sr.trim() === '') {
+                console.log('[NOTA CREDITO] sr vacío o inválido, se omite llamada');
+                continue;
+            }
             const notaRes = await fetch(
                 `${BASE_URL}/recibo/nota-credito/${encodeURIComponent(sr)}`,
             );
 
             if (!notaRes.ok) {
-                console.error('Error en api', sr, notaRes.status, notaRes.statusText);
+                console.error('Error en api 5', sr, notaRes.status, notaRes.statusText);
                 return NextResponse.json(
                     { success: false, message: 'Error consultando nota de crédito.' },
                     { status: 500 },
@@ -209,11 +236,15 @@ export async function POST(req: NextRequest) {
 
         // 9) Valor en letras
         const valorTotalNum = Number(normalizaNumero(encabezado[4]));
+        console.log('Valor total numérico para valor en letras:', valorTotalNum);
         const velRes = await fetch(`${BASE_URL}/recibo/valor-en-letras`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ valor_total: valorTotalNum }),
         });
+
+        console.log('[VALOR-LETRAS] status:', velRes.status);
+        console.log('[VALOR-LETRAS] content-type:', velRes.headers.get('content-type'));
 
         if (!velRes.ok) {
             console.error('Error en api', velRes.status, velRes.statusText);
@@ -223,8 +254,11 @@ export async function POST(req: NextRequest) {
             );
         }
 
-        const velJson = await velRes.json();
-        const valorEnLetras = velJson.valor ?? velJson.VALOR ?? '';
+        const valorEnLetrasRaw = await velRes.text();
+        console.log('[VALOR-LETRAS] Texto recibido:', valorEnLetrasRaw);
+
+        // Si viene vacío, lo interpretamos como '' (sin romper)
+        const valorEnLetras = valorEnLetrasRaw?.trim() || '';
 
         // 10) Respuesta
         const data = {
@@ -245,7 +279,7 @@ export async function POST(req: NextRequest) {
             { status: 200 },
         );
     } catch (error) {
-        console.error('Error en api', error);
+        console.error('Error en api 6', error);
         return NextResponse.json(
             {
                 success: false,

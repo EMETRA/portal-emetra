@@ -5,7 +5,7 @@
 import React from "react";
 import Link from "next/link";
 import styles from "./CalendarWidget.module.scss";
-import { events } from "@/data/local/examples/event";
+import { events } from "@/data/local/event";
 import classNames from "classnames";
 
 const daysShort = ["D", "L", "M", "X", "J", "V", "S"];

@@ -7,11 +7,10 @@ import { useRoutes } from "@/data/remote/route/useRoutes";
 const Page: React.FC = () => {
   const { routes, loading, error } = useRoutes();
   if (loading) return <LoadingSpinner variant="page-wide" />;
-  if (error) return <p>Error: {error}</p>;
 
   return (
     <>
-      <MapView routes={routes} />
+      <MapView routes={error ? [] : routes} />
     </>
   );
 };

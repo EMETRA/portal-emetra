@@ -5,10 +5,10 @@ export async function POST(req: Request) {
   const { tipoPlaca, placa, fechaRecibo, numeroRecibo } = body;
 
   const payload = {
-    tipo_Placa: tipoPlaca,
+    tipo_placa: tipoPlaca,
     numero_placa: placa,
-    fecha: fechaRecibo,
-    recibo: numeroRecibo,
+    fecha_recibo: fechaRecibo,
+    numero_recibo: numeroRecibo,
   };
 
   const res = await fetch(`${BASE_URL}/solvencia/consultar-existencia-documento`, {

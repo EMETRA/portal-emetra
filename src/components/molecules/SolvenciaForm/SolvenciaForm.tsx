@@ -51,9 +51,10 @@ const SolvenciaForm: React.FC = () => {
             })
 
             const data = await res.json()
-            setMessage(data.message)
-            setMessageType(data.success ? 'success' : 'error')
-            if (data.success) {
+            
+            setMessage(data.mensaje)
+            setMessageType(data.valido ? 'success' : 'error')
+            if (data.valido) {
                 const pdfRes = await fetch('/api/solvencia/pdf', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },

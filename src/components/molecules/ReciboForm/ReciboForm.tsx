@@ -107,9 +107,9 @@ const ReciboForm: React.FC = () => {
                             id="tipoPlaca"
                             name="tipoPlaca"
                             options={[
-                                { value: "P", label: "Particular" },
-                                { value: "M", label: "Moto" },
-                                { value: "C", label: "Camión" },
+                                { value: "P", label: "P" },
+                                { value: "M", label: "M" },
+                                { value: "C", label: "C" },
                             ]}
                             value={tipoPlaca}
                             onChange={e => setTipoPlaca(e.target.value)}

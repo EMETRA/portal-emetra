@@ -156,7 +156,7 @@ export default function RouteLine({ route, onSelect }: RouteLineProps) {
       >
         <Popup>
           <div style={{ textAlign: "center" }}>
-            <strong>{route.name}</strong>
+            <strong>{route.name.split("-")[0].trim()}</strong>
             <br />
             <small>Punto de inicio</small>
           </div>
@@ -170,7 +170,9 @@ export default function RouteLine({ route, onSelect }: RouteLineProps) {
       >
         <Popup>
           <div style={{ textAlign: "center" }}>
-            <strong>{route.name}</strong>
+            <strong>
+              {route.name.includes("-") ? route.name.split("-")[1].trim() : route.name}
+            </strong>
             <br />
             <small>Punto final</small>
           </div>

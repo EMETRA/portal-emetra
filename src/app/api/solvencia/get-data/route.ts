@@ -3,7 +3,7 @@ import { json } from 'zod';
 
 export const runtime = 'nodejs';
 
-const BASE_URL = process.env.EMETRA_API_BASE_URL; 
+const BASE_URL = process.env.NEXT_PUBLIC_EMETRA_API_BASE_URL; 
 
 function normalizaNumero(str: string): string {
     if (str == null) return '0';

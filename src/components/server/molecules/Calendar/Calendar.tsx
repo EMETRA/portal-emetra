@@ -1,10 +1,11 @@
 "use client";
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
 import Cell from "@/components/server/atoms/CalendarCell/CalendarCell";
 import styles from "./Calendar.module.scss";
-import { events } from "@/examples/event";
 import { Icon } from "../../atoms";
 import Link from "next/link";
+import { isValid, parse } from "date-fns";
+import type { PrediceEventDto } from "@/lib/predice/api";
 
 const daysShort = ["Dom", "Lun", "Mar", "Mié", "Jue", "Vie", "Sáb"];
 
@@ -12,24 +13,10 @@ function getDaysInMonth(year: number, month: number) {
   return new Date(year, month + 1, 0).getDate();
 }
 
-const activeEventsByDate = events.data
-  .filter(
-    (e) =>
-      e.extendedProps &&
-      e.extendedProps.status === "ACTIVO" &&
-      typeof e.start === "string"
-  )
-  .reduce<Record<string, typeof events.data>>((acc, e) => {
-    const [day, month, year] = e.start.split("/");
-    const key = `${year}-${month.padStart(2, "0")}-${day.padStart(2, "0")}`;
-    if (!acc[key]) acc[key] = [];
-    acc[key].push(e);
-    return acc;
-  }, {});
-
 const Calendar: React.FC<{
+  events?: PrediceEventDto[];
   initialDate?: Date;
-}> = ({ initialDate = new Date() }) => {
+}> = ({ events = [], initialDate = new Date() }) => {
   const [currentDate, setCurrentDate] = useState(initialDate);
 
   const year = currentDate.getFullYear();
@@ -38,6 +25,26 @@ const Calendar: React.FC<{
 
   const firstDay = new Date(year, month, 1).getDay();
   const blanks = Array.from({ length: firstDay });
+
+  const activeEventsByDate = useMemo(() => {
+    return events
+      .filter(
+        (event) =>
+          event.extendedProps?.status === "ACTIVO" &&
+          typeof (event.start ?? event.fechai) === "string",
+      )
+      .reduce<Record<string, PrediceEventDto[]>>((acc, event) => {
+        const dateValue = event.start ?? event.fechai ?? "";
+        const parsedDate = parse(dateValue, "dd/MM/yyyy", new Date());
+        if (!isValid(parsedDate)) {
+          return acc;
+        }
+        const key = parsedDate.toISOString().slice(0, 10);
+        if (!acc[key]) acc[key] = [];
+        acc[key].push(event);
+        return acc;
+      }, {});
+  }, [events]);
 
   const handlePrevMonth = () => {
     setCurrentDate(new Date(year, month - 1, 1));

@@ -10,6 +10,79 @@ import { NewCard } from "@/components/molecules/NewCard";
 import NewsCarrousel from "@/components/organisms/NewsCarrousel/NewsCarrousel";
 import { FAQ, FAQ_Type } from "@/schema";
 import { FAQQuestions } from "@/components/organisms/FAQ-Questions";
+import { API_BASE_URL } from "@/lib/config";
+
+interface NewsSummaryDto {
+  id: number;
+  slug: string;
+  titulo: string;
+  resumen?: string | null;
+  estado: string;
+  visibilidad: string;
+  fecha_publicacion?: string | null;
+  idioma: string;
+  creado: string;
+  actualizado: string;
+  recurso_principal?: {
+    id: number;
+    nombre?: string | null;
+    url?: string | null;
+  } | null;
+}
+
+interface NewsListResponseDto {
+  items: NewsSummaryDto[];
+  total: number;
+  page: number;
+  limit: number;
+}
+
+function formatDateToSpanish(dateISO?: string | null) {
+  if (!dateISO) {
+    return "Fecha no disponible";
+  }
+
+  const formatter = new Intl.DateTimeFormat("es-GT", {
+    day: "2-digit",
+    month: "long",
+    year: "numeric",
+  });
+
+  return formatter.format(new Date(dateISO));
+}
+
+async function fetchLatestNews(): Promise<NewsSummaryDto[]> {
+  try {
+    const searchParams = new URLSearchParams({
+      estado: "borrador",
+      visibilidad: "publica",
+      idioma: "es-GT",
+      page: "1",
+      limit: "10",
+    });
+
+    const response = await fetch(`${API_BASE_URL}/news?${searchParams.toString()}`, {
+      headers: {
+        Accept: "application/json",
+      },
+      next: {
+        revalidate: 300,
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error(
+        `No fue posible obtener las noticias. Código: ${response.status}`,
+      );
+    }
+
+    const data: NewsListResponseDto = await response.json();
+    return data.items ?? [];
+  } catch (error) {
+    console.error("Error al obtener las noticias más recientes:", error);
+    return [];
+  }
+}
 
 type NewsState = "draft" | "published" | "archived";
 type NewsVisibility = "public" | "private";
@@ -166,6 +239,8 @@ const slides: BannerSlide[] = [
   },
 ];
 
+const DEFAULT_NEWS_IMAGE = "/images/Evento.jpg";
+
 const loremQuestions: FAQ[] = [
   {
     id: 1,
@@ -210,14 +285,7 @@ const loremQuestions: FAQ[] = [
 ];
 
 export default async function Home() {
-  const news = await getNewsMock({ 
-    estado: "published",
-    visibilidad: "public",
-    idioma: "es",
-    page: 1,
-    limit: 8,
-   });
-
+  const latestNews = await fetchLatestNews();
 
   return (
     <div className={styles.page}>
@@ -263,17 +331,25 @@ export default async function Home() {
         </div>
       </Separator>
 
-      <NewsCarrousel>
-        {news.items.map((newsItem) => (
-          <NewCard
-            key={newsItem.id}
-            id={newsItem.id}
-            title={newsItem.titulo}
-            date={formatISODateToEsPretty(newsItem.fecha_publicacion)}
-            image={newsItem.portada_url || "/images/Evento.jpg"}
-          />
-        ))}
-      </NewsCarrousel>
+      {latestNews.length > 0 ? (
+        <NewsCarrousel>
+          {latestNews.map((news) => (
+            <NewCard
+              key={news.id}
+              id={news.id.toString()}
+              title={news.titulo}
+              date={formatDateToSpanish(
+                news.fecha_publicacion ?? news.creado,
+              )}
+              image={news.recurso_principal?.url ?? DEFAULT_NEWS_IMAGE}
+            />
+          ))}
+        </NewsCarrousel>
+      ) : (
+        <p className={styles.noNewsMessage}>
+          No hay noticias disponibles por el momento.
+        </p>
+      )}
       <Separator>
         <h1 className={classNames(styles.Title)}>Preguntas Frecuentes</h1>
       </Separator>

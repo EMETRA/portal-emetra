@@ -8,19 +8,25 @@ import Link from "next/link";
 import { useState } from "react";
 import dynamic from "next/dynamic";
 import { Icon } from "@/components/server/atoms";
+import {
+  createPrediceEvent,
+  type CreatePrediceEventPayload,
+} from "@/lib/predice/api";
+import { format } from "date-fns";
 
 const MapInput = dynamic(
   () => import("@/components/client/atoms/MapInput/MapInput"),
-  { ssr: false }
+  { ssr: false },
 );
 
 const tipoEventoOptions = [
   { value: "", label: "Seleccione un tipo de evento" },
-  { value: "concierto", label: "Concierto" },
-  { value: "deportivo", label: "Deportivo" },
-  { value: "religioso", label: "Religioso" },
-  { value: "cultural", label: "Cultural" },
-  { value: "otro", label: "Otro" },
+  { value: "Deportivos", label: "Deportivo" },
+  { value: "Beneficiencia", label: "Beneficencia" },
+  { value: "Entretenimiento", label: "Entretenimiento" },
+  { value: "Cultural", label: "Cultural" },
+  { value: "Religioso", label: "Religioso" },
+  { value: "Otro", label: "Otro" },
 ];
 
 type Parqueo = {
@@ -33,35 +39,116 @@ type Parqueo = {
 
 const defaultCoords: [number, number] = [14.6269386, -90.5160683];
 
+function formatDateTimeField(value: FormDataEntryValue | null) {
+  if (typeof value !== "string" || value.length === 0) {
+    return null;
+  }
+
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) {
+    return null;
+  }
+
+  return {
+    date: format(date, "dd/MM/yyyy"),
+    time: format(date, "HH:mm:ss"),
+  };
+}
+
 const Page: React.FC = () => {
   const [coords, setCoords] = useState<[number, number]>(defaultCoords);
   const [parqueos, setParqueos] = useState<Parqueo[]>([]);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    const formData = new FormData(e.target as HTMLFormElement);
+    setSuccessMessage(null);
+    setErrorMessage(null);
 
-    const data = {
-      nombre: formData.get("nombre"),
-      descripcion: formData.get("descripcion"),
-      tipo: formData.get("tipo"),
-      organizador: formData.get("organizador"),
-      telefono: formData.get("telefono"),
-      correo: formData.get("correo"),
-      visitantes: formData.get("visitantes"),
-      inicio: formData.get("inicio"),
-      fin: formData.get("fin"),
-      direccion: formData.get("direccion"),
-      coords, // ubicación del evento
-      parqueos,
+    const form = e.currentTarget;
+    const formData = new FormData(form);
+
+    const inicio = formatDateTimeField(formData.get("inicio"));
+    const fin = formatDateTimeField(formData.get("fin"));
+
+    if (!inicio || !fin) {
+      setErrorMessage(
+        "Las fechas del evento no son válidas. Verifica los campos de inicio y finalización.",
+      );
+      return;
+    }
+
+    const estimado = Number(formData.get("visitantes") ?? 0);
+    if (!Number.isFinite(estimado)) {
+      setErrorMessage("El estimado de visitantes debe ser un número válido.");
+      return;
+    }
+
+    const estado = Number(formData.get("estado") ?? 1);
+    const muni = Number(formData.get("muni") ?? 1);
+
+    if (!Number.isFinite(estado) || !Number.isFinite(muni)) {
+      setErrorMessage("Los campos Municipio y Estado deben ser numéricos.");
+      return;
+    }
+
+    const payload: CreatePrediceEventPayload = {
+      nombre: String(formData.get("nombre") ?? ""),
+      descripcion: String(formData.get("descripcion") ?? ""),
+      propietario: String(formData.get("organizador") ?? ""),
+      lugar: String(formData.get("direccion") ?? ""),
+      fecha_inicial: inicio.date,
+      fecha_final: fin.date,
+      horai: inicio.time,
+      horaf: fin.time,
+      tipo: String(formData.get("tipo") ?? ""),
+      categoria: String(formData.get("categoria") ?? ""),
+      estimado,
+      muni,
+      chapa: formData.get("chapa")?.toString() || null,
+      oficio: formData.get("oficio")?.toString() || null,
+      latitud: coords[0],
+      longitud: coords[1],
+      telefono: String(formData.get("telefono") ?? ""),
+      correo: String(formData.get("correo") ?? ""),
+      tasa_compensatoria:
+        formData.get("tasa_compensatoria")?.toString() || null,
+      estado,
+      parqueos: parqueos.map((parqueo) => ({
+        id: null,
+        descripcion: parqueo.descripcion,
+        direccion: parqueo.direccion,
+        capacidad: parqueo.capacidad,
+        reservados: parqueo.usados,
+        observaciones: null,
+        lat: parqueo.coords[0],
+        lng: parqueo.coords[1],
+      })),
     };
 
-    console.log(data);
+    try {
+      setIsSubmitting(true);
+      await createPrediceEvent(payload);
+      setSuccessMessage("Evento creado exitosamente.");
+      form.reset();
+      setCoords(defaultCoords);
+      setParqueos([]);
+    } catch (error) {
+      const message =
+        error instanceof Error
+          ? error.message
+          : "No fue posible crear el evento. Intenta nuevamente.";
+      setErrorMessage(message);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const handleAddParqueo = () => {
-    setParqueos([
-      ...parqueos,
+    setParqueos((prev) => [
+      ...prev,
       {
         descripcion: "",
         direccion: "",
@@ -73,23 +160,23 @@ const Page: React.FC = () => {
   };
 
   const handleRemoveParqueo = (idx: number) => {
-    setParqueos(parqueos.filter((_, i) => i !== idx));
+    setParqueos((prev) => prev.filter((_, i) => i !== idx));
   };
 
   const handleParqueoChange = <K extends keyof Parqueo>(
     idx: number,
     field: K,
-    value: Parqueo[K]
+    value: Parqueo[K],
   ) => {
     setParqueos((prev) =>
-      prev.map((p, i) =>
-        i === idx
+      prev.map((parqueo, index) =>
+        index === idx
           ? {
-              ...p,
+              ...parqueo,
               [field]: value,
             }
-          : p
-      )
+          : parqueo,
+      ),
     );
   };
 
@@ -115,6 +202,15 @@ const Page: React.FC = () => {
         </p>
       </div>
 
+      {successMessage && (
+        <div className={classNames(styles.SuccessMessage)}>
+          {successMessage}
+        </div>
+      )}
+      {errorMessage && (
+        <div className={classNames(styles.ErrorMessage)}>{errorMessage}</div>
+      )}
+
       <Separator>
         <h2>Datos del evento</h2>
       </Separator>
@@ -132,6 +228,10 @@ const Page: React.FC = () => {
           <Select name="tipo" options={tipoEventoOptions} required />
         </label>
         <label>
+          Categoría
+          <Input type="text" name="categoria" required />
+        </label>
+        <label>
           Organizador o Representante Legal
           <Input type="text" name="organizador" required />
         </label>
@@ -146,6 +246,26 @@ const Page: React.FC = () => {
         <label>
           Estimado de visitantes
           <Input type="number" name="visitantes" min={0} required />
+        </label>
+        <label>
+          Municipio (ID)
+          <Input type="number" name="muni" min={0} defaultValue={1} required />
+        </label>
+        <label>
+          Estado
+          <Input type="number" name="estado" min={0} defaultValue={1} required />
+        </label>
+        <label>
+          Chapa
+          <Input type="text" name="chapa" />
+        </label>
+        <label>
+          Oficio
+          <Input type="text" name="oficio" />
+        </label>
+        <label>
+          Tasa compensatoria
+          <Input type="text" name="tasa_compensatoria" />
         </label>
         <label>
           Fecha y hora de inicio
@@ -226,7 +346,7 @@ const Page: React.FC = () => {
                       handleParqueoChange(
                         idx,
                         "capacidad",
-                        Number(e.target.value)
+                        Number(e.target.value),
                       )
                     }
                     required
@@ -257,8 +377,12 @@ const Page: React.FC = () => {
             + Agregar parqueo
           </Button>
         </div>
-        <Button type="submit" className={classNames(styles.SubmitButton)}>
-          Enviar evento
+        <Button
+          type="submit"
+          className={classNames(styles.SubmitButton)}
+          disabled={isSubmitting}
+        >
+          {isSubmitting ? "Enviando..." : "Enviar evento"}
         </Button>
       </form>
     </div>

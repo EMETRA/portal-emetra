@@ -1,13 +1,16 @@
 /* eslint-disable @next/next/no-img-element */
-import { events } from "@/examples/event";
-import { addMonths, isAfter, isBefore, parse, startOfDay } from "date-fns";
-import Map from "@/components/client/atoms/Map";
 import { Metadata } from "next";
 import Image from "next/image";
 import classNames from "classnames";
 import styles from "./Page.module.scss";
 import Calendar from "@/components/server/molecules/Calendar/Calendar";
 import Link from "next/link";
+import Map from "@/components/client/atoms/Map";
+import {
+  fetchPrediceEvents,
+  PrediceEventDto,
+} from "@/lib/predice/api";
+import { addMonths, isAfter, isBefore, parse, startOfDay } from "date-fns";
 
 const today = startOfDay(new Date());
 const twoMonthsLater = addMonths(today, 2);
@@ -19,7 +22,51 @@ export const metadata: Metadata = {
   },
 };
 
-const Page: React.FC = () => {
+function isValidCoordinate(value: unknown): value is number {
+  return typeof value === "number" && Number.isFinite(value);
+}
+
+function isActiveEvent(event: PrediceEventDto) {
+  return event.extendedProps?.status === "ACTIVO";
+}
+
+function parseEventDate(date?: string | null) {
+  if (!date) return null;
+  const parsed = parse(date, "dd/MM/yyyy", new Date());
+  return Number.isNaN(parsed.getTime()) ? null : parsed;
+}
+
+export default async function Page() {
+  const events = await fetchPrediceEvents();
+  const activeEvents = events.filter(isActiveEvent);
+  const eventsWithinTwoMonths = activeEvents.filter((event) => {
+    const parsedDate = parseEventDate(event.start ?? event.fechai ?? undefined);
+    if (!parsedDate) return false;
+    return (
+      (isAfter(parsedDate, today) ||
+        parsedDate.getTime() === today.getTime()) &&
+      isBefore(parsedDate, twoMonthsLater)
+    );
+  });
+
+  const mapEvents = eventsWithinTwoMonths
+    .filter((event) =>
+      isValidCoordinate(event.extendedProps?.latitud) &&
+      isValidCoordinate(event.extendedProps?.longitud),
+    )
+    .map((event) => ({
+      id: String(event.id),
+      name: event.title,
+      lat: event.extendedProps!.latitud as number,
+      lng: event.extendedProps!.longitud as number,
+      start: event.start ?? event.fechai ?? undefined,
+      end: event.end ?? event.fechaf ?? undefined,
+      horai: event.horai ?? undefined,
+      horaf: event.horaf ?? undefined,
+      aforo: event.estimado ?? undefined,
+      parqueosDisponibles: event.parqueosDisponibles ?? undefined,
+    }));
+
   return (
     <div className={classNames(styles.Page)}>
       <div className={classNames(styles.Header)}>
@@ -32,40 +79,26 @@ const Page: React.FC = () => {
         <h1>PREDICE</h1>
       </div>
 
-      <Link href="/predice/nuevo" className={classNames(styles.AddEventButton)}>
-        Agregar evento
-      </Link>
-      <Calendar />
-      <Map
-        events={events.data
-          .filter((e) => {
-            if (!e.extendedProps || e.extendedProps.status !== "ACTIVO")
-              return false;
-            const eventDate = parse(e.start, "dd/MM/yyyy", new Date());
-            return (
-              (isAfter(eventDate, today) ||
-                eventDate.getTime() === today.getTime()) &&
-              isBefore(eventDate, twoMonthsLater)
-            );
-          })
-          .filter(
-            (e) =>
-              typeof e.extendedProps.latitud === "number" &&
-              typeof e.extendedProps.longitud === "number"
-          )
-          .map((e) => ({
-            id: String(e.id),
-            name: e.title,
-            lat: e.extendedProps.latitud,
-            lng: e.extendedProps.longitud,
-            start: e.start,
-            end: e.end,
-            horai: e.horai,
-            horaf: e.horaf,
-            aforo: e.estimado,
-            parqueosDisponibles: e.parqueosDisponibles,
-          }))}
-      />
+      <div className={classNames(styles.AddEventRow)}>
+        <Link
+          href="/predice/nuevo"
+          className={classNames(styles.AddEventButton)}
+        >
+          Agregar evento
+        </Link>
+      </div>
+
+      <Calendar events={activeEvents} />
+
+      {mapEvents.length > 0 ? (
+        <Map events={mapEvents} />
+      ) : (
+        <p className={classNames(styles.NoEventsMessage)}>
+          No hay eventos activos con ubicación disponible para mostrar en el
+          mapa.
+        </p>
+      )}
+
       <h4>En colaboración con:</h4>
       <div className={classNames(styles.LogosRow)}>
         <img
@@ -125,6 +158,4 @@ const Page: React.FC = () => {
       </div>
     </div>
   );
-};
-
-export default Page;
+}

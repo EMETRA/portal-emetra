@@ -7,9 +7,9 @@ import ContactForm from "./ContactForm";
 const Footer: React.FC = () => {
   return (
     <footer className={classNames(styles.Container)}>
-      <ContactForm />
+      {/* <ContactForm /> */}
       <div className={classNames(styles.Below)}>
-        <div className={classNames(styles.Links)}>
+        {/* <div className={classNames(styles.Links)}>
           <Link href="/" className={classNames(styles.Link)}>
             Antecedentes
           </Link>
@@ -22,7 +22,7 @@ const Footer: React.FC = () => {
           <Link href="/" className={classNames(styles.Link)}>
             Formulario
           </Link>
-        </div>
+        </div> */}
         <div className={classNames(styles.Links, styles.Social)}>
           <Link href="/" className={classNames(styles.Link)}>
             <Icon name="Facebook" />

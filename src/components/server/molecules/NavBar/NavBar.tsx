@@ -9,10 +9,10 @@ import { useState, useEffect, useRef } from "react";
 
 const navItems: { name: string; icon: IconType; href: string }[] = [
   { name: "INICIO", icon: "DPI", href: "/" },
-  { name: "REMISIONES", icon: "Multa", href: "/remisiones" },
-  { name: "SERVICIOS", icon: "Files", href: "/servicios" },
+  { name: "REMISIONES", icon: "Multa", href: "https://especiales.muniguate.com/remisiones.htm" },
+  { name: "SERVICIOS5", icon: "Files", href: "/#servicios" },
   { name: "VIDEOS", icon: "DPI", href: "/videos" },
-  { name: "FAQ", icon: "Info", href: "/ayuda" },
+  { name: "FAQ", icon: "Info", href: "/#ayuda" },
   { name: "SÚMATE", icon: "User", href: "/sumate" },
 ];
 

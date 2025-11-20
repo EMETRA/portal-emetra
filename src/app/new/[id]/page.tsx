@@ -129,7 +129,7 @@ export default async function NewPage({ params }: PageProps) {
   ].filter((section) => section.subtitulos.length > 0);
 
   const recursos = [
-    news.url_canonica && `Visita la noticia oficial: ${news.url_canonica}`,
+    news.url_canonica && `Visita la notici  a oficial: ${news.url_canonica}`,
     news.recurso_principal?.url &&
       `Recurso principal: ${news.recurso_principal.url}`,
     news.recurso_og?.url && `Open Graph: ${news.recurso_og.url}`,
@@ -187,7 +187,7 @@ export default async function NewPage({ params }: PageProps) {
           </div>
         )}
 
-        {recursos.length > 0 && (
+        {/* {recursos.length > 0 && (
           <div className={classNames(styles.resourcesSection)}>
             <div className={classNames(styles.resourcesContainer)}>
               <h3 className={classNames(styles.resourcesTitle)}>
@@ -205,8 +205,8 @@ export default async function NewPage({ params }: PageProps) {
               </div>
             </div>
           </div>
-        )}
-        <MultimediaCarrousel>
+        )} */}
+        {/* <MultimediaCarrousel>
           <MultimediaCard
             src={"https://www.w3schools.com/html/mov_bbb.mp4"}
             title={"Card de Vídeo"}
@@ -227,7 +227,7 @@ export default async function NewPage({ params }: PageProps) {
             title={"Card de Vídeo"}
             description="Lorem ipsum dolor sit amet consectetur adipisicing elit. Aperiam consequatur necessitatibus natus eum atque architecto provident nostrum blanditiis ad adipisci, repellat rerum omnis magnam, asperiores quo praesentium alias minima odio."
           />
-        </MultimediaCarrousel>
+        </MultimediaCarrousel> */}
       </main>
     </div>
   );

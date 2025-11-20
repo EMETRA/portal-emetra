@@ -9,22 +9,22 @@ import{ Hero } from "@molecules/Hero";
 
 export const Banner: React.FC<BannerProps> = ({ slides }) => {
     const [idx, setIdx] = useState(0)
+    const hasMultipleSlides = slides.length > 1
 
     const prev = () => setIdx(i => (i - 1 + slides.length) % slides.length)
     const next = () => setIdx(i => (i + 1) % slides.length)
 
-/*     const slide = slides[idx]
- */
-
     return (
         <div className={styles.banner}>
-            <button
-                onClick={prev}
-                className={classNames(styles.arrow, styles.prev)}
-                aria-label="Anterior"
-            >
-                <Icon name="Up" color="white" style={{ transform: 'rotate(-90deg)', transformOrigin: 'center' }}/>
-            </button>
+            {hasMultipleSlides &&(
+                <button
+                    onClick={prev}
+                    className={classNames(styles.arrow, styles.prev)}
+                    aria-label="Anterior"
+                >
+                    <Icon name="Up" color="white" style={{ transform: 'rotate(-90deg)', transformOrigin: 'center' }}/>
+                </button>
+            )}            
 
             <div className={styles.slides} style={{ transform: `translateX(-${idx * 100}%)` }}>
                 {slides.map((slide, i) => {
@@ -39,14 +39,15 @@ export const Banner: React.FC<BannerProps> = ({ slides }) => {
                     )
                 })}
             </div>
-
-            <button
-                onClick={next}
-                className={classNames(styles.arrow, styles.next)}
-                aria-label="Siguiente"
-            >
-                <Icon name="Up" color="white" style={{ transform: 'rotate(90deg)', transformOrigin: 'center' }}/>
-            </button>
+            {hasMultipleSlides && (
+                <button
+                    onClick={next}
+                    className={classNames(styles.arrow, styles.next)}
+                    aria-label="Siguiente"
+                >
+                    <Icon name="Up" color="white" style={{ transform: 'rotate(90deg)', transformOrigin: 'center' }}/>
+                </button>
+            )}            
 
         </div>
     )

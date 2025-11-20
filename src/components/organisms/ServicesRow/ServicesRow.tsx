@@ -17,26 +17,29 @@ export const ServicesRow: React.FC<ServicesRowProps> = ({
     <ServiceItem
       iconA="Document"
       iconB="DPI"
-      label="Denuncia PMT"
+      label="SUMATE"
+      href="/sumate"
       className={styles.serviceItem}
     />
     <ServiceItem
       iconA="Document"
       iconB="User"
-      label="Juzgado de Tránsito"
-      href="/juzgado"
+      label="Tránsito Hoy"
+      href="/desplazamiento"
       className={styles.serviceItem}
     />
     <ServiceItem
       iconA="Document"
       iconB="Bus"
-      label="Remisiones de Buses (STP)"
+      label="Impresión Solvencia"
+      href="/solvencia"
       className={styles.serviceItem}
     />
     <ServiceItem
       iconA="Document"
       iconB="Vehiculo"
       label="Remisiones Emetra"
+      href="https://especiales.muniguate.com/remisiones.htm"
       className={styles.serviceItem}
     />
   </div>

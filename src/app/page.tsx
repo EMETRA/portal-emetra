@@ -92,11 +92,11 @@ const slides: BannerSlide[] = [
     text: "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.",
     overlayImage: "/images/Logos.png",
   },
-  {
-    backgroundImage: "/images/banner.jpg",
-    text: "Conoce nuestros servicios",
-    overlayImage: "/images/Logos.png",
-  },
+  // {
+  //   backgroundImage: "/images/banner.jpg",
+  //   text: "Conoce nuestros servicios",
+  //   overlayImage: "/images/Logos.png",
+  // },
 ];
 
 const DEFAULT_NEWS_IMAGE = "/images/Evento.jpg";
@@ -150,9 +150,11 @@ export default async function Home() {
   return (
     <div className={styles.page}>
       <Banner slides={slides} />
-      <Separator>
-        <h1 className={classNames(styles.Title)}>Nuestros Servicios</h1>
-      </Separator>
+      <section id="servicios">
+        <Separator>
+          <h1 className={classNames(styles.Title)}>Nuestros Servicios</h1>
+        </Separator>
+      </section>      
       <ServicesRow />
       <div className={classNames(styles.Services)}>
         <CalendarWidget />
@@ -213,11 +215,13 @@ export default async function Home() {
       <Separator>
         <h1 className={classNames(styles.Title)}>Preguntas Frecuentes</h1>
       </Separator>
-      <FAQQuestions
-        questions={loremQuestions}
-        variant="No-Landing"
-        className={styles.faqQuestions}
-      />
+      <section id="ayuda">
+        <FAQQuestions
+          questions={loremQuestions}
+          variant="No-Landing"
+          className={styles.faqQuestions}
+        />
+      </section>
     </div>
   );
 }

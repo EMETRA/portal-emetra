@@ -8,12 +8,10 @@ import classNames from "classnames";
 import styles from "./Page.module.scss";
 import Calendar from "@/components/server/molecules/Calendar/Calendar";
 import Link from "next/link";
-import Map from "@/components/client/atoms/Map";
 import {
   fetchPrediceEvents,
   PrediceEventDto,
 } from "@/lib/predice/api";
-import { addMonths, isAfter, isBefore, parse, startOfDay } from "date-fns";
 
 const today = startOfDay(new Date());
 const twoMonthsLater = addMonths(today, 2);

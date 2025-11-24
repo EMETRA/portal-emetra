@@ -1,4 +1,4 @@
-import { Route } from '@/data/routesData';
+import { Route } from './MapView';
 
 export interface MapViewProps {
     routes: Route[]

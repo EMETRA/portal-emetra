@@ -1,8 +1,9 @@
 import { useEffect, useState } from "react";
 import { api } from "@/lib/apiClient";
+import type { Route } from "@/components/templates/MapView/MapView";
 
 export function useRoute(id?: string | number) {
-  const [route, setRoute] = useState<any | null>(null);
+  const [route, setRoute] = useState<Route | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -13,8 +14,9 @@ export function useRoute(id?: string | number) {
       try {
         const response = await api.get(`/routes/${id}`);
         setRoute(response.data);
-      } catch (err: any) {
-        setError(err.message);
+      } catch (err) {
+        const error = err as Error;
+        setError(error.message);
       } finally {
         setLoading(false);
       }

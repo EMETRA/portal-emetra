@@ -1,5 +1,4 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { json } from 'zod';
 
 export const runtime = 'nodejs';
 
@@ -168,14 +167,14 @@ export async function POST(req: NextRequest) {
         ];
 
         // 4) Remisiones
-        const remisiones = (Array.isArray(remisionesRaw) ? remisionesRaw : []).map((r: any) => {
+        const remisiones = (Array.isArray(remisionesRaw) ? remisionesRaw : []).map((r: Record<string, unknown>) => {
             const serieRem = r.SERIE_REMISION ?? r.serie_remision ?? '';
             const numRem = r.NUMERO_REMISION ?? r.numero_remision ?? '';
             return [`${serieRem}${numRem}`];
         });
 
         // 5) Cuentas
-        const cuentas = (Array.isArray(cuentasRaw) ? cuentasRaw : []).map((c: any) => [
+        const cuentas = (Array.isArray(cuentasRaw) ? cuentasRaw : []).map((c: Record<string, unknown>) => [
             c.TIPO_COBRO ?? c.tipo_cobro,
             c.COBRO ?? c.cobro,
             c.CUENTA_COBRO ?? c.cuenta_cobro,
@@ -184,7 +183,7 @@ export async function POST(req: NextRequest) {
         ]);
 
         // 6) Intereses
-        let intereses: any = [];
+        let intereses: [number | string, number | string, number | string, string, string] | [] = [];
         if (interesesRaw) {
             const iRow = Array.isArray(interesesRaw)
                 ? interesesRaw[0]
@@ -201,7 +200,7 @@ export async function POST(req: NextRequest) {
         }
 
         // 7) Descuentos
-        const descuentos = (Array.isArray(descuentosRaw) ? descuentosRaw : []).map((d: any) => [
+        const descuentos = (Array.isArray(descuentosRaw) ? descuentosRaw : []).map((d: Record<string, unknown>) => [
             d.TIPO_COBRO ?? d.tipo_cobro,
             d.COBRO ?? d.cobro,
             d.CUENTA_COBRO ?? d.cuenta_cobro,

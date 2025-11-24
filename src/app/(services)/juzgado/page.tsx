@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { NotificationsCard, ExpedientesCard } from "@/components/organisms/index";
+import { ExpedientesCard } from "@/components/organisms/index";
 import { SectionTitle } from "@/components/server/molecules/SectionTitle";
 
 export default function Page() {

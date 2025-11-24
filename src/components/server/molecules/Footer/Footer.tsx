@@ -2,7 +2,6 @@ import Link from "next/link";
 import { Icon } from "../../atoms";
 import classNames from "classnames";
 import styles from "./Footer.module.scss";
-import ContactForm from "./ContactForm";
 
 const Footer: React.FC = () => {
   return (

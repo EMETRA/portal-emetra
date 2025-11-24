@@ -3,7 +3,7 @@ import dynamic from "next/dynamic";
 import { RouteLineProps } from "./types";
 import prepareCoordinates from "@/helpers/prepareCoordinates";
 import catmullRomSpline from "@/helpers/catmullRomSpline";
-import { FaMapMarkerAlt, FaFlagCheckered } from "react-icons/fa";
+import { FaMapMarkerAlt } from "react-icons/fa";
 import { renderToStaticMarkup } from "react-dom/server";
 
 const Polyline = dynamic(
@@ -12,7 +12,12 @@ const Polyline = dynamic(
     return mod.Polyline;
   },
   { ssr: false }
-) as React.ComponentType<any>;
+) as unknown as React.ComponentType<{
+  positions: [number, number][] | number[][];
+  pathOptions: { color: string; weight: number };
+  eventHandlers: { click: () => void };
+  children?: React.ReactNode;
+}>;
 
 const Tooltip = dynamic(
   async () => {
@@ -20,7 +25,9 @@ const Tooltip = dynamic(
     return mod.Tooltip;
   },
   { ssr: false }
-) as React.ComponentType<any>;
+) as unknown as React.ComponentType<{
+  children: React.ReactNode;
+}>;
 
 const Marker = dynamic(
   async () => {
@@ -28,7 +35,12 @@ const Marker = dynamic(
     return mod.Marker;
   },
   { ssr: false }
-) as React.ComponentType<any>;
+) as unknown as React.ComponentType<{
+  position: [number, number];
+  icon: unknown;
+  eventHandlers: { click: () => void };
+  children?: React.ReactNode;
+}>;
 
 const Popup = dynamic(
   async () => {
@@ -36,7 +48,9 @@ const Popup = dynamic(
     return mod.Popup;
   },
   { ssr: false }
-) as React.ComponentType<any>;
+) as unknown as React.ComponentType<{
+  children: React.ReactNode;
+}>;
 
 const getColor = (state: string) => {
   switch (state) {
@@ -58,6 +72,7 @@ const getColor = (state: string) => {
 const createDivIcon = (IconComponent: React.ComponentType, color: string) => {
   if (typeof window === "undefined") return null;
 
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
   const L = require("leaflet");
 
   const iconMarkup = renderToStaticMarkup(
@@ -103,7 +118,7 @@ export default function RouteLine({ route, onSelect }: RouteLineProps) {
   const startPoint = smoothCoords[0];
   const endPoint = smoothCoords[smoothCoords.length - 1];
 
-  const isValidPoint = (point: any) =>
+  const isValidPoint = (point: unknown): point is [number, number] =>
     Array.isArray(point) &&
     point.length === 2 &&
     typeof point[0] === "number" &&

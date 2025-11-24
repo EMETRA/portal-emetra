@@ -1,5 +1,4 @@
 /* eslint-disable @next/next/no-img-element */
-import { events } from "@/data/local/event";
 import { addMonths, isAfter, isBefore, parse, startOfDay } from "date-fns";
 import Map from "@/components/client/atoms/Map";
 import { Metadata } from "next";

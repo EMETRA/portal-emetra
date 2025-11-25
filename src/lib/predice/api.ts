@@ -48,7 +48,17 @@ export interface PrediceEventDto {
 }
 
 function buildPrediceUrl(path: string, admin: string | undefined) {
-  const url = new URL(`${API_BASE_URL}${path}`);
+  const envUrl = typeof window !== "undefined" 
+    ? process.env.NEXT_PUBLIC_API_BASE_URL
+    : process.env.API_BASE_URL;
+  
+  const baseUrl = envUrl || API_BASE_URL;
+  const fullBaseUrl = baseUrl.startsWith("http") 
+    ? baseUrl 
+    : `http://${baseUrl}`;
+  
+  const cleanPath = path.startsWith("/") ? path : `/${path}`;
+  const url = new URL(cleanPath, `${fullBaseUrl}/`);
   if (admin) {
     url.searchParams.set("admin", admin);
   }
@@ -89,7 +99,7 @@ export async function fetchPrediceEventsWithDebug(
       headers: {
         Accept: "application/json",
       },
-      cache: "no-store",
+      cache: typeof window !== "undefined" ? "no-cache" : "no-store",
     });
 
     if (!response.ok) {
@@ -117,7 +127,6 @@ export async function fetchPrediceEventsWithDebug(
       },
     };
   } catch (error) {
-    console.error("Error al obtener los eventos de Predice:", error);
     return {
       events: [],
       debug: {
@@ -162,10 +171,6 @@ export async function fetchPrediceEventById(
 
     return (await response.json()) as PrediceEventDto;
   } catch (error) {
-    console.error(
-      `Error al obtener el evento de Predice con id ${id}:`,
-      error,
-    );
     return null;
   }
 }

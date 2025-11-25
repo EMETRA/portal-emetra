@@ -1,7 +1,8 @@
+"use client";
 /* eslint-disable @next/next/no-img-element */
 import { addMonths, isAfter, isBefore, parse, startOfDay } from "date-fns";
+import { useEffect, useState, useMemo } from "react";
 import Map from "@/components/client/atoms/Map";
-import { Metadata } from "next";
 import Image from "next/image";
 import classNames from "classnames";
 import styles from "./Page.module.scss";
@@ -12,18 +13,6 @@ import {
   PrediceEventDto,
   FetchPrediceEventsDebugInfo,
 } from "@/lib/predice/api";
-
-const today = startOfDay(new Date());
-const twoMonthsLater = addMonths(today, 2);
-
-export const dynamic = "force-dynamic";
-
-export const metadata: Metadata = {
-  title: "Predice",
-  icons: {
-    icon: "/images/Predice.ico",
-  },
-};
 
 function isValidCoordinate(value: unknown): value is number {
   return typeof value === "number" && Number.isFinite(value);
@@ -124,36 +113,69 @@ function DebugPanel({ debug }: DebugPanelProps) {
   );
 }
 
-export default async function Page() {
-  const { events, debug } = await fetchPrediceEventsWithDebug();
-  const activeEvents = events.filter(isActiveEvent);
-  const eventsWithinTwoMonths = activeEvents.filter((event) => {
-    const parsedDate = parseEventDate(event.start ?? event.fechai ?? undefined);
-    if (!parsedDate) return false;
-    return (
-      (isAfter(parsedDate, today) ||
-        parsedDate.getTime() === today.getTime()) &&
-      isBefore(parsedDate, twoMonthsLater)
-    );
-  });
+export default function Page() {
+  const [events, setEvents] = useState<PrediceEventDto[]>([]);
+  const [debug, setDebug] = useState<FetchPrediceEventsDebugInfo | null>(null);
+  const [loading, setLoading] = useState(true);
 
-  const mapEvents = eventsWithinTwoMonths
-    .filter((event) =>
-      isValidCoordinate(event.extendedProps?.latitud) &&
-      isValidCoordinate(event.extendedProps?.longitud),
-    )
-    .map((event) => ({
-      id: String(event.id),
-      name: event.title,
-      lat: event.extendedProps!.latitud as number,
-      lng: event.extendedProps!.longitud as number,
-      start: event.start ?? event.fechai ?? undefined,
-      end: event.end ?? event.fechaf ?? undefined,
-      horai: event.horai ?? undefined,
-      horaf: event.horaf ?? undefined,
-      aforo: event.estimado ?? undefined,
-      parqueosDisponibles: event.parqueosDisponibles ?? undefined,
-    }));
+  const today = useMemo(() => startOfDay(new Date()), []);
+  const twoMonthsLater = useMemo(() => addMonths(today, 2), [today]);
+
+  useEffect(() => {
+    async function loadEvents() {
+      setLoading(true);
+      const result = await fetchPrediceEventsWithDebug();
+      setEvents(result.events);
+      setDebug(result.debug);
+      setLoading(false);
+    }
+
+    loadEvents();
+  }, []);
+
+  const activeEvents = useMemo(
+    () => events.filter(isActiveEvent),
+    [events]
+  );
+
+  const eventsWithinTwoMonths = useMemo(
+    () =>
+      activeEvents.filter((event) => {
+        const parsedDate = parseEventDate(
+          event.start ?? event.fechai ?? undefined
+        );
+        if (!parsedDate) return false;
+        return (
+          (isAfter(parsedDate, today) ||
+            parsedDate.getTime() === today.getTime()) &&
+          isBefore(parsedDate, twoMonthsLater)
+        );
+      }),
+    [activeEvents, today, twoMonthsLater]
+  );
+
+  const mapEvents = useMemo(
+    () =>
+      eventsWithinTwoMonths
+        .filter(
+          (event) =>
+            isValidCoordinate(event.extendedProps?.latitud) &&
+            isValidCoordinate(event.extendedProps?.longitud)
+        )
+        .map((event) => ({
+          id: String(event.id),
+          name: event.title,
+          lat: event.extendedProps!.latitud as number,
+          lng: event.extendedProps!.longitud as number,
+          start: event.start ?? event.fechai ?? undefined,
+          end: event.end ?? event.fechaf ?? undefined,
+          horai: event.horai ?? undefined,
+          horaf: event.horaf ?? undefined,
+          aforo: event.estimado ?? undefined,
+          parqueosDisponibles: event.parqueosDisponibles ?? undefined,
+        })),
+    [eventsWithinTwoMonths]
+  );
 
   return (
     <div className={classNames(styles.Page)}>
@@ -176,17 +198,25 @@ export default async function Page() {
         </Link>
       </div>
 
-      <DebugPanel debug={debug} />
-
-      <Calendar events={activeEvents} />
-
-      {mapEvents.length > 0 ? (
-        <Map events={mapEvents} />
-      ) : (
-        <p className={classNames(styles.NoEventsMessage)}>
-          No hay eventos activos con ubicación disponible para mostrar en el
-          mapa.
+      {loading ? (
+        <p className={classNames(styles.LoadingMessage)}>
+          Cargando eventos...
         </p>
+      ) : (
+        <>
+          {debug && <DebugPanel debug={debug} />}
+
+          <Calendar events={activeEvents} />
+
+          {mapEvents.length > 0 ? (
+            <Map events={mapEvents} />
+          ) : (
+            <p className={classNames(styles.NoEventsMessage)}>
+              No hay eventos activos con ubicación disponible para mostrar en el
+              mapa.
+            </p>
+          )}
+        </>
       )}
 
       <h4>En colaboración con:</h4>

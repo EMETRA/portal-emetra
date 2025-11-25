@@ -76,6 +76,13 @@
   font-weight: 600;
 }
 
+.LoadingMessage {
+  text-align: center;
+  margin-block: 2rem;
+  color: $azul-1;
+  font-weight: 600;
+}
+
 .DebugPanel {
   background: #f3f6ff;
   border: 1px solid rgba(23, 0, 165, 0.2);

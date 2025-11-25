@@ -1,18 +1,28 @@
-"use client";
 /* eslint-disable @next/next/no-img-element */
 import { addMonths, isAfter, isBefore, parse, startOfDay } from "date-fns";
-import { useEffect, useState, useMemo } from "react";
 import Map from "@/components/client/atoms/Map";
+import { Metadata } from "next";
 import Image from "next/image";
 import classNames from "classnames";
 import styles from "./Page.module.scss";
 import Calendar from "@/components/server/molecules/Calendar/Calendar";
 import Link from "next/link";
 import {
-  fetchPrediceEventsWithDebug,
+  fetchPrediceEvents,
   PrediceEventDto,
-  FetchPrediceEventsDebugInfo,
 } from "@/lib/predice/api";
+
+const today = startOfDay(new Date());
+const twoMonthsLater = addMonths(today, 2);
+
+export const metadata: Metadata = {
+  title: "Predice",
+  icons: {
+    icon: "/images/Predice.ico",
+  },
+};
+
+export const revalidate = 180;
 
 function isValidCoordinate(value: unknown): value is number {
   return typeof value === "number" && Number.isFinite(value);
@@ -28,154 +38,36 @@ function parseEventDate(date?: string | null) {
   return Number.isNaN(parsed.getTime()) ? null : parsed;
 }
 
-interface DebugPanelProps {
-  debug: FetchPrediceEventsDebugInfo;
-}
+export default async function Page() {
+  const events = await fetchPrediceEvents();
+  const activeEvents = events.filter(isActiveEvent);
+  const eventsWithinTwoMonths = activeEvents.filter((event) => {
+    const parsedDate = parseEventDate(event.start ?? event.fechai ?? undefined);
+    if (!parsedDate) return false;
+    return (
+      (isAfter(parsedDate, today) ||
+        parsedDate.getTime() === today.getTime()) &&
+      isBefore(parsedDate, twoMonthsLater)
+    );
+  });
 
-function DebugPanel({ debug }: DebugPanelProps) {
-  const formatTimestamp = (isoString: string) => {
-    try {
-      const date = new Date(isoString);
-      return date.toLocaleString("es-GT", {
-        dateStyle: "medium",
-        timeStyle: "medium",
-      });
-    } catch {
-      return isoString;
-    }
-  };
-
-  return (
-    <div className={classNames(styles.DebugPanel)}>
-      <h3 className={classNames(styles.DebugTitle)}>Debug: Fetch de Eventos</h3>
-      <div className={classNames(styles.DebugContent)}>
-        <div className={classNames(styles.DebugItem)}>
-          <span className={classNames(styles.DebugLabel)}>URL:</span>
-          <span className={classNames(styles.DebugValue)}>{debug.url}</span>
-        </div>
-        <div className={classNames(styles.DebugItem)}>
-          <span className={classNames(styles.DebugLabel)}>Timestamp:</span>
-          <span className={classNames(styles.DebugValue)}>
-            {formatTimestamp(debug.timestamp)}
-          </span>
-        </div>
-        <div className={classNames(styles.DebugItem)}>
-          <span className={classNames(styles.DebugLabel)}>Status HTTP:</span>
-          <span
-            className={classNames(
-              styles.DebugValue,
-              debug.ok ? styles.DebugSuccess : styles.DebugError,
-            )}
-          >
-            {debug.status} {debug.ok ? "OK" : "ERROR"}
-          </span>
-        </div>
-        <div className={classNames(styles.DebugItem)}>
-          <span className={classNames(styles.DebugLabel)}>Total Eventos:</span>
-          <span className={classNames(styles.DebugValue)}>
-            {debug.totalEvents}
-          </span>
-        </div>
-        <div className={classNames(styles.DebugItem)}>
-          <span className={classNames(styles.DebugLabel)}>Eventos Activos:</span>
-          <span className={classNames(styles.DebugValue)}>
-            {debug.activeEvents}
-          </span>
-        </div>
-        {debug.error && (
-          <div className={classNames(styles.DebugItem)}>
-            <span className={classNames(styles.DebugLabel)}>Error:</span>
-            <span className={classNames(styles.DebugValue, styles.DebugError)}>
-              {debug.error}
-            </span>
-          </div>
-        )}
-      </div>
-      {debug.sampleEvent && (
-        <div className={classNames(styles.DebugItem)}>
-          <span className={classNames(styles.DebugLabel)}>Ejemplo de Evento:</span>
-          <div className={classNames(styles.DebugSample)}>
-            <pre className={classNames(styles.DebugPre)}>
-              {JSON.stringify(debug.sampleEvent, null, 2)}
-            </pre>
-          </div>
-        </div>
-      )}
-      <details className={classNames(styles.DebugDetails)}>
-        <summary className={classNames(styles.DebugSummary)}>
-          Ver información de debug completa
-        </summary>
-        <pre className={classNames(styles.DebugPre)}>
-          {JSON.stringify(debug, null, 2)}
-        </pre>
-      </details>
-    </div>
-  );
-}
-
-export default function Page() {
-  const [events, setEvents] = useState<PrediceEventDto[]>([]);
-  const [debug, setDebug] = useState<FetchPrediceEventsDebugInfo | null>(null);
-  const [loading, setLoading] = useState(true);
-
-  const today = useMemo(() => startOfDay(new Date()), []);
-  const twoMonthsLater = useMemo(() => addMonths(today, 2), [today]);
-
-  useEffect(() => {
-    async function loadEvents() {
-      setLoading(true);
-      const result = await fetchPrediceEventsWithDebug();
-      setEvents(result.events);
-      setDebug(result.debug);
-      setLoading(false);
-    }
-
-    loadEvents();
-  }, []);
-
-  const activeEvents = useMemo(
-    () => events.filter(isActiveEvent),
-    [events]
-  );
-
-  const eventsWithinTwoMonths = useMemo(
-    () =>
-      activeEvents.filter((event) => {
-        const parsedDate = parseEventDate(
-          event.start ?? event.fechai ?? undefined
-        );
-        if (!parsedDate) return false;
-        return (
-          (isAfter(parsedDate, today) ||
-            parsedDate.getTime() === today.getTime()) &&
-          isBefore(parsedDate, twoMonthsLater)
-        );
-      }),
-    [activeEvents, today, twoMonthsLater]
-  );
-
-  const mapEvents = useMemo(
-    () =>
-      eventsWithinTwoMonths
-        .filter(
-          (event) =>
-            isValidCoordinate(event.extendedProps?.latitud) &&
-            isValidCoordinate(event.extendedProps?.longitud)
-        )
-        .map((event) => ({
-          id: String(event.id),
-          name: event.title,
-          lat: event.extendedProps!.latitud as number,
-          lng: event.extendedProps!.longitud as number,
-          start: event.start ?? event.fechai ?? undefined,
-          end: event.end ?? event.fechaf ?? undefined,
-          horai: event.horai ?? undefined,
-          horaf: event.horaf ?? undefined,
-          aforo: event.estimado ?? undefined,
-          parqueosDisponibles: event.parqueosDisponibles ?? undefined,
-        })),
-    [eventsWithinTwoMonths]
-  );
+  const mapEvents = eventsWithinTwoMonths
+    .filter((event) =>
+      isValidCoordinate(event.extendedProps?.latitud) &&
+      isValidCoordinate(event.extendedProps?.longitud),
+    )
+    .map((event) => ({
+      id: String(event.id),
+      name: event.title,
+      lat: event.extendedProps!.latitud as number,
+      lng: event.extendedProps!.longitud as number,
+      start: event.start ?? event.fechai ?? undefined,
+      end: event.end ?? event.fechaf ?? undefined,
+      horai: event.horai ?? undefined,
+      horaf: event.horaf ?? undefined,
+      aforo: event.estimado ?? undefined,
+      parqueosDisponibles: event.parqueosDisponibles ?? undefined,
+    }));
 
   return (
     <div className={classNames(styles.Page)}>
@@ -198,25 +90,15 @@ export default function Page() {
         </Link>
       </div>
 
-      {loading ? (
-        <p className={classNames(styles.LoadingMessage)}>
-          Cargando eventos...
-        </p>
+      <Calendar events={activeEvents} />
+
+      {mapEvents.length > 0 ? (
+        <Map events={mapEvents} />
       ) : (
-        <>
-          {debug && <DebugPanel debug={debug} />}
-
-          <Calendar events={activeEvents} />
-
-          {mapEvents.length > 0 ? (
-            <Map events={mapEvents} />
-          ) : (
-            <p className={classNames(styles.NoEventsMessage)}>
-              No hay eventos activos con ubicación disponible para mostrar en el
-              mapa.
-            </p>
-          )}
-        </>
+        <p className={classNames(styles.NoEventsMessage)}>
+          No hay eventos activos con ubicación disponible para mostrar en el
+          mapa.
+        </p>
       )}
 
       <h4>En colaboración con:</h4>

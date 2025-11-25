@@ -48,97 +48,40 @@ export interface PrediceEventDto {
 }
 
 function buildPrediceUrl(path: string, admin: string | undefined) {
-  const envUrl = typeof window !== "undefined" 
-    ? process.env.NEXT_PUBLIC_API_BASE_URL
-    : process.env.API_BASE_URL;
-  
-  const baseUrl = envUrl || API_BASE_URL;
-  const fullBaseUrl = baseUrl.startsWith("http") 
-    ? baseUrl 
-    : `http://${baseUrl}`;
-  
-  const cleanPath = path.startsWith("/") ? path : `/${path}`;
-  const url = new URL(cleanPath, `${fullBaseUrl}/`);
+  const url = new URL(`${API_BASE_URL}${path}`);
   if (admin) {
     url.searchParams.set("admin", admin);
   }
   return url.toString();
 }
 
-export interface FetchPrediceEventsDebugInfo {
-  url: string;
-  timestamp: string;
-  status: number;
-  ok: boolean;
-  totalEvents: number;
-  activeEvents: number;
-  error?: string;
-  sampleEvent?: PrediceEventDto;
-}
-
-export interface FetchPrediceEventsResult {
-  events: PrediceEventDto[];
-  debug: FetchPrediceEventsDebugInfo;
-}
-
 export async function fetchPrediceEvents(
   admin: string = DEFAULT_ADMIN_KEY,
 ): Promise<PrediceEventDto[]> {
-  const result = await fetchPrediceEventsWithDebug(admin);
-  return result.events;
-}
-
-export async function fetchPrediceEventsWithDebug(
-  admin: string = DEFAULT_ADMIN_KEY,
-): Promise<FetchPrediceEventsResult> {
-  const url = buildPrediceUrl("/predice/eventos", admin);
-  const timestamp = new Date().toISOString();
-  
   try {
-    const response = await fetch(url, {
-      headers: {
-        Accept: "application/json",
+    const response = await fetch(
+      buildPrediceUrl("/predice/eventos", admin),
+      {
+        headers: {
+          Accept: "application/json",
+        },
+        next: {
+          revalidate: 180,
+        },
       },
-      cache: typeof window !== "undefined" ? "no-cache" : "no-store",
-    });
+    );
 
     if (!response.ok) {
-      const errorMessage = `No fue posible obtener la lista de eventos. Código: ${response.status}`;
-      throw new Error(errorMessage);
+      throw new Error(
+        `No fue posible obtener la lista de eventos. Código: ${response.status}`,
+      );
     }
 
     const data = (await response.json()) as PrediceEventDto[];
-    const events = Array.isArray(data) ? data : [];
-    const activeEvents = events.filter(
-      (event) => event.extendedProps?.status === "ACTIVO"
-    ).length;
-    const sampleEvent = events.length > 0 ? events[0] : undefined;
-
-    return {
-      events,
-      debug: {
-        url,
-        timestamp,
-        status: response.status,
-        ok: response.ok,
-        totalEvents: events.length,
-        activeEvents,
-        sampleEvent,
-      },
-    };
+    return Array.isArray(data) ? data : [];
   } catch (error) {
-    return {
-      events: [],
-      debug: {
-        url,
-        timestamp,
-        status: 0,
-        ok: false,
-        totalEvents: 0,
-        activeEvents: 0,
-        error: error instanceof Error ? error.message : String(error),
-      },
-    };
+    console.error("Error al obtener los eventos de Predice:", error);
+    return [];
   }
 }
 
@@ -154,7 +97,7 @@ export async function fetchPrediceEventById(
           Accept: "application/json",
         },
         next: {
-          revalidate: 300,
+          revalidate: 180,
         },
       },
     );
@@ -171,6 +114,10 @@ export async function fetchPrediceEventById(
 
     return (await response.json()) as PrediceEventDto;
   } catch (error) {
+    console.error(
+      `Error al obtener el evento de Predice con id ${id}:`,
+      error,
+    );
     return null;
   }
 }

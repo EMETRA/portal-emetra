@@ -1,19 +1,10 @@
 /* eslint-disable @next/next/no-img-element */
-import { addMonths, isAfter, isBefore, parse, startOfDay } from "date-fns";
-import Map from "@/components/client/atoms/Map";
 import { Metadata } from "next";
 import Image from "next/image";
 import classNames from "classnames";
 import styles from "./Page.module.scss";
-import Calendar from "@/components/server/molecules/Calendar/Calendar";
 import Link from "next/link";
-import {
-  fetchPrediceEvents,
-  PrediceEventDto,
-} from "@/lib/predice/api";
-
-const today = startOfDay(new Date());
-const twoMonthsLater = addMonths(today, 2);
+import PrediceContent from "@/components/client/organisms/PrediceContent/PrediceContent";
 
 export const metadata: Metadata = {
   title: "Predice",
@@ -22,53 +13,7 @@ export const metadata: Metadata = {
   },
 };
 
-export const revalidate = 180;
-
-function isValidCoordinate(value: unknown): value is number {
-  return typeof value === "number" && Number.isFinite(value);
-}
-
-function isActiveEvent(event: PrediceEventDto) {
-  return event.extendedProps?.status === "ACTIVO";
-}
-
-function parseEventDate(date?: string | null) {
-  if (!date) return null;
-  const parsed = parse(date, "dd/MM/yyyy", new Date());
-  return Number.isNaN(parsed.getTime()) ? null : parsed;
-}
-
-export default async function Page() {
-  const events = await fetchPrediceEvents();
-  const activeEvents = events.filter(isActiveEvent);
-  const eventsWithinTwoMonths = activeEvents.filter((event) => {
-    const parsedDate = parseEventDate(event.start ?? event.fechai ?? undefined);
-    if (!parsedDate) return false;
-    return (
-      (isAfter(parsedDate, today) ||
-        parsedDate.getTime() === today.getTime()) &&
-      isBefore(parsedDate, twoMonthsLater)
-    );
-  });
-
-  const mapEvents = eventsWithinTwoMonths
-    .filter((event) =>
-      isValidCoordinate(event.extendedProps?.latitud) &&
-      isValidCoordinate(event.extendedProps?.longitud),
-    )
-    .map((event) => ({
-      id: String(event.id),
-      name: event.title,
-      lat: event.extendedProps!.latitud as number,
-      lng: event.extendedProps!.longitud as number,
-      start: event.start ?? event.fechai ?? undefined,
-      end: event.end ?? event.fechaf ?? undefined,
-      horai: event.horai ?? undefined,
-      horaf: event.horaf ?? undefined,
-      aforo: event.estimado ?? undefined,
-      parqueosDisponibles: event.parqueosDisponibles ?? undefined,
-    }));
-
+export default function Page() {
   return (
     <div className={classNames(styles.Page)}>
       <div className={classNames(styles.Header)}>
@@ -90,16 +35,7 @@ export default async function Page() {
         </Link>
       </div>
 
-      <Calendar events={activeEvents} />
-
-      {mapEvents.length > 0 ? (
-        <Map events={mapEvents} />
-      ) : (
-        <p className={classNames(styles.NoEventsMessage)}>
-          No hay eventos activos con ubicación disponible para mostrar en el
-          mapa.
-        </p>
-      )}
+      <PrediceContent />
 
       <h4>En colaboración con:</h4>
       <div className={classNames(styles.LogosRow)}>

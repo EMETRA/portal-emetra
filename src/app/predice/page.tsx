@@ -8,12 +8,15 @@ import styles from "./Page.module.scss";
 import Calendar from "@/components/server/molecules/Calendar/Calendar";
 import Link from "next/link";
 import {
-  fetchPrediceEvents,
+  fetchPrediceEventsWithDebug,
   PrediceEventDto,
+  FetchPrediceEventsDebugInfo,
 } from "@/lib/predice/api";
 
 const today = startOfDay(new Date());
 const twoMonthsLater = addMonths(today, 2);
+
+export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
   title: "Predice",
@@ -36,8 +39,93 @@ function parseEventDate(date?: string | null) {
   return Number.isNaN(parsed.getTime()) ? null : parsed;
 }
 
+interface DebugPanelProps {
+  debug: FetchPrediceEventsDebugInfo;
+}
+
+function DebugPanel({ debug }: DebugPanelProps) {
+  const formatTimestamp = (isoString: string) => {
+    try {
+      const date = new Date(isoString);
+      return date.toLocaleString("es-GT", {
+        dateStyle: "medium",
+        timeStyle: "medium",
+      });
+    } catch {
+      return isoString;
+    }
+  };
+
+  return (
+    <div className={classNames(styles.DebugPanel)}>
+      <h3 className={classNames(styles.DebugTitle)}>Debug: Fetch de Eventos</h3>
+      <div className={classNames(styles.DebugContent)}>
+        <div className={classNames(styles.DebugItem)}>
+          <span className={classNames(styles.DebugLabel)}>URL:</span>
+          <span className={classNames(styles.DebugValue)}>{debug.url}</span>
+        </div>
+        <div className={classNames(styles.DebugItem)}>
+          <span className={classNames(styles.DebugLabel)}>Timestamp:</span>
+          <span className={classNames(styles.DebugValue)}>
+            {formatTimestamp(debug.timestamp)}
+          </span>
+        </div>
+        <div className={classNames(styles.DebugItem)}>
+          <span className={classNames(styles.DebugLabel)}>Status HTTP:</span>
+          <span
+            className={classNames(
+              styles.DebugValue,
+              debug.ok ? styles.DebugSuccess : styles.DebugError,
+            )}
+          >
+            {debug.status} {debug.ok ? "OK" : "ERROR"}
+          </span>
+        </div>
+        <div className={classNames(styles.DebugItem)}>
+          <span className={classNames(styles.DebugLabel)}>Total Eventos:</span>
+          <span className={classNames(styles.DebugValue)}>
+            {debug.totalEvents}
+          </span>
+        </div>
+        <div className={classNames(styles.DebugItem)}>
+          <span className={classNames(styles.DebugLabel)}>Eventos Activos:</span>
+          <span className={classNames(styles.DebugValue)}>
+            {debug.activeEvents}
+          </span>
+        </div>
+        {debug.error && (
+          <div className={classNames(styles.DebugItem)}>
+            <span className={classNames(styles.DebugLabel)}>Error:</span>
+            <span className={classNames(styles.DebugValue, styles.DebugError)}>
+              {debug.error}
+            </span>
+          </div>
+        )}
+      </div>
+      {debug.sampleEvent && (
+        <div className={classNames(styles.DebugItem)}>
+          <span className={classNames(styles.DebugLabel)}>Ejemplo de Evento:</span>
+          <div className={classNames(styles.DebugSample)}>
+            <pre className={classNames(styles.DebugPre)}>
+              {JSON.stringify(debug.sampleEvent, null, 2)}
+            </pre>
+          </div>
+        </div>
+      )}
+      <details className={classNames(styles.DebugDetails)}>
+        <summary className={classNames(styles.DebugSummary)}>
+          Ver información de debug completa
+        </summary>
+        <pre className={classNames(styles.DebugPre)}>
+          {JSON.stringify(debug, null, 2)}
+        </pre>
+      </details>
+    </div>
+  );
+}
+
 export default async function Page() {
-  const events = await fetchPrediceEvents();
+  const { events, debug } = await fetchPrediceEventsWithDebug();
   const activeEvents = events.filter(isActiveEvent);
   const eventsWithinTwoMonths = activeEvents.filter((event) => {
     const parsedDate = parseEventDate(event.start ?? event.fechai ?? undefined);
@@ -87,6 +175,8 @@ export default async function Page() {
           Agregar evento
         </Link>
       </div>
+
+      <DebugPanel debug={debug} />
 
       <Calendar events={activeEvents} />
 

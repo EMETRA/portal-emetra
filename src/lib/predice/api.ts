@@ -55,33 +55,81 @@ function buildPrediceUrl(path: string, admin: string | undefined) {
   return url.toString();
 }
 
+export interface FetchPrediceEventsDebugInfo {
+  url: string;
+  timestamp: string;
+  status: number;
+  ok: boolean;
+  totalEvents: number;
+  activeEvents: number;
+  error?: string;
+  sampleEvent?: PrediceEventDto;
+}
+
+export interface FetchPrediceEventsResult {
+  events: PrediceEventDto[];
+  debug: FetchPrediceEventsDebugInfo;
+}
+
 export async function fetchPrediceEvents(
   admin: string = DEFAULT_ADMIN_KEY,
 ): Promise<PrediceEventDto[]> {
+  const result = await fetchPrediceEventsWithDebug(admin);
+  return result.events;
+}
+
+export async function fetchPrediceEventsWithDebug(
+  admin: string = DEFAULT_ADMIN_KEY,
+): Promise<FetchPrediceEventsResult> {
+  const url = buildPrediceUrl("/predice/eventos", admin);
+  const timestamp = new Date().toISOString();
+  
   try {
-    const response = await fetch(
-      buildPrediceUrl("/predice/eventos", admin),
-      {
-        headers: {
-          Accept: "application/json",
-        },
-        next: {
-          revalidate: 300,
-        },
+    const response = await fetch(url, {
+      headers: {
+        Accept: "application/json",
       },
-    );
+      cache: "no-store",
+    });
 
     if (!response.ok) {
-      throw new Error(
-        `No fue posible obtener la lista de eventos. Código: ${response.status}`,
-      );
+      const errorMessage = `No fue posible obtener la lista de eventos. Código: ${response.status}`;
+      throw new Error(errorMessage);
     }
 
     const data = (await response.json()) as PrediceEventDto[];
-    return Array.isArray(data) ? data : [];
+    const events = Array.isArray(data) ? data : [];
+    const activeEvents = events.filter(
+      (event) => event.extendedProps?.status === "ACTIVO"
+    ).length;
+    const sampleEvent = events.length > 0 ? events[0] : undefined;
+
+    return {
+      events,
+      debug: {
+        url,
+        timestamp,
+        status: response.status,
+        ok: response.ok,
+        totalEvents: events.length,
+        activeEvents,
+        sampleEvent,
+      },
+    };
   } catch (error) {
     console.error("Error al obtener los eventos de Predice:", error);
-    return [];
+    return {
+      events: [],
+      debug: {
+        url,
+        timestamp,
+        status: 0,
+        ok: false,
+        totalEvents: 0,
+        activeEvents: 0,
+        error: error instanceof Error ? error.message : String(error),
+      },
+    };
   }
 }
 

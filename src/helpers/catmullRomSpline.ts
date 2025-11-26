@@ -1,4 +1,4 @@
-function catmullRomSpline(points: any, samples = 20) {
+function catmullRomSpline(points: number[][], samples = 20): [number, number][] {
   const result = [];
 
   for (let i = 0; i < points.length - 1; i++) {
@@ -25,7 +25,7 @@ function catmullRomSpline(points: any, samples = 20) {
           (2 * p0[1] - 5 * p1[1] + 4 * p2[1] - p3[1]) * tt +
           (-p0[1] + 3 * p1[1] - 3 * p2[1] + p3[1]) * ttt);
 
-      result.push([lat, lng]);
+      result.push([lat, lng] as [number, number]);
     }
   }
 

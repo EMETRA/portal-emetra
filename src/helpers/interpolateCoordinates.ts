@@ -1,6 +1,4 @@
-import { de } from "zod/v4/locales";
-
-function interpolateCoordinates(coords: any, steps = 20) {
+function interpolateCoordinates(coords: number[][], steps = 20): number[][] {
   if (!coords || coords.length < 2) return coords;
 
   const result = [];

@@ -3,7 +3,7 @@ import puppeteer from 'puppeteer';
 
 export const runtime = 'nodejs';
 
-function normalizaNumero(str: string): string {
+/* function normalizaNumero(str: string): string {
   if (str == null) return '0';
   const s = String(str);
   const idx = s.lastIndexOf(',');
@@ -14,7 +14,7 @@ function normalizaNumero(str: string): string {
   out = out.replace(/,/g, '');
   return out;
 }
-
+ */
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
@@ -55,7 +55,6 @@ export async function POST(req: NextRequest) {
     let remisionesStr = '';
     let descripcionCta = '';
     let montoTotalCta = '';
-    let totalCuentas = 0;
     let totalDescuentos = 0;
 
     // remisiones: solo usamos el texto (notaCredito viene ya sumado en notaCredito)
@@ -68,7 +67,6 @@ export async function POST(req: NextRequest) {
       // cuenta[3] = descripción, cuenta[4] = valor formateado
       descripcionCta += `<label class='text-header'>${cuenta[3]}</label>`;
       montoTotalCta += `<label class='text-header' style='text-align: right;'>${cuenta[4]}</label>`;
-      totalCuentas += Number(normalizaNumero(cuenta[4]));
     }
 
     // intereses
@@ -262,7 +260,7 @@ export async function POST(req: NextRequest) {
     await page.close();
     await browser.close();
 
-    return new NextResponse(pdfBuffer, {
+    return new NextResponse(Buffer.from(pdfBuffer), {
       status: 200,
       headers: {
         'Content-Type': 'application/pdf',

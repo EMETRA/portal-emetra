@@ -48,7 +48,10 @@ export interface PrediceEventDto {
 }
 
 function buildPrediceUrl(path: string, admin: string | undefined) {
-  const url = new URL(`${API_BASE_URL}${path}`);
+  const baseUrl = API_BASE_URL.startsWith("http")
+    ? API_BASE_URL
+    : `https://${API_BASE_URL}`;
+  const url = new URL(`${baseUrl}${path}`);
   if (admin) {
     url.searchParams.set("admin", admin);
   }
@@ -66,7 +69,7 @@ export async function fetchPrediceEvents(
           Accept: "application/json",
         },
         next: {
-          revalidate: 300,
+          revalidate: 180,
         },
       },
     );
@@ -97,7 +100,7 @@ export async function fetchPrediceEventById(
           Accept: "application/json",
         },
         next: {
-          revalidate: 300,
+          revalidate: 180,
         },
       },
     );
@@ -175,5 +178,33 @@ export async function createPrediceEvent(
   }
 
   return response.json();
+}
+
+export async function fetchPrediceEventsClient(
+  admin: string = DEFAULT_ADMIN_KEY,
+): Promise<PrediceEventDto[]> {
+  try {
+    const response = await fetch(
+      buildPrediceUrl("/predice/eventos", admin),
+      {
+        headers: {
+          Accept: "application/json",
+        },
+        cache: "no-store",
+      },
+    );
+
+    if (!response.ok) {
+      throw new Error(
+        `No fue posible obtener la lista de eventos. Código: ${response.status}`,
+      );
+    }
+
+    const data = (await response.json()) as PrediceEventDto[];
+    return Array.isArray(data) ? data : [];
+  } catch (error) {
+    console.error("Error al obtener los eventos de Predice:", error);
+    return [];
+  }
 }
 

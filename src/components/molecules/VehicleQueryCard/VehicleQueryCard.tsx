@@ -12,7 +12,7 @@ export default function VehicleQueryCard({ initialPlate = "" }: Props) {
   const [plate, setPlate] = React.useState(initialPlate);
   const [isEditing, setIsEditing] = React.useState(false);
   const [loading, setLoading] = React.useState(false);
-  const [message, setMessage] = React.useState<string | null>(null);
+  const [, setMessage] = React.useState<string | null>(null);
   const inputRef = React.useRef<HTMLInputElement | null>(null);
 
   const toggleEdit = (e?: React.MouseEvent) => {

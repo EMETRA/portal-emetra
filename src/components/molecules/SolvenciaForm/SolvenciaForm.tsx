@@ -1,6 +1,6 @@
 'use client'
 
-import React, {useState, ChangeEvent} from 'react'
+import React, {useState} from 'react'
 import {Input, Button} from '../../server/atoms/index'
 import Select from '../../atoms/Select/Select'
 import styles from './SolvenciaForm.module.scss'
@@ -64,7 +64,7 @@ const SolvenciaForm: React.FC = () => {
                 const pdfBlob = await pdfRes.blob()
                 const pdfUrl = URL.createObjectURL(pdfBlob)
                 const a = document.createElement('a')
-                a.href = pdfUrl,
+                a.href = pdfUrl
                 a.download = `solvencia_${placa}.pdf`
                 a.click()
                 URL.revokeObjectURL(pdfUrl)                

@@ -3,8 +3,6 @@ import classNames from "classnames";
 import { notFound } from "next/navigation";
 import styles from "./Page.module.scss";
 import { Icon } from "@/components/server/atoms";
-import MultimediaCard from "@/components/server/molecules/MultimediaCard/MultimediaCard";
-import MultimediaCarrousel from "@/components/server/organisms/MultimediaCarrousel/MultimediaCarrousel";
 import { API_BASE_URL } from "@/lib/config";
 
 interface PageProps {
@@ -127,13 +125,6 @@ export default async function NewPage({ params }: PageProps) {
         })) ?? [],
     },
   ].filter((section) => section.subtitulos.length > 0);
-
-  const recursos = [
-    news.url_canonica && `Visita la notici  a oficial: ${news.url_canonica}`,
-    news.recurso_principal?.url &&
-      `Recurso principal: ${news.recurso_principal.url}`,
-    news.recurso_og?.url && `Open Graph: ${news.recurso_og.url}`,
-  ].filter(Boolean) as string[];
 
   return (
     <div>

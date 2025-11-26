@@ -6,7 +6,6 @@ import Select from '../../atoms/Select/Select'
 import styles from './ReciboForm.module.scss'
 import { Text } from '@/components/atoms'
 import Heading from '../../server/atoms/Heading/Heading'
-import { set } from 'zod'
 
 type MsgType = 'success' | 'error' | null
 
@@ -76,7 +75,7 @@ const ReciboForm: React.FC = () => {
                     const pdfBlob = await pdfRes.blob()
                     const pdfUrl = URL.createObjectURL(pdfBlob)
                     const a = document.createElement('a')
-                    a.href = pdfUrl,
+                    a.href = pdfUrl
                     a.download = `recibo_${placa}.pdf`
                     a.click()
                     URL.revokeObjectURL(pdfUrl)   

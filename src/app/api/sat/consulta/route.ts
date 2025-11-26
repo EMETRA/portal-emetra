@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-const baseUrl = process.env.NEXT_PUBLIC_EMETRA_API_BASE_URL;
+const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL;
 
 export async function POST(req: NextRequest) {
   try {
@@ -25,7 +25,7 @@ export async function POST(req: NextRequest) {
 
     
     if (!baseUrl) {
-      throw new Error("NEXT_PUBLIC_EMETRA_API_BASE_URL no está configurada");
+      throw new Error("NEXT_PUBLIC_API_BASE_URL no está configurada");
     }
 
     const externalUrl = `${baseUrl}/notificado/consulta/${encodeURIComponent(tplaca)}/${encodeURIComponent(nplaca)}`;

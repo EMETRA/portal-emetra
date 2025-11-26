@@ -64,6 +64,19 @@
   border-radius: 8px;
 }
 
+.successMessage {
+  margin-top: 1rem;
+  color: #0f766e; 
+  font-size: 0.9rem;
+}
+
+.errorMessage {
+  margin-top: 1rem;
+  color: #b91c1c; 
+  font-size: 0.9rem;
+}
+
+
 /* Mobile */
 @media (max-width: 640px) {
   .row {

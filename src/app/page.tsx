@@ -60,7 +60,7 @@ async function fetchLatestNews(): Promise<NewsSummaryDto[]> {
       page: "1",
       limit: "10",
     });
-
+    console.log('Fetching news from:', `${API_BASE_URL}/news?${searchParams.toString()}`);
     const response = await fetch(`${API_BASE_URL}/news?${searchParams.toString()}`, {
       headers: {
         Accept: "application/json",
@@ -173,6 +173,16 @@ export default async function Home() {
           </h2>
           <MultimediaCarrousel>
             <MultimediaCard
+              src={"https://www.youtube.com/watch?v=k7GpknPnk1A"}
+              title={"Card de Vídeo"}
+              description="Lorem ipsum dolor sit amet consectetur adipisicing elit. Aperiam consequatur necessitatibus natus eum atque architecto provident nostrum blanditiis ad adipisci, repellat rerum omnis magnam, asperiores quo praesentium alias minima odio."
+            />
+            <MultimediaCard
+              src={"https://www.youtube.com/watch?v=QsxsN9JVB0A"}
+              title={"Card de Vídeo"}
+              description="Lorem ipsum dolor sit amet consectetur adipisicing elit. Aperiam consequatur necessitatibus natus eum atque architecto provident nostrum blanditiis ad adipisci, repellat rerum omnis magnam, asperiores quo praesentium alias minima odio."
+            />
+            {/* <MultimediaCard
               src={"https://www.w3schools.com/html/mov_bbb.mp4"}
               title={"Card de Vídeo"}
               description="Lorem ipsum dolor sit amet consectetur adipisicing elit. Aperiam consequatur necessitatibus natus eum atque architecto provident nostrum blanditiis ad adipisci, repellat rerum omnis magnam, asperiores quo praesentium alias minima odio."
@@ -181,17 +191,7 @@ export default async function Home() {
               src={"https://www.w3schools.com/html/mov_bbb.mp4"}
               title={"Card de Vídeo"}
               description="Lorem ipsum dolor sit amet consectetur adipisicing elit. Aperiam consequatur necessitatibus natus eum atque architecto provident nostrum blanditiis ad adipisci, repellat rerum omnis magnam, asperiores quo praesentium alias minima odio."
-            />
-            <MultimediaCard
-              src={"https://www.w3schools.com/html/mov_bbb.mp4"}
-              title={"Card de Vídeo"}
-              description="Lorem ipsum dolor sit amet consectetur adipisicing elit. Aperiam consequatur necessitatibus natus eum atque architecto provident nostrum blanditiis ad adipisci, repellat rerum omnis magnam, asperiores quo praesentium alias minima odio."
-            />
-            <MultimediaCard
-              src={"https://www.w3schools.com/html/mov_bbb.mp4"}
-              title={"Card de Vídeo"}
-              description="Lorem ipsum dolor sit amet consectetur adipisicing elit. Aperiam consequatur necessitatibus natus eum atque architecto provident nostrum blanditiis ad adipisci, repellat rerum omnis magnam, asperiores quo praesentium alias minima odio."
-            />
+            /> */}
           </MultimediaCarrousel>
         </div>
       </div>

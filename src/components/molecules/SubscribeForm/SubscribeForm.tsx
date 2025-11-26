@@ -6,14 +6,80 @@ import RadioGroup from "../../atoms/RadioGroup/RadioGroup";
 import styles     from "./SubscribeForm.module.scss";
 import { Text } from "@/components/atoms";
 import Heading from "../../server/atoms/Heading/Heading";
+import { DiameterIcon } from "lucide-react";
+
+const suscripcionMap: Record<string, number> = {
+  diario: 1,
+  semanal: 2,
+  anual: 3,
+}
+
 const SubscribeForm: React.FC = () => {
   const [sexo, setSexo] = useState("");
   const [tipoSolicitud, setTipoSolicitud] = useState("");
   const [tipoPlaca, setTipoPlaca] = useState("");
   const [suscripcion, setSuscripcion] = useState("diario");
 
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+
+    const form = e.currentTarget;
+    const formData = new FormData(form);
+
+    const nombre = (formData.get("nombres") as string) || "";
+    const apellido = (formData.get("apellidos") as string) || "";
+    const email = (formData.get("correo") as string) || "";
+    const direccion = (formData.get("direccion") as string) || "";
+    const telefono = (formData.get("telefono") as string) || "";
+    const fechaNacRaw = (formData.get("nacimiento") as string) || "";
+    const numeroPlaca = (formData.get("numeroPlaca") as string) || "";
+    const empresa = (formData.get("nombreEmpresa") as string) || "";
+
+    const fechaNac = fechaNacRaw ? fechaNacRaw.replace(/-/g, "/") : undefined;
+
+    const body = {
+      nombre,
+      apellido,
+      email,
+      direccion: direccion || undefined,
+      telefono: telefono || undefined,
+      sexo: sexo || undefined,
+      tipo_sol: tipoSolicitud, 
+      fechaNac,
+      suscripcion: suscripcionMap[suscripcion],
+      placas: [
+        {
+          tipo_placa: tipoPlaca,
+          numero_placa: numeroPlaca,
+        },
+      ],
+      empresa: empresa || undefined,
+    };
+
+    try {
+      const res = await fetch("/api/notificaciones/suscripcion", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        console.error("Error suscripción:", data);
+        alert(data.message || "Error al crear suscripción");
+        return;
+      }
+
+      alert(data.message || "Suscripción creada correctamente");
+    } catch (err) {
+      console.error(err);
+      alert("Error de conexión con el servidor");
+    }
+  };
+
   return (
-    <form className={styles.formBody}>
+    <form className={styles.formBody} onSubmit={handleSubmit}>
       <Heading variant="Medium" className={styles.Title}> Suscripción multas </Heading>
       {/* Seccion datos personales */}
       <div className={styles.section}>
@@ -80,8 +146,8 @@ const SubscribeForm: React.FC = () => {
               id="tipoSolicitud"
               name="tipoSolicitud"
               options={[
-                { value: "OP1", label: "OP1" },
-                { value: "OP2", label: "OP2" },
+                { value: "I", label: "Individual" },
+                { value: "E", label: "Empresa" },
               ]}
               value={tipoSolicitud}
               onChange={e => setTipoSolicitud(e.target.value)}
@@ -132,7 +198,7 @@ const SubscribeForm: React.FC = () => {
               options={[
                 { label: "Diario", value: "diario" },
                 { label: "Semanal", value: "semanal" },
-                { label: "Mensual", value: "mensual" },
+                { label: "Anual", value: "mensual" },
               ]}
               selected={suscripcion}
               onChange={setSuscripcion}

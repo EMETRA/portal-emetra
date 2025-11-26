@@ -2,7 +2,7 @@ import { NextRequest } from "next/server";
 
 export const runtime = "nodejs";
 
-const baseUrl = process.env.NEXT_PUBLIC_EMETRA_API_BASE_URL;
+const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL;
 export async function POST(req: NextRequest) {
     try {
         const { plate } = await req.json();
@@ -27,7 +27,7 @@ export async function POST(req: NextRequest) {
         }
 
         if (!baseUrl) {
-            throw new Error("NEXT_PUBLIC_EMETRA_API_BASE_URL no está configurada");
+            throw new Error("NEXT_PUBLIC_API_BASE_URL no está configurada");
         }
 
         const externalUrl = `${baseUrl}/notificado/generar`;

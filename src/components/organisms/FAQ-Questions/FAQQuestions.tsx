@@ -27,7 +27,9 @@ const FAQQuestions: React.FC<FAQQuestionsProps> = ({
               question={question.pregunta}
               key={`FAQ-QuestionD-${question.pregunta}-${index}`}
             >
-              {question.respuesta}
+              <p className={styles.answer}>
+                {question.respuesta}
+              </p>
             </Dropdown>
             {index < questions.length - 1 && (
               <Separator

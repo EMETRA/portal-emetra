@@ -24,13 +24,13 @@ const Footer: React.FC = () => {
           </Link>
         </div> */}
         <div className={classNames(styles.Links, styles.Social)}>
-          <Link href="/" className={classNames(styles.Link)}>
+          <Link href="https://www.facebook.com/PoliciaMTMuniGuate" className={classNames(styles.Link)}>
             <Icon name="Facebook" />
           </Link>
-          <Link href="/" className={classNames(styles.Link)}>
+          <Link href="https://x.com/PMTMuniGuate" className={classNames(styles.Link)}>
             <Icon name="Twitter" />
           </Link>
-          <Link href="/" className={classNames(styles.Link)}>
+          <Link href="https://www.instagram.com/policia_mt/" className={classNames(styles.Link)}>
             <Icon name="Instagram" />
           </Link>
         </div>

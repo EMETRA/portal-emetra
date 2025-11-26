@@ -89,7 +89,7 @@ async function fetchLatestNews(): Promise<NewsSummaryDto[]> {
 const slides: BannerSlide[] = [
   {
     backgroundImage: "/images/banner.jpg",
-    text: "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.",
+    text: "EMETRA es la Entidad Metropolitana Reguladora de Transporte y Tránsito de la Ciudad de Guatemala. Administra a la Policía Municipal de Tránsito y coordina las acciones necesarias para ordenar la movilidad en la ciudad. Realiza la gestión administrativa, técnica y normativa relacionada con el transporte y el tránsito, vela por el cumplimiento de las regulaciones vigentes y promueve la educación y la seguridad vial para todos los vecinos.",
     overlayImage: "/images/Logos.png",
   },
   // {
@@ -100,15 +100,24 @@ const slides: BannerSlide[] = [
 ];
 
 const DEFAULT_NEWS_IMAGE = "/images/Evento.jpg";
+const parte1 = `La Policía MT es la autoridad que trabaja directamente en las calles. Su función es regular y ordenar el tránsito, hacer cumplir la Ley de Tránsito, atender emergencias viales, orientar a los conductores y apoyar la seguridad vial en la ciudad.`;
 
+const parte2 = `Por su parte, EMETRA es la entidad municipal que administra y dirige a la Policía MT. Su papel es planificar, coordinar y supervisar cómo debe funcionar el tránsito en la ciudad. EMETRA define políticas, normativas y lineamientos técnicos para mejorar la movilidad, y la Policía MT las ejecuta en el territorio.`;
+
+const parte3 = `En resumen:
+• EMETRA: planifica, regula y administra.
+• Policía MT: ejecuta y opera en las calles.
+Ambas trabajan juntas para que la movilidad en la ciudad sea más segura, ordenada y eficiente.`;
 const loremQuestions: FAQ[] = [
   {
     id: 1,
     tipo: FAQ_Type.PILOTOS,
     enLanding: false,
-    pregunta: "Lorem ipsum dolor sit amet?",
+    pregunta: "¿Funciones de la Policía MT y qué papel desempeña EMETRA en la regulación de la ciudad?",
     respuesta:
-      "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam euismod, nisl eget aliquam ultricies, nunc nisl aliquet nunc, quis aliquam nisl nunc eu nisl.",
+      `${parte1}
+      ${parte2}
+      ${parte3}`,
   },
   {
     id: 2,

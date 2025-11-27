@@ -37,6 +37,26 @@ interface NewsListResponseDto {
   limit: number;
 }
 
+interface FaqApiDto {
+  id: number;
+  categoria: string;
+  idioma: string;
+  estado: string;
+  pregunta: string;
+  respuesta: string;
+  orden?: number;
+  creado: string;
+  actualizado: string;
+}
+
+interface FaqListResponseDto {
+  items: FaqApiDto[];
+  total: number;
+  page: number;
+  limit: number;
+}
+
+
 function formatDateToSpanish(dateISO?: string | null) {
   if (!dateISO) {
     return "Fecha no disponible";
@@ -84,7 +104,60 @@ async function fetchLatestNews(): Promise<NewsSummaryDto[]> {
   }
 }
 
+function mapCategoriaToFaqType(categoria: string): FAQ_Type {
+  const normalized = categoria?.toLowerCase();
 
+  switch (normalized) {
+    case "pilotos":
+      return FAQ_Type.PILOTOS;
+    default:
+      return FAQ_Type.PILOTOS;
+  }
+}
+
+async function fetchFaqs(): Promise<FAQ[]> {
+  try {
+    const searchParams = new URLSearchParams({
+      estado: "activo",
+      page: "1",
+      limit: "50",
+    });
+
+    const url = `${API_BASE_URL}/faq?${searchParams.toString()}`;
+    console.log("Fetching FAQs from:", url);
+
+    const response = await fetch(url, {
+      headers: {
+        Accept: "application/json",
+      },
+      next: {
+        revalidate: 300,
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error(
+        `No fue posible obtener las FAQs. Código: ${response.status}`,
+      );
+    }
+
+    const data: FaqListResponseDto = await response.json();
+
+    const faqs: FAQ[] =
+      data.items?.map((item) => ({
+        id: item.id,
+        tipo: mapCategoriaToFaqType(item.categoria),
+        enLanding: false,
+        pregunta: item.pregunta,
+        respuesta: item.respuesta,
+      })) ?? [];
+
+    return faqs;
+  } catch (error) {
+    console.error("Error al obtener las FAQs:", error);
+    return [];
+  }
+}
 
 const slides: BannerSlide[] = [
   {
@@ -100,61 +173,10 @@ const slides: BannerSlide[] = [
 ];
 
 const DEFAULT_NEWS_IMAGE = "/images/Evento.jpg";
-const parte1 = `La Policía MT es la autoridad que trabaja directamente en las calles. Su función es regular y ordenar el tránsito, hacer cumplir la Ley de Tránsito, atender emergencias viales, orientar a los conductores y apoyar la seguridad vial en la ciudad.`;
-
-const parte2 = `Por su parte, EMETRA es la entidad municipal que administra y dirige a la Policía MT. Su papel es planificar, coordinar y supervisar cómo debe funcionar el tránsito en la ciudad. EMETRA define políticas, normativas y lineamientos técnicos para mejorar la movilidad, y la Policía MT las ejecuta en el territorio.`;
-
-const parte3 = `En resumen:
-• EMETRA: planifica, regula y administra.
-• Policía MT: ejecuta y opera en las calles.
-Ambas trabajan juntas para que la movilidad en la ciudad sea más segura, ordenada y eficiente.`;
-const loremQuestions: FAQ[] = [
-  {
-    id: 1,
-    tipo: FAQ_Type.PILOTOS,
-    enLanding: false,
-    pregunta: "¿Funciones de la Policía MT y qué papel desempeña EMETRA en la regulación de la ciudad?",
-    respuesta:
-      `${parte1}
-      ${parte2}
-      ${parte3}`,
-  },
-  {
-    id: 2,
-    tipo: FAQ_Type.PILOTOS,
-    enLanding: false,
-    pregunta: "Vestibulum auctor dapibus neque?",
-    respuesta:
-      "Vestibulum auctor dapibus neque. Aenean euismod bibendum laoreet. Proin gravida dolor sit amet lacus accumsan et viverra justo commodo.",
-  },
-  {
-    id: 3,
-    tipo: FAQ_Type.PILOTOS,
-    enLanding: false,
-    pregunta: "Cras mattis consectetur purus sit amet fermentum?",
-    respuesta:
-      "Cras mattis consectetur purus sit amet fermentum. Donec sed odio dui. Nullam quis risus eget urna mollis ornare vel eu leo.",
-  },
-  {
-    id: 4,
-    tipo: FAQ_Type.PILOTOS,
-    enLanding: false,
-    pregunta: "Maecenas sed diam eget risus varius blandit?",
-    respuesta:
-      "Maecenas sed diam eget risus varius blandit sit amet non magna. Aenean lacinia bibendum nulla sed consectetur.",
-  },
-  {
-    id: 5,
-    tipo: FAQ_Type.PILOTOS,
-    enLanding: false,
-    pregunta: "Donec ullamcorper nulla non metus auctor fringilla?",
-    respuesta:
-      "Donec ullamcorper nulla non metus auctor fringilla. Nullam id dolor id nibh ultricies vehicula ut id elit. Etiam porta sem malesuada magna mollis euismod.",
-  },
-];
 
 export default async function Home() {
   const latestNews = await fetchLatestNews();
+  const faqQuestions = await fetchFaqs();
 
   return (
     <div className={styles.page}>
@@ -226,7 +248,7 @@ export default async function Home() {
       </Separator>
       <section id="ayuda">
         <FAQQuestions
-          questions={loremQuestions}
+          questions={faqQuestions}
           variant="No-Landing"
           className={styles.faqQuestions}
         />

@@ -3,6 +3,7 @@ import React from "react";
 import { Card, Text } from "@components/atoms";
 import { Input } from "@/components/server/atoms";
 import styles from "./VehicleQueryCard.module.scss";
+import { set } from "zod";
 
 type Props = {
   initialPlate: string;
@@ -12,7 +13,8 @@ export default function VehicleQueryCard({ initialPlate = "" }: Props) {
   const [plate, setPlate] = React.useState(initialPlate);
   const [isEditing, setIsEditing] = React.useState(false);
   const [loading, setLoading] = React.useState(false);
-  const [, setMessage] = React.useState<string | null>(null);
+  const [message, setMessage] = React.useState<string | null>(null);
+  const [messageType, setMessageType] = React.useState<"success" | "error" | null>(null);
   const inputRef = React.useRef<HTMLInputElement | null>(null);
 
   const toggleEdit = (e?: React.MouseEvent) => {
@@ -33,6 +35,7 @@ export default function VehicleQueryCard({ initialPlate = "" }: Props) {
     try {
       setLoading(true);
       setMessage(null);
+      setMessageType(null);
 
       //Consultar remisiones
       const consulta = await fetch("/api/sat/consulta", {
@@ -49,11 +52,21 @@ export default function VehicleQueryCard({ initialPlate = "" }: Props) {
 
       const consultaJson = await consulta.json().catch(() => null);
 
-      if (consultaJson?.error || consultaJson?.success === false || !consultaJson?.data || consultaJson.data.length === 0) {
-        setMessage(
-          consultaJson?.message ||
-            "No se encontraron remisiones pendientes de notificación"
-        );
+      if (!consultaJson) {
+        setMessage("Error al consultar remisiones");
+        setMessageType("error");
+        return;
+      }
+
+      if (consultaJson.error === true) {
+        setMessage("Placa solvente");
+        setMessageType("success");
+        return;
+      }
+
+      if (consultaJson.success !== true) {
+        setMessage(consultaJson.message || "Error al consultar remisiones");
+        setMessageType("error");
         return;
       }
 
@@ -69,14 +82,12 @@ export default function VehicleQueryCard({ initialPlate = "" }: Props) {
         setMessage(
           errorData?.message || "No se pudo obtener la notificación en PDF"
         );
+        setMessageType("error");
         return;
       }
 
       const pdfData = await pdfRes.json();
-      console.log("PDF data:", pdfData);
 
-
-      // console.log("Generando PDF para placa:", plate);
       const res = await fetch("/api/sat/pdf", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -85,6 +96,8 @@ export default function VehicleQueryCard({ initialPlate = "" }: Props) {
 
       if (!res.ok) {
         console.error("No se pudo generar el PDF");
+        setMessage("No se pudo generar el PDF.");
+        setMessageType("error");
         return;
       }
 
@@ -161,6 +174,19 @@ export default function VehicleQueryCard({ initialPlate = "" }: Props) {
                     Descarga tu comprobante digital al instante.
                 </Step>
             </div>
+            {message && messageType === "success" && (
+              <div className={styles.SolventBanner}>
+                <Text variant="Small" className={styles.SolventText}>
+                  {message}
+                </Text>
+              </div>
+            )}
+
+            {message && messageType === "error" && (
+              <Text variant="Small" className={styles.ErrorText}>
+                {message}
+              </Text>
+            )}
         </div>
     </Card>
   );

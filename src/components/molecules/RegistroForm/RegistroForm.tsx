@@ -17,32 +17,46 @@ interface RemisionRow {
     observaciones: string
 }
 
+interface BackendRemision {
+  REMISION: string;
+  FECHA: string;
+  LICENCIA: string;
+  CONDUCTOR: string;
+  LUGAR: string;
+  MONTO: number | string;
+}
+
+
 const RegistroForm: React.FC = () => {
     const [juzgado, setJuzgado] = useState("");
-/*     const [sexo, setSexo] = useState("");
- */    const [addingPlate, setAddingPlate] = useState(false)
+    const [addingPlate, setAddingPlate] = useState(false)
 
     const [tipoPlaca, setTipoPlaca] = useState("");
-/*     const [numeroPlaca, setNumeroPlaca] = useState("");
- */
-    const [misRemisiones] = useState<RemisionRow[]>([
-        {
-        id: '1',
-        remision: '225515151',
-        estatus: 'PENDIENTE',
-        numeroResolucion: '10555555',
-        boletaReformada: 'E-10507277',
-        observaciones: 'Deberá cancelar su totalidad en 5 días'
-        },
-        {
-        id: '2',
-        remision: '225515152',
-        estatus: 'FINALIZADO',
-        numeroResolucion: '10555556',
-        boletaReformada: 'E-10507278',
-        observaciones: 'Sin observaciones'
-        }
-    ])
+const [numeroPlaca, setNumeroPlaca] = useState("");
+const [loadingRemisiones, setLoadingRemisiones] = useState(false);
+const [remisionesError, setRemisionesError] = useState<string | null>(null);
+
+
+    // const [misRemisiones] = useState<RemisionRow[]>([
+    //     {
+    //     id: '1',
+    //     remision: '225515151',
+    //     estatus: 'PENDIENTE',
+    //     numeroResolucion: '10555555',
+    //     boletaReformada: 'E-10507277',
+    //     observaciones: 'Deberá cancelar su totalidad en 5 días'
+    //     },
+    //     {
+    //     id: '2',
+    //     remision: '225515152',
+    //     estatus: 'FINALIZADO',
+    //     numeroResolucion: '10555556',
+    //     boletaReformada: 'E-10507278',
+    //     observaciones: 'Sin observaciones'
+    //     }
+    // ])
+    const [misRemisiones, setMisRemisiones] = useState<RemisionRow[]>([])
+
 
     const [selectedRemisiones, setSelectedRemisiones] = useState<string[]>([])
     const toggleSelectRemision = (row: RemisionRow) => {
@@ -70,6 +84,50 @@ const RegistroForm: React.FC = () => {
         { key: 'boletaReformada', label: 'Boleta reformada' },
         { key: 'observaciones', label: 'Observaciones' }
     ], [selectedRemisiones])
+
+    const handleBuscarRemisiones = async () => {
+        setRemisionesError(null);
+
+        if (!tipoPlaca || !numeroPlaca) {
+            setRemisionesError('Debes ingresar tipo de placa y número de placa.');
+            return;
+        }
+
+        try {
+            setLoadingRemisiones(true);
+
+            const params = new URLSearchParams({
+                tipo_placa: tipoPlaca,
+                numero_placa: numeroPlaca,
+            });
+
+            const res = await fetch(`/api/juzgado/remisiones?${params.toString()}`);
+
+            if (!res.ok) {
+                const errorBody = await res.json().catch(() => ({}));
+                throw new Error(errorBody.message || 'Error al obtener remisiones');
+            }
+
+            const data: BackendRemision[] = await res.json();
+
+            const mapped: RemisionRow[] = data.map((item) => ({
+                id: item.REMISION,                 
+                remision: item.REMISION,
+                estatus: 'PENDIENTE',              
+                numeroResolucion: '',              
+                boletaReformada: '',               
+                observaciones: `${item.CONDUCTOR} - ${item.LUGAR} - Q${item.MONTO}`,
+            }));
+
+            setMisRemisiones(mapped);
+            setSelectedRemisiones([]); 
+        } catch (error: any) {
+            setRemisionesError(error.message || 'Error desconocido al buscar remisiones');
+        } finally {
+            setLoadingRemisiones(false);
+        }
+    };
+
 
     return (
         <form className={styles.formBody}>
@@ -191,8 +249,17 @@ const RegistroForm: React.FC = () => {
                             </div>
                             <div className={styles.formControl}>
                                 <Text variant="Small" className={styles.TextStyle}>Ingrese Placa</Text>
-                                <Input id="tipPlaca" type="text" name="tipoPlaca" placeholder="########"/>
+                                <Input id="numeroPlaca" type="text" name="numeroPlaca" placeholder="########"
+                                        value={numeroPlaca} onChange={e => setNumeroPlaca(e.target.value)}/>
                             </div>
+
+                            <div className={styles.formControl}>
+                                <Text variant="Small" className={styles.TextStyle}>&nbsp;</Text>
+                                <Button onClick={handleBuscarRemisiones}>
+                                    {loadingRemisiones ? 'Buscando...' : 'Buscar'}
+                                </Button>
+                            </div>
+
                         </div>
                         
                         {/* Tabla de remisiones */}

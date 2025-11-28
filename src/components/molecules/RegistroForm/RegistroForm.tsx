@@ -32,29 +32,10 @@ const RegistroForm: React.FC = () => {
     const [addingPlate, setAddingPlate] = useState(false)
 
     const [tipoPlaca, setTipoPlaca] = useState("");
-const [numeroPlaca, setNumeroPlaca] = useState("");
-const [loadingRemisiones, setLoadingRemisiones] = useState(false);
-const [remisionesError, setRemisionesError] = useState<string | null>(null);
+    const [numeroPlaca, setNumeroPlaca] = useState("");
+    const [loadingRemisiones, setLoadingRemisiones] = useState(false);
+    const [remisionesError, setRemisionesError] = useState<string | null>(null);
 
-
-    // const [misRemisiones] = useState<RemisionRow[]>([
-    //     {
-    //     id: '1',
-    //     remision: '225515151',
-    //     estatus: 'PENDIENTE',
-    //     numeroResolucion: '10555555',
-    //     boletaReformada: 'E-10507277',
-    //     observaciones: 'Deberá cancelar su totalidad en 5 días'
-    //     },
-    //     {
-    //     id: '2',
-    //     remision: '225515152',
-    //     estatus: 'FINALIZADO',
-    //     numeroResolucion: '10555556',
-    //     boletaReformada: 'E-10507278',
-    //     observaciones: 'Sin observaciones'
-    //     }
-    // ])
     const [misRemisiones, setMisRemisiones] = useState<RemisionRow[]>([])
 
 
@@ -147,9 +128,9 @@ const [remisionesError, setRemisionesError] = useState<string | null>(null);
                                     id="juzgado"
                                     name="juzgado"
                                     options={[
-                                        { value: "1", label: "1" },
-                                        { value: "2", label: "2" },
-                                        { value: "3", label: "3" },
+                                        { value: "1", label: "Juzgado Palacio Municipal" },
+                                        { value: "2", label: "Juzgado Cenma" },
+                                        { value: "3", label: "Juzgado Álamos" },
                                     ]}
                                     value={juzgado}
                                     onChange={e => setJuzgado(e.target.value)}

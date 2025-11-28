@@ -91,8 +91,13 @@ const ConsultaForm: React.FC = () => {
         { key: 'observaciones',    label: 'Observaciones' }
     ], [])
 
+    const handleSubmit = (e: React.FormEvent) => {
+        e.preventDefault();
+    
+    }
+
     return (
-        <form className={styles.formBody}>
+        <form className={styles.formBody} onSubmit={handleSubmit}>
             <Heading variant="Medium" className={styles.Title}>Datos del expediente</Heading>
             <div className={styles.section}>
                 <div className={styles.row}>
@@ -106,9 +111,9 @@ const ConsultaForm: React.FC = () => {
                                 id="juzgado"
                                 name="juzgado"
                                 options={[
-                                    { value: "1", label: "1" },
-                                    { value: "2", label: "2" },
-                                    { value: "3", label: "3" },
+                                    { value: "1", label: "Juzgado Palacio Municipal" },
+                                    { value: "2", label: "Juzgado Cenma" },
+                                    { value: "3", label: "Juzgado Álamos" },
                                 ]}
                                 value={juzgado}
                                 onChange={e => setJuzgado(e.target.value)}

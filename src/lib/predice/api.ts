@@ -48,9 +48,10 @@ export interface PrediceEventDto {
 }
 
 function buildPrediceUrl(path: string, admin: string | undefined) {
-  const baseUrl = API_BASE_URL.startsWith("http")
-    ? API_BASE_URL
-    : `https://${API_BASE_URL}`;
+  let baseUrl = API_BASE_URL;
+  if (!baseUrl.startsWith("http://") && !baseUrl.startsWith("https://")) {
+    baseUrl = `http://${baseUrl}`;
+  }
   const url = new URL(`${baseUrl}${path}`);
   if (admin) {
     url.searchParams.set("admin", admin);
@@ -184,15 +185,13 @@ export async function fetchPrediceEventsClient(
   admin: string = DEFAULT_ADMIN_KEY,
 ): Promise<PrediceEventDto[]> {
   try {
-    const response = await fetch(
-      buildPrediceUrl("/predice/eventos", admin),
-      {
-        headers: {
-          Accept: "application/json",
-        },
-        cache: "no-store",
+    const url = buildPrediceUrl("/predice/eventos", admin);
+    const response = await fetch(url, {
+      headers: {
+        Accept: "application/json",
       },
-    );
+      cache: "no-store",
+    });
 
     if (!response.ok) {
       throw new Error(
@@ -205,6 +204,39 @@ export async function fetchPrediceEventsClient(
   } catch (error) {
     console.error("Error al obtener los eventos de Predice:", error);
     return [];
+  }
+}
+
+export async function fetchPrediceEventByIdClient(
+  id: string,
+  admin: string = DEFAULT_ADMIN_KEY,
+): Promise<PrediceEventDto | null> {
+  try {
+    const url = buildPrediceUrl(`/predice/eventos/${id}`, admin);
+    const response = await fetch(url, {
+      headers: {
+        Accept: "application/json",
+      },
+      cache: "no-store",
+    });
+
+    if (response.status === 404) {
+      return null;
+    }
+
+    if (!response.ok) {
+      throw new Error(
+        `No fue posible obtener el evento ${id}. Código: ${response.status}`,
+      );
+    }
+
+    return (await response.json()) as PrediceEventDto;
+  } catch (error) {
+    console.error(
+      `Error al obtener el evento de Predice con id ${id}:`,
+      error,
+    );
+    return null;
   }
 }
 

@@ -1,19 +1,17 @@
+"use client";
+
 import Map from "@/components/client/atoms/Map";
 import Link from "next/link";
 import classNames from "classnames";
 import styles from "./Page.module.scss";
 import {
-  fetchPrediceEventById,
+  fetchPrediceEventByIdClient,
   type PrediceEventDto,
 } from "@/lib/predice/api";
-import { notFound } from "next/navigation";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
-import React from "react";
-
-interface PageProps {
-  params: Promise<{ id: string }>;
-}
+import React, { useEffect, useState } from "react";
+import { useParams } from "next/navigation";
 
 function decodeHtmlEntities(value: string) {
   return value
@@ -68,12 +66,52 @@ function parseNumber(value: unknown) {
   return null;
 }
 
-export default async function Page({ params }: PageProps) {
-  const { id } = await params;
-  const event = await fetchPrediceEventById(id);
+export default function Page() {
+  const params = useParams();
+  const id = params?.id as string;
+  const [event, setEvent] = useState<PrediceEventDto | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [notFound, setNotFound] = useState(false);
 
-  if (!event) {
-    notFound();
+  useEffect(() => {
+    if (!id) return;
+
+    async function loadEvent() {
+      try {
+        const fetchedEvent = await fetchPrediceEventByIdClient(id);
+        if (!fetchedEvent) {
+          setNotFound(true);
+        } else {
+          setEvent(fetchedEvent);
+        }
+      } catch (error) {
+        console.error("Error al cargar el evento:", error);
+        setNotFound(true);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    loadEvent();
+  }, [id]);
+
+  if (loading) {
+    return (
+      <div className={classNames(styles.Page)}>
+        <p>Cargando evento...</p>
+      </div>
+    );
+  }
+
+  if (notFound || !event) {
+    return (
+      <div className={classNames(styles.Page)}>
+        <p>Evento no encontrado</p>
+        <Link href="/predice" className={classNames(styles.BackLink)}>
+          ← Volver
+        </Link>
+      </div>
+    );
   }
 
   const title = decodeHtmlEntities(event.title);

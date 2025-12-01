@@ -26,6 +26,10 @@ import uvg from '@assets/logos/UVG.png';
 import vrc from '@assets/logos/VRC.png';
 import yamaha from '@assets/logos/Yamaha.png';
 import sumate from '@assets/images/sumate.png';
+import camarain from '@assets/logos/CamaraIndustria.png';
+import shell from '@assets/logos/Shell.png';
+import uber from '@assets/logos/Uber.png';
+import LogoSumate from '@assets/images/sumateLogo.png'
 import {LogoWall} from '@molecules/LogosWall';
 
 type ImportedImg = string | { src: string };
@@ -58,13 +62,16 @@ const logos: Logo[] = [
     { src: toUrl(uvg), alt: 'UVG' },
     { src: toUrl(vrc), alt: 'VRC' },
     { src: toUrl(yamaha), alt: 'Yamaha' },
+    { src: toUrl(camarain), alt: 'Cámara de Industria' },
+    { src: toUrl(shell), alt: 'Shell' },
+    { src: toUrl(uber), alt: 'Uber' }    
 ];
 
 const SumateHome: React.FC = () => {
     return (
         <div className={styles.home} style={{ backgroundImage: `url(${bgImage.src})` }}>
             <main className={styles.home__content}>
-                <LogoWall logos={logos} centerBadgeSrc={toUrl(sumate)} />            
+                <LogoWall logos={logos} centerBadgeSrc={toUrl(LogoSumate)} />            
             </main>
             <div className={styles.home__footerBox}>
                 <p className={styles.home__footerText}>Una iniciativa de:</p>

@@ -1,6 +1,6 @@
 import React from "react";
 import styles from "./SumateInscribete.module.scss";
-import bgImage from "@/assets/images/FondoFooter.png";
+import bgImage from "@/assets/images/FondoCiudad.png";
 
 const SumateInscribete: React.FC = () => {
     const bgUrl = typeof bgImage === "string" ? bgImage : (bgImage as { src: string }).src;

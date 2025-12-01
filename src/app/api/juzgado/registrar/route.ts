@@ -8,7 +8,7 @@ type Remision = {
 };
 
 type SolicitudBody = {
-  juzgado: number;
+  juzgado: number | string;   
   nombres: string;
   apellidos: string;
   direccion: string;
@@ -25,6 +25,13 @@ type SolicitudBody = {
 };
 
 export async function POST(req: NextRequest) {
+    if (!baseUrl) {
+        return NextResponse.json(
+            { message: "Falta NEXT_PUBLIC_API_BASE_URL en las variables de entorno" },
+            { status: 500 }
+        );
+    }
+
     const body = (await req.json()) as SolicitudBody;
 
     const {
@@ -45,8 +52,21 @@ export async function POST(req: NextRequest) {
     } = body;
 
     const payload = {
-        //constriur payload como en el api
-    }
+        juzgado: Number(juzgado),
+        nombres,
+        apellidos,
+        direccion,
+        telefono,
+        celular,
+        correo,
+        dpi,
+        sexo,
+        solicitante,
+        tipo_placa,
+        placa,
+        observaciones,
+        remisiones,
+    };
 
     const url = `${baseUrl}/juzgado/expediente`;
 
@@ -58,7 +78,17 @@ export async function POST(req: NextRequest) {
             },
             body: JSON.stringify(payload),
         });
-        const data = await res.json();
+        if (!res.ok) {
+            const text = await res.text().catch(() => "");
+            return NextResponse.json(
+                {
+                    message: "Error al crear expediente en backend",
+                    backendResponse: text,
+                },
+                { status: res.status }
+            );
+        }
+        const data = await res.json().catch(() => ({}));
 
         return NextResponse.json(data);
     }catch(error:any){

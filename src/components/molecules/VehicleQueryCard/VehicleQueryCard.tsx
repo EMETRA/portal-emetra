@@ -3,7 +3,6 @@ import React from "react";
 import { Card, Text } from "@components/atoms";
 import { Input } from "@/components/server/atoms";
 import styles from "./VehicleQueryCard.module.scss";
-import { set } from "zod";
 
 type Props = {
   initialPlate: string;

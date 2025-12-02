@@ -25,7 +25,6 @@ import url from '@assets/logos/URL.png';
 import uvg from '@assets/logos/UVG.png';
 import vrc from '@assets/logos/VRC.png';
 import yamaha from '@assets/logos/Yamaha.png';
-import sumate from '@assets/images/sumate.png';
 import camarain from '@assets/logos/CamaraIndustria.png';
 import shell from '@assets/logos/Shell.png';
 import uber from '@assets/logos/Uber.png';

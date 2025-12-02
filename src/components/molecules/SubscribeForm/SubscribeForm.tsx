@@ -6,7 +6,6 @@ import RadioGroup from "../../atoms/RadioGroup/RadioGroup";
 import styles     from "./SubscribeForm.module.scss";
 import { Text } from "@/components/atoms";
 import Heading from "../../server/atoms/Heading/Heading";
-import { DiameterIcon } from "lucide-react";
 
 const suscripcionMap: Record<string, number> = {
   diario: 1,

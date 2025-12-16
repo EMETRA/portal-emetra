@@ -1,7 +1,7 @@
 import puppeteer, { type Browser } from "puppeteer";
 
 export const runtime = "nodejs";
-
+const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL;
 type Body = {
   notification_no?: string;
   fecha_notificacion?: string;
@@ -22,6 +22,7 @@ type Body = {
   firmante_cargo?: string;
   footer_left_url?: string;
   footer_right_url?: string;
+  foto_url?: string;
 };
 
 type Remision = {
@@ -45,7 +46,7 @@ type RemisionesResponse = {
 
 };
 
-function htmlTemplate(origin: string, data: Required<Body>) {
+function htmlTemplate(origin: string, data: Body) {
   return `
       <div class="wrap">
         <!-- Encabezado -->
@@ -75,6 +76,16 @@ function htmlTemplate(origin: string, data: Required<Body>) {
           de la multa en el siguiente link <a href=${data.detalle_remision_url}>ver detalle remision</a> .
         </p>
 
+        ${
+          data.foto_url
+            ? `
+              <div class="foto-remision">
+                <img src="${data.foto_url}" alt="Foto de remisión" onerror="this.hidden=true" />
+              </div>
+            `
+            : ""
+        }
+
         <p>
           Usted tiene el plazo establecido en la Ley de Tránsito para efectuar el pago correspondiente en cajas municipales,
           vía electrónica, bancos del sistema y sistema POS, según la reforma a la Ley de Tránsito contenida en el Decreto
@@ -88,7 +99,7 @@ function htmlTemplate(origin: string, data: Required<Body>) {
         </p>
 
         <p>Notificación electrónica, de conformidad con el Acuerdo COM-32-2022 y sus reformas.</p>
-
+        <div class="page-safe"></div>
         <!-- Firma -->
         <div class="firma">
           <img src="${data.firma_url}" alt="Firma" />
@@ -96,11 +107,6 @@ function htmlTemplate(origin: string, data: Required<Body>) {
           <div class="cargo">${data.firmante_cargo}</div>
         </div>
 
-        <!-- Footer con imágenes -->
-        <div class="footer">
-          <img src="${data.footer_left_url}"  alt="Footer izquierdo" onerror="this.hidden=true">
-          <img src="${data.footer_right_url}" alt="Footer derecho" class="Footer2" onerror="this.hidden=true">
-        </div>
       </div>
   `;
 }
@@ -211,6 +217,27 @@ function horaALetras(hhmm: string): string {
   return `${horaTxt} ${palabraHora} con ${minuTxt} ${palabraMin}`;
 }
 
+async function getFotoRemision(
+  serie: string,
+  remision: string
+): Promise<string | null> {
+  try {
+    const res = await fetch(
+      `${baseUrl}/foto/${encodeURIComponent(serie)}/${encodeURIComponent(remision)}`,
+      { cache: "no-store" }
+    );
+
+    if (!res.ok) return null;
+
+    const json = await res.json();
+    return json?.success ? json.data?.ruta_completa ?? null : null;
+  } catch {
+    return null;
+  }
+}
+
+const s = (v: unknown) => (v === null || v === undefined ? "" : String(v));
+
 export async function POST(req: Request) {
   let browser: Browser | null = null;
 
@@ -226,24 +253,31 @@ export async function POST(req: Request) {
       now.getMinutes()
     ).padStart(2, "0")}`;
 
-    const dataList: Required<Body>[] = body.remisiones.map((remision) => {
+
+    const dataList: Required<Body>[] = [];
+    for (const remision of body.remisiones) {
       const numeroSerie = remision.SERIE_REMISION.replace(/[^0-9]/g, "");
-      return {
+      // const fotoUrl = await getFotoRemision(
+      //   remision.SERIE_REMISION,
+      //   remision.id_notificacion.toString()
+      // );
+      const fotoUrl = "https://www.nintenderos.com/wp-content/uploads/2022/05/1200px-EP1102_Pikachu_de_Ash.png";
+      dataList.push({
         notification_no: remision.id_notificacion.toString(),
         fecha_notificacion: fechaALetras(fechaRaw),
         hora_notificacion: horaALetras(horaRaw),
 
-        plate: remision.PLACA,
-        modelo: remision.MODELO.toString(),
-        marca: remision.MARCA,
+        plate: s(remision.PLACA),
+        modelo: s(remision.MODELO),
+        marca: s(remision.MARCA),
 
         n_infraccion: remision.SERIE_REMISION,
         articulo: remision.ARTICULOS,
         fecha_infraccion: remision.FECHA,
-        monto: remision.MONTO.toString(),
+        monto: s(remision.MONTO),
 
-        lugar: remision.LUGAR,
-        hora_hecho: remision.HORA,
+        lugar: s(remision.LUGAR),
+        hora_hecho: s(remision.HORA),
 
         detalle_remision_url: `https://consulta.muniguate.com/emetra/detalle.php?s=${numeroSerie}&r=${remision.id_notificacion.toString()}&id=1`,
         shield_url: `${origin}/images/EscudoMuni.png`,
@@ -252,8 +286,9 @@ export async function POST(req: Request) {
         firmante_cargo: "Intendente",
         footer_left_url: `${origin}/images/footer_left.png`,
         footer_right_url: `${origin}/images/footer_right.png`,
-      };
-    });
+        foto_url: fotoUrl || ``,
+      });
+    }
 
     const pagesHtml = dataList.map((data) => htmlTemplate(origin,data)).join("");
 
@@ -264,9 +299,10 @@ export async function POST(req: Request) {
         <title>Notificación</title>
         <style>
           body { font-family: "Arial"; color: #111; font-size: 12pt; line-height: 1.5; }
-          .wrap { width: 100%; box-sizing: border-box; page-break-before: always; break-before: page;}
+          .wrap { width: 100%; box-sizing: border-box; page-break-before: always; break-before: page; }
           .wrap:first-of-type { page-break-before: auto; break-before: auto;}
           .header{ display:flex; align-items:center; justify-content:space-between; height: 80px; margin-bottom: 10px; }
+          .page-safe{ height: 320px; display:block; }
           .title { text-align: center; margin-top: 12px; margin-bottom: 16px; }
           .title h1 { font-size: 15pt; margin: 0 0 8px 0; font-weight: 700; }
           .title h2, .title h3 { font-size: 12.5pt; margin: 0; font-weight: 700; }
@@ -281,8 +317,17 @@ export async function POST(req: Request) {
           .footer { display: flex; justify-content: space-between; align-items:flex-end; margin-top: 24px; min-height: 48px;  }
           .footer img{ height: 56px; width: auto; object-fit: contain; display: block; }
           .Footer2 {height: 86px !important; width: auto;}
+          .foto-remision {margin-top: 12px; margin-bottom: 12px; display: flex; justify-content: center;}
+          .foto-remision img { max-width: 90%; max-height: 320px; object-fit: contain; display: block; }
+          .global-footer{ position: fixed; left: 8mm; right: 8mm; bottom: 6mm; display:flex; justify-content: space-between; align-items:flex-end; height: 18mm; z-index: 999 ;}
+          .global-footer img{ height: 56px; width: auto; object-fit: contain; display: block; }
+          .global-footer .Footer2{ height: 86px !important; }
         </style>
         <body>
+          <div class="global-footer">
+            <img src="${origin}/images/footer_left.png" alt="Footer izquierdo" onerror="this.hidden=true">
+            <img src="${origin}/images/footer_right.png" alt="Footer derecho" class="Footer2" onerror="this.hidden=true">
+          </div>
           ${pagesHtml}
         </body>
       </html>
@@ -302,7 +347,7 @@ export async function POST(req: Request) {
     const pdfBuffer = await page.pdf({
       format: "A4",
       printBackground: true,
-      margin: { top: "14mm", right: "8mm", bottom: "1mm", left: "8mm" },
+      margin: { top: "14mm", right: "8mm", bottom: "8mm", left: "8mm" },
     });
 
     await page.close();

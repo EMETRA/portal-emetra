@@ -8,6 +8,40 @@ type Props = {
   initialPlate: string;
 };
 
+const plate = "P-180RTT";
+const pdfDatadummy = {
+  success: true,
+  placa: plate,
+  remisiones: [
+    {
+      PLACA: plate,
+      MODELO: 2020,
+      MARCA: "TOYOTA",
+      ARTICULOS: "ART. 123",
+      MONTO: 500,
+      FECHA: "2025-12-16",
+      LUGAR: "Ciudad de Guatemala",
+      SERIE_REMISION: "A-123456",
+      HORA: "10:15",
+      id_notificacion: 999001,
+    },
+    {
+      PLACA: plate,
+      MODELO: null, // prueba campo faltante
+      MARCA: "HONDA",
+      ARTICULOS: "ART. 45",
+      MONTO: 200,
+      FECHA: "2025-12-15",
+      LUGAR: "Zona 10",
+      SERIE_REMISION: "B-654321",
+      HORA: "08:40",
+      id_notificacion: 999002,
+    },
+  ],
+  recursos: {},
+};
+
+
 export default function VehicleQueryCard({ initialPlate = "" }: Props) {
   const [plate, setPlate] = React.useState(initialPlate);
   const [isEditing, setIsEditing] = React.useState(false);
@@ -37,60 +71,60 @@ export default function VehicleQueryCard({ initialPlate = "" }: Props) {
       setMessageType(null);
 
       //Consultar remisiones
-      const consulta = await fetch("/api/sat/consulta", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ plate }),
-      });
+      // const consulta = await fetch("/api/sat/consulta", {
+      //   method: "POST",
+      //   headers: { "Content-Type": "application/json" },
+      //   body: JSON.stringify({ plate }),
+      // });
 
-      if (!consulta.ok) {
-        const errorData = await consulta.json();
-        setMessage(errorData.message || "Error al consultar remisiones");
-        return;
-      }
+      // if (!consulta.ok) {
+      //   const errorData = await consulta.json();
+      //   setMessage(errorData.message || "Error al consultar remisiones");
+      //   return;
+      // }
 
-      const consultaJson = await consulta.json().catch(() => null);
+      // const consultaJson = await consulta.json().catch(() => null);
 
-      if (!consultaJson) {
-        setMessage("Error al consultar remisiones");
-        setMessageType("error");
-        return;
-      }
+      // if (!consultaJson) {
+      //   setMessage("Error al consultar remisiones");
+      //   setMessageType("error");
+      //   return;
+      // }
 
-      if (consultaJson.error === true) {
-        setMessage("Placa solvente");
-        setMessageType("success");
-        return;
-      }
+      // if (consultaJson.error === true) {
+      //   setMessage("Placa solvente");
+      //   setMessageType("success");
+      //   return;
+      // }
 
-      if (consultaJson.success !== true) {
-        setMessage(consultaJson.message || "Error al consultar remisiones");
-        setMessageType("error");
-        return;
-      }
+      // if (consultaJson.success !== true) {
+      //   setMessage(consultaJson.message || "Error al consultar remisiones");
+      //   setMessageType("error");
+      //   return;
+      // }
 
       //Generar PDF
-      const pdfRes = await fetch("/api/sat/getpdf", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ plate }),
-      });
+      // const pdfRes = await fetch("/api/sat/getpdf", {
+      //   method: "POST",
+      //   headers: { "Content-Type": "application/json" },
+      //   body: JSON.stringify({ plate }),
+      // });
 
-      if (!pdfRes.ok) {
-        const errorData = await pdfRes.json().catch(() => null);
-        setMessage(
-          errorData?.message || "No se pudo obtener la notificación en PDF"
-        );
-        setMessageType("error");
-        return;
-      }
+      // if (!pdfRes.ok) {
+      //   const errorData = await pdfRes.json().catch(() => null);
+      //   setMessage(
+      //     errorData?.message || "No se pudo obtener la notificación en PDF"
+      //   );
+      //   setMessageType("error");
+      //   return;
+      // }
 
-      const pdfData = await pdfRes.json();
+      // const pdfData = await pdfRes.json();
 
       const res = await fetch("/api/sat/pdf", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(pdfData),
+        body: JSON.stringify(pdfDatadummy),
       });
 
       if (!res.ok) {

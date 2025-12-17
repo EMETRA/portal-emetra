@@ -42,7 +42,6 @@ export async function POST(req: NextRequest) {
 
         const contentType = externalRes.headers.get("content-type") ?? "application/json";
         const rawBody = await externalRes.text(); 
-        console.log("datos pdf: ", rawBody)
         return new Response(rawBody, {
             status: externalRes.status,
             headers: {

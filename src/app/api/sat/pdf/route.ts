@@ -80,7 +80,7 @@ function htmlTemplate(origin: string, data: Body) {
           data.foto_url
             ? `
               <div class="foto-remision">
-                <img src="${data.foto_url}" alt="Foto de remisión" onerror="this.hidden=true" />
+                <img src="https://emetra.muniguate.com/fotos/${data.foto_url}" alt="Foto de remisión" onerror="this.hidden=true" />
               </div>
             `
             : ""
@@ -91,7 +91,13 @@ function htmlTemplate(origin: string, data: Body) {
           vía electrónica, bancos del sistema y sistema POS, según la reforma a la Ley de Tránsito contenida en el Decreto
           33-2024, emitido por el Congreso de la República de Guatemala.
         </p>
-
+        ${
+          data.foto_url
+            ? `
+              <div class="page-safe"></div>
+            `
+              : ""
+        }
         <p>
           Procedimiento para la impugnación: los establecidos en el artículo 186 del Reglamento de Tránsito Acuerdo
           Gubernativo 273-98, y Reforma del artículo 31 de la Ley de Tránsito. Plazo para presentar recurso: no mayor de
@@ -99,7 +105,7 @@ function htmlTemplate(origin: string, data: Body) {
         </p>
 
         <p>Notificación electrónica, de conformidad con el Acuerdo COM-32-2022 y sus reformas.</p>
-        <div class="page-safe"></div>
+
         <!-- Firma -->
         <div class="firma">
           <img src="${data.firma_url}" alt="Firma" />
@@ -223,7 +229,7 @@ async function getFotoRemision(
 ): Promise<string | null> {
   try {
     const res = await fetch(
-      `${baseUrl}/foto/${encodeURIComponent(serie)}/${encodeURIComponent(remision)}`,
+      `${baseUrl}/notificado/foto/${encodeURIComponent(serie)}/${encodeURIComponent(remision)}`,
       { cache: "no-store" }
     );
 
@@ -255,13 +261,14 @@ export async function POST(req: Request) {
 
 
     const dataList: Required<Body>[] = [];
+    let i = 0;
     for (const remision of body.remisiones) {
       const numeroSerie = remision.SERIE_REMISION.replace(/[^0-9]/g, "");
-      // const fotoUrl = await getFotoRemision(
-      //   remision.SERIE_REMISION,
-      //   remision.id_notificacion.toString()
-      // );
-      const fotoUrl = "https://www.nintenderos.com/wp-content/uploads/2022/05/1200px-EP1102_Pikachu_de_Ash.png";
+      const serie = remision.SERIE_REMISION.split('-')[0].trim();
+      const fotoUrl = await getFotoRemision(
+        serie,
+        remision.id_notificacion.toString()
+      );
       dataList.push({
         notification_no: remision.id_notificacion.toString(),
         fecha_notificacion: fechaALetras(fechaRaw),
@@ -279,7 +286,7 @@ export async function POST(req: Request) {
         lugar: s(remision.LUGAR),
         hora_hecho: s(remision.HORA),
 
-        detalle_remision_url: `https://consulta.muniguate.com/emetra/detalle.php?s=${numeroSerie}&r=${remision.id_notificacion.toString()}&id=1`,
+        detalle_remision_url: `https://consulta.muniguate.com/emetra/detalle.php?s=${serie}&r=${numeroSerie}&id=1`,
         shield_url: `${origin}/images/EscudoMuni.png`,
         firma_url: `${origin}/images/firma.png`,
         firmante_nombre: "Carlos Antonio Lemus Guerra",
@@ -302,7 +309,7 @@ export async function POST(req: Request) {
           .wrap { width: 100%; box-sizing: border-box; page-break-before: always; break-before: page; }
           .wrap:first-of-type { page-break-before: auto; break-before: auto;}
           .header{ display:flex; align-items:center; justify-content:space-between; height: 80px; margin-bottom: 10px; }
-          .page-safe{ height: 320px; display:block; }
+          .page-safe{ height: 200px; display:block; }
           .title { text-align: center; margin-top: 12px; margin-bottom: 16px; }
           .title h1 { font-size: 15pt; margin: 0 0 8px 0; font-weight: 700; }
           .title h2, .title h3 { font-size: 12.5pt; margin: 0; font-weight: 700; }
@@ -317,7 +324,7 @@ export async function POST(req: Request) {
           .footer { display: flex; justify-content: space-between; align-items:flex-end; margin-top: 24px; min-height: 48px;  }
           .footer img{ height: 56px; width: auto; object-fit: contain; display: block; }
           .Footer2 {height: 86px !important; width: auto;}
-          .foto-remision {margin-top: 12px; margin-bottom: 12px; display: flex; justify-content: center;}
+          .foto-remision {margin-top: 22px; margin-bottom: 22px; display: flex; justify-content: center;}
           .foto-remision img { max-width: 90%; max-height: 320px; object-fit: contain; display: block; }
           .global-footer{ position: fixed; left: 8mm; right: 8mm; bottom: 6mm; display:flex; justify-content: space-between; align-items:flex-end; height: 18mm; z-index: 999 ;}
           .global-footer img{ height: 56px; width: auto; object-fit: contain; display: block; }

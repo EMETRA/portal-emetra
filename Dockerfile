@@ -1,4 +1,4 @@
-ARG BASE_IMAGE=node:20-alpine
+ARG BASE_IMAGE=mirror.gcr.io/library/node:20-alpine
 FROM ${BASE_IMAGE} AS base
 
 RUN corepack enable && corepack prepare pnpm@10.11.0 --activate

@@ -14,6 +14,7 @@ services:
       - path: .env.production
         required: false
     restart: unless-stopped
+    init: true
     healthcheck:
       test:
         [

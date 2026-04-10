@@ -1,6 +1,5 @@
 import Image from "next/image";
 import styles from "./page.module.css";
-import { Icon } from "@/components/server/atoms/Icon";
 
 export default function Home() {
   return (
@@ -14,7 +13,6 @@ export default function Home() {
           height={38}
           priority
         />
-        <Icon />
         <ol>
           <li>
             Get started by editing <code>src/app/page.tsx</code>.

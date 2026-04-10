@@ -261,7 +261,6 @@ export async function POST(req: Request) {
 
 
     const dataList: Required<Body>[] = [];
-    let i = 0;
     for (const remision of body.remisiones) {
       const numeroSerie = remision.SERIE_REMISION.replace(/[^0-9]/g, "");
       const serie = remision.SERIE_REMISION.split('-')[0].trim();

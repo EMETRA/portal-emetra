@@ -56,7 +56,6 @@ interface FaqListResponseDto {
   limit: number;
 }
 
-
 function formatDateToSpanish(dateISO?: string | null) {
   if (!dateISO) {
     return "Fecha no disponible";
@@ -80,15 +79,21 @@ async function fetchLatestNews(): Promise<NewsSummaryDto[]> {
       page: "1",
       limit: "10",
     });
-    console.log('Fetching news from:', `${API_BASE_URL}/news?${searchParams.toString()}`);
-    const response = await fetch(`${API_BASE_URL}/news?${searchParams.toString()}`, {
-      headers: {
-        Accept: "application/json",
+    console.log(
+      "Fetching news from:",
+      `${API_BASE_URL}/news?${searchParams.toString()}`,
+    );
+    const response = await fetch(
+      `${API_BASE_URL}/news?${searchParams.toString()}`,
+      {
+        headers: {
+          Accept: "application/json",
+        },
+        next: {
+          revalidate: 300,
+        },
       },
-      next: {
-        revalidate: 300,
-      },
-    });
+    );
 
     if (!response.ok) {
       throw new Error(
@@ -165,11 +170,6 @@ const slides: BannerSlide[] = [
     text: "EMETRA es la Entidad Metropolitana Reguladora de Transporte y Tránsito de la Ciudad de Guatemala. Administra a la Policía Municipal de Tránsito y coordina las acciones necesarias para ordenar la movilidad en la ciudad. Realiza la gestión administrativa, técnica y normativa relacionada con el transporte y el tránsito, vela por el cumplimiento de las regulaciones vigentes y promueve la educación y la seguridad vial para todos los vecinos.",
     overlayImage: "/images/Logos.png",
   },
-  // {
-  //   backgroundImage: "/images/banner.jpg",
-  //   text: "Conoce nuestros servicios",
-  //   overlayImage: "/images/Logos.png",
-  // },
 ];
 
 const DEFAULT_NEWS_IMAGE = "/images/Evento.jpg";
@@ -185,7 +185,7 @@ export default async function Home() {
         <Separator>
           <h1 className={classNames(styles.Title)}>Nuestros Servicios</h1>
         </Separator>
-      </section>      
+      </section>
       <ServicesRow />
       <div className={classNames(styles.Services)}>
         <CalendarWidget />
@@ -204,16 +204,6 @@ export default async function Home() {
               title={"Card de Vídeo"}
               description="Lorem ipsum dolor sit amet consectetur adipisicing elit. Aperiam consequatur necessitatibus natus eum atque architecto provident nostrum blanditiis ad adipisci, repellat rerum omnis magnam, asperiores quo praesentium alias minima odio."
             />
-            {/* <MultimediaCard
-              src={"https://www.w3schools.com/html/mov_bbb.mp4"}
-              title={"Card de Vídeo"}
-              description="Lorem ipsum dolor sit amet consectetur adipisicing elit. Aperiam consequatur necessitatibus natus eum atque architecto provident nostrum blanditiis ad adipisci, repellat rerum omnis magnam, asperiores quo praesentium alias minima odio."
-            />
-            <MultimediaCard
-              src={"https://www.w3schools.com/html/mov_bbb.mp4"}
-              title={"Card de Vídeo"}
-              description="Lorem ipsum dolor sit amet consectetur adipisicing elit. Aperiam consequatur necessitatibus natus eum atque architecto provident nostrum blanditiis ad adipisci, repellat rerum omnis magnam, asperiores quo praesentium alias minima odio."
-            /> */}
           </MultimediaCarrousel>
         </div>
       </div>

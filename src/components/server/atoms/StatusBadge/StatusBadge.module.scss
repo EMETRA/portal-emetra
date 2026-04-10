@@ -1,0 +1,25 @@
+.badge {
+    display: inline-block;
+    padding: 0.25rem 0.75rem;
+    border-radius: 9999px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    line-height: 1;
+}
+
+/* Variantes de color */
+.badge--confirmada {
+    background-color: #a3e635; /* verde claro */
+    color: #1f2937;            /* gris oscuro para contraste */
+}
+
+.badge--pendiente {
+    background-color: #fde047; /* amarillo */
+    color: #1f2937;
+}
+
+.badge--finalizado {
+    background-color: #9ca3af; /* gris */
+    color: #ffffff;
+}

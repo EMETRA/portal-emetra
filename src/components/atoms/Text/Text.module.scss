@@ -1,0 +1,24 @@
+@use '../../../theme/index.scss' as *;
+
+$large-text: 16px;
+$medium-text: 14px;
+$small-text: 12px;
+
+.text {
+    font-family: $fonts;
+    display: block;
+    text-align: center;
+    justify-content: center;
+}
+
+.Large {
+    font-size: $large-text;
+}
+
+.Medium {
+    font-size: $medium-text;
+}
+
+.Small {
+    font-size: $small-text;
+}

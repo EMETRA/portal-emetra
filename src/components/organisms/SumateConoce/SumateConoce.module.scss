@@ -1,0 +1,121 @@
+.container {
+    block-size: 100%;
+    min-block-size: 0;
+    box-sizing: border-box;
+
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: clamp(16px, 4vw, 48px);
+    padding: clamp(16px, 4vw, 48px);
+
+    /* que nada “se salga” del page */
+    overflow: hidden;
+    @media (max-width: 1024px) {
+        grid-template-columns: 1fr;
+        grid-template-rows: auto 1fr;
+        padding: 0rem;
+    }
+}
+
+.left {
+    block-size: 100%;
+    min-block-size: 0;
+
+    display: grid;
+    grid-template-rows: 1fr 1fr;
+    gap: 2px;
+    align-items: stretch; 
+    @media (max-width: 1024px) {
+        width: 100%;
+        height: auto;
+        display: none;
+    }
+}
+
+.imageBox {
+    display: block;          
+    inline-size: 100%;
+    block-size: 100%;        
+    object-fit: contain;     
+    object-position: center; 
+}
+
+.imageSlot {
+    inline-size: 100%;
+    block-size: 100%;
+    overflow: hidden;      
+    display: grid;
+    place-items: center;   
+}
+
+.image {
+    display: block;        
+    max-inline-size: 100%;  
+    max-block-size: 100%;  
+    width: auto;
+    height: auto;
+    object-fit: contain;   
+    object-position: center;
+}
+
+.right {
+    min-block-size: 0;
+    display: grid;
+    align-content: start;
+    overflow: hidden;
+    @media (max-width: 1024px) {
+        width: 100%;
+        padding-top: 1rem;
+        padding-inline: 2rem;
+    }
+}
+
+
+.imageBoxMob {
+    display: none;
+    inline-size: 100%;
+    object-fit: cover;
+    @media (max-width: 1024px) {
+        display: block;
+    }
+}
+
+.title1 {
+    font-size: 4vw;
+    font-weight: 800;
+    color: #919191;
+    margin: 0px !important;
+    @media (max-width: 1024px) {
+        font-size: 2.5vh;
+    }
+}
+.title2 {
+    font-size: 4vw;
+    font-weight: 800;
+    color: #919191;
+    margin: 0px !important;
+    @media (max-width: 1024px) {
+        font-size: 2.5vh;
+        // text-align: end;
+    }
+}
+
+.subtitle {
+    font-weight: 700;
+    margin: 1rem 0;
+    font-size: 1.5vw;
+    @media (max-width: 1024px) {
+        font-size: 2vh;
+    }
+}
+
+.paragraph {
+    margin-bottom: 1rem;
+    color: #919191;
+    line-height: 1.6;
+    font-size: 1.1vw;
+
+    @media (max-width: 1024px) {
+        font-size: 1.6vh;
+    }
+}

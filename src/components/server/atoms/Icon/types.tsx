@@ -1,52 +1,54 @@
-// Inclusión de archivos de íconos.
-import Arrow from "@public/icons/Arrow.svg";
-import Bus from "@public/icons/Bus.svg";
-import Calendar from "@public/icons/Calendar.svg";
-import Check from "@public/icons/Check.svg";
-import Checked from "@public/icons/Checked.svg";
-import Class from "@public/icons/Class.svg";
-import Clock from "@public/icons/Clock.svg";
-import Cross from "@public/icons/Cross.svg";
-import Delete from "@public/icons/Delete.svg";
-import Details from "@public/icons/Details.svg";
-import Document from "@public/icons/Document.svg";
-import Down from "@public/icons/Down.svg";
-import Download from "@public/icons/Download.svg";
-import DPI from "@public/icons/DPI.svg";
-import Eye from "@public/icons/Eye.svg";
-import EyeOff from "@public/icons/EyeOff.svg";
-import Files from "@public/icons/Files.svg";
-import Image from "@public/icons/Image.svg";
-import Info from "@public/icons/Info.svg";
-import Location from "@public/icons/Location.svg";
-import Logout from "@public/icons/Logout.svg";
-import Menu from "@public/icons/Menu.svg";
-import Moto from "@public/icons/Moto.svg";
-import Multa from "@public/icons/Multa.svg";
-import Next from "@public/icons/Next.svg";
-import Notification from "@public/icons/Notification.svg";
-import Out from "@public/icons/Out.svg";
-import PDF from "@public/icons/PDF.svg";
-import PendingExam from "@public/icons/PendingExam.svg";
-import Pickup from "@public/icons/Pickup.svg";
-import Piloto from "@public/icons/Piloto.svg";
-import Publicidad from "@public/icons/Publicidad.svg";
-import Search_2 from "@public/icons/Search_2.svg";
-import Search from "@public/icons/Search.svg";
-import Tarjeton from "@public/icons/Tarjeton.svg";
-import Taxi from "@public/icons/Taxi.svg";
-import Unchecked from "@public/icons/Unchecked.svg";
-import Up from "@public/icons/Up.svg";
-import User from "@public/icons/User.svg";
-import Vehiculo from "@public/icons/Vehiculo.svg";
-import Upload from "@public/icons/Upload.svg";
-import Back from "@public/icons/Back.svg";
-import Camion from "@public/icons/Camion.svg";
-import TucTuc from "@public/icons/TucTuc.svg";
+import React from "react";
 
-/**
- * Definición de los nombres para los tipos de Íconos.
- */
+import Approve from "@/assets/icons/Approve.svg";
+import Arrow from "@/assets/icons/Arrow.svg";
+import Bus from "@/assets/icons/Bus.svg";
+import Calendar from "@/assets/icons/Calendar.svg";
+import Check from "@/assets/icons/Check.svg";
+import Checked from "@/assets/icons/Checked.svg";
+import Class from "@/assets/icons/Class.svg";
+import Clock from "@/assets/icons/Clock.svg";
+import Cross from "@/assets/icons/Cross.svg";
+import Delete from "@/assets/icons/Delete.svg";
+import Details from "@/assets/icons/Details.svg";
+import Document from "@/assets/icons/Document.svg";
+import Down from "@/assets/icons/Down.svg";
+import Download from "@/assets/icons/Download.svg";
+import DPI from "@/assets/icons/DPI.svg";
+import Eye from "@/assets/icons/Eye.svg";
+import EyeOff from "@/assets/icons/EyeOff.svg";
+import Files from "@/assets/icons/Files.svg";
+import Image from "@/assets/icons/Image.svg";
+import Info from "@/assets/icons/Info.svg";
+import Location from "@/assets/icons/Location.svg";
+import Logout from "@/assets/icons/Logout.svg";
+import Menu from "@/assets/icons/Menu.svg";
+import Moto from "@/assets/icons/Moto.svg";
+import Multa from "@/assets/icons/Multa.svg";
+import Next from "@/assets/icons/Next.svg";
+import Notification from "@/assets/icons/Notification.svg";
+import Out from "@/assets/icons/Out.svg";
+import PDF from "@/assets/icons/PDF.svg";
+import PendingExam from "@/assets/icons/PendingExam.svg";
+import Pickup from "@/assets/icons/Pickup.svg";
+import Piloto from "@/assets/icons/Piloto.svg";
+import Publicidad from "@/assets/icons/Publicidad.svg";
+import Search_2 from "@/assets/icons/Search_2.svg";
+import Search from "@/assets/icons/Search.svg";
+import Tarjeton from "@/assets/icons/Tarjeton.svg";
+import Taxi from "@/assets/icons/Taxi.svg";
+import Unchecked from "@/assets/icons/Unchecked.svg";
+import Up from "@/assets/icons/Up.svg";
+import User from "@/assets/icons/User.svg";
+import Vehiculo from "@/assets/icons/Vehiculo.svg";
+import Upload from "@/assets/icons/Upload.svg";
+import Back from "@/assets/icons/Back.svg";
+import Camion from "@/assets/icons/Camion.svg";
+import TucTuc from "@/assets/icons/TucTuc.svg";
+import Facebook from "@/assets/icons/Facebook.svg";
+import Twitter from "@/assets/icons/Twitter.svg";
+import Instagram from "@/assets/icons/Instagram.svg";
+
 type IconType =
   | "Camion"
   | "Approve"
@@ -92,22 +94,19 @@ type IconType =
   | "Vehiculo"
   | "Upload"
   | "TucTuc"
-  | "Back";
+  | "Back"
+  | "Facebook"
+  | "Twitter"
+  | "Instagram";
 
-/**
- * Interface para las propiedades de los íconos.
- * */
 interface IconProps extends React.SVGProps<SVGSVGElement> {
   className?: string;
   name: IconType;
 }
 
-/**
- * Mapeo de los íconos con sus respectivos nombres.
- */
 const IconMap: Record<IconType, React.FC<React.SVGProps<SVGSVGElement>>> = {
   Camion: Camion,
-  Approve: Check,
+  Approve: Approve,
   Arrow: Arrow,
   Bus: Bus,
   Calendar: Calendar,
@@ -151,6 +150,9 @@ const IconMap: Record<IconType, React.FC<React.SVGProps<SVGSVGElement>>> = {
   Upload: Upload,
   TucTuc: TucTuc,
   Back: Back,
+  Facebook: Facebook,
+  Twitter: Twitter,
+  Instagram: Instagram,
 };
 
 export type { IconProps, IconType };

@@ -1,0 +1,78 @@
+@use "@/theme/colors.scss" as *;
+
+.Container{
+  margin-inline: auto;
+  padding-inline: 1vw;      /* márgenes laterales fluidos */
+  max-width: 72rem;         /* tope ancho legible, no en px */
+  width: 100%;
+  height: 42rem;
+}
+
+
+.Title {
+  color: #1700a5;
+  margin-block: 2rem;
+  font-size: xx-large;
+  font-weight: 100;
+  margin-inline: 2vw;
+}
+
+.Actions{
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+  margin-block: 0.5rem;
+  margin-bottom: 2rem;
+}
+
+@media (max-width: 48rem){
+  .Actions{ grid-template-columns: 1fr; }
+}
+
+.Separator{
+  border: 0;
+  border-top: 3px solid $brand-green;          
+  border-radius: 999px;   
+  margin-block: 2rem;              
+}
+
+/* pie de página centrado */
+.Footer{
+  text-align: center;
+  color: $primary-blue;                  /* azul de marca */
+  font-weight: 700;
+  line-height: 1.0;
+  margin-bottom: 2rem;                   /* respiro con el final de la página */
+
+  /* compacta los párrafos */
+  & > p{
+    margin: .25rem 0;
+    font-size: .8rem;
+  }
+}
+
+.footerLink{
+  display: inline-block;
+  margin-top: .25rem;
+  color: $primary-blue;
+  text-decoration: none;
+  font-weight: 800;
+}
+.footerLink:hover{ text-decoration: underline; }
+
+.linkButton {
+  text-decoration: none;
+}
+
+.linkButton:hover,
+.linkButton:focus,
+.linkButton:visited {
+  text-decoration: none;
+}
+
+
+/* móvil */
+@media (max-width: 48rem){
+  .Separator{ max-inline-size: 94%; margin: 1rem auto 1.5rem; }
+  .Footer > p{ font-size: .9rem; }
+}

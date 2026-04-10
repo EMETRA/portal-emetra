@@ -1,7 +1,7 @@
 {
   "compilerOptions": {
     "target": "ES2017",
-    "lib": ["dom", "dom.iterable", "esnext"],
+    "lib": ["dom", "dom.iterable", "esnext", "es2021"],
     "allowJs": true,
     "skipLibCheck": true,
     "strict": true,
@@ -13,6 +13,7 @@
     "isolatedModules": true,
     "jsx": "preserve",
     "incremental": true,
+    "baseUrl": ".",
     "plugins": [
       {
         "name": "next"
@@ -20,11 +21,41 @@
     ],
     "paths": {
       "@/*": ["./src/*"],
-      "@components": ["./src/components/index"],
+      "@components": ["./src/components"],
       "@components/*": ["./src/components/*"],
-      "@public/*": ["./public/*"]
+      "@atoms/*": ["./src/components/atoms/*"],
+      "@atoms": ["./src/components/atoms/index.tsx"],
+      "@molecules/*": ["./src/components/molecules/*"],
+      "@molecules": ["./src/components/molecules/index.tsx"],
+      "@organisms/*": ["./src/components/organisms/*"],
+      "@organisms": ["./src/components/organisms/index.tsx"],
+      "@templates/*": ["./src/components/templates/*"],
+      "@templates": ["./src/components/templates/index.tsx"],
+      "@pages/*": ["./src/components/pages/*"],
+      "@pages": ["./src/components/pages/index.tsx"],
+      "@theme/*": ["./src/theme/*"],
+      "@hooks/*": ["./src/hooks/*"],
+      "@hooks": ["./src/hooks/index.tsx"],
+      "@store/*": ["./src/store/*"],
+      "@store": ["./src/store/index.ts"],
+      "@public/*": ["./public/*"],
+      "@mocks": ["./src/mocks/index.ts"],
+      "@mocks/*": ["./src/mocks/*"],
+      "@utils": ["./src/utils/index.ts"],
+      "@utils/*": ["./src/utils/*"],
+      "@schema": ["./src/schema/index.ts"],
+      "@schema/*": ["./src/schema/*"],
+      "@functions": ["./src/functions/index.ts"],
+      "@functions/*": ["./src/functions/*"],
+      "@assets/*": ["./src/assets/*"]
     }
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
+  "include": [
+    "next-env.d.ts",
+    "**/*.ts",
+    "**/*.tsx",
+    ".next/types/**/*.ts",
+    "**/*.d.ts"
+  ],
   "exclude": ["node_modules"]
 }

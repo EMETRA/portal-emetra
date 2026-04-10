@@ -1,0 +1,1 @@
+export { default as SumateConoce } from './SumateConoce';

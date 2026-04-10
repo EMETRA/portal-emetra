@@ -1,0 +1,26 @@
+@use "../../../../theme/index.scss" as *;
+
+.Separator {
+  box-sizing: border-box;
+  width: 100%;
+  border-top: 4px solid $cuaternary-text;
+}
+
+.green {
+  border-top-color: $verde-claro-2;
+}
+
+.Container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  box-sizing: border-box;
+  padding-block: 1rem;
+}
+
+@media screen and (max-width: 768px) {
+  .Container {
+    padding-inline: 42px;
+  }
+}

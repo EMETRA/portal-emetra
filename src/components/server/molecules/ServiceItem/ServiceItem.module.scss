@@ -1,0 +1,29 @@
+@use "../../../../theme/index.scss" as *;
+
+.wrapper {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  flex: 1 1 auto;
+  min-width: 0;
+  padding: 0.5rem;
+  box-sizing: border-box;
+  width: fit-content;
+  align-items: center;
+  justify-content: center;
+}
+
+.label {
+  color: $azul-2;
+  font-weight: 800;
+  text-transform: uppercase;
+  flex-shrink: 1;
+  min-width: 0;
+  max-width: 7rem;
+}
+
+.icon {
+  width: 1.5rem;
+  height: 1.5rem;
+  object-fit: contain;
+}

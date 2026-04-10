@@ -1,0 +1,177 @@
+@use "../../../../theme/index.scss" as *;
+@use "../../../../theme/colors.scss" as *;
+
+.Container {
+  display: flex;
+  flex-direction: row;
+  padding-block: 0.7rem;
+  background-color: $navbar-background;
+  position: relative;
+  padding-inline: 1.25rem;
+}
+
+.Button {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  column-gap: 10px;
+  background-color: $navbar-background !important;
+  color: $azul-1 !important;
+}
+
+.ButtonsContainer {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  flex-grow: 1;
+  padding-inline: 2rem;
+}
+
+.ActiveButton {
+  background-color: $azul-1 !important;
+  color: $navbar-background !important;
+}
+
+.ImageContainer {
+  height: 50px;
+  width: fit-content;
+  padding-inline: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.NavLink {
+  text-decoration: none;
+  color: inherit;
+}
+
+.Hamburger {
+  display: none;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0.5rem;
+}
+
+.Dropdown { position: relative; }
+
+.DropdownToggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.DropdownMenu {
+  position: absolute;
+  right: 0;
+  top: calc(100% + 8px);
+  min-width: 220px;
+  padding: 8px 10px;
+  background: rgb(253, 253, 253);
+  backdrop-filter: blur(4px);
+  border-radius: 8px;
+  display: grid;
+  gap: 6px;
+
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(-6px);
+  transition: opacity .18s ease, transform .18s ease;
+  z-index: 999;
+}
+
+.DropdownOpen .DropdownMenu {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateY(0);
+}
+
+.DropdownItem {
+  appearance: none;
+  border: 0;
+  background: none;
+  color: inherit;
+  text-align: left;
+  padding: 8px 10px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 700;
+  white-space: nowrap;
+}
+.DropdownItem:hover { background: rgba(131, 131, 131, 0.75);}
+
+
+@media (max-width: 936px) {
+  .ButtonsContainer {
+    display: flex;
+    flex-direction: column;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    background: $navbar-background;
+    width: 100vw;
+    z-index: 10;
+    opacity: 0;
+    transform: translateY(-10px);
+    transition: opacity 0.3s ease, transform 0.3s ease, visibility 0.3s;
+    pointer-events: none;
+    visibility: hidden;
+  }
+  .MenuOpen {
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: auto;
+    visibility: visible;
+  }
+  .Hamburger {
+    display: block;
+    margin-left: auto;
+  }
+  .Button {
+    width: 100%;
+  }
+
+  .NavLink {
+    width: 100%;
+  }
+  .DropdownToggle {
+    width: 100%;
+    justify-content: center;
+  }
+  .Dropdown { width: 100%; }
+  .DropdownMenu {
+    position: static;
+    background: transparent;
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    border: 0;
+    box-shadow: none;
+    transform: none;
+    min-width: 0;
+
+    max-height: 0;
+    opacity: 0;
+    padding: 0;
+    margin: 0;
+    overflow: hidden;
+    pointer-events: none;
+
+    transition: max-height .25s ease, opacity .18s ease;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .DropdownOpen .DropdownMenu {
+    max-height: 400px;          
+    opacity: 1;
+    padding: 8px 0;
+    pointer-events: auto;
+  }
+
+  .DropdownItem {
+    text-align: center;
+  }
+}

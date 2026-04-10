@@ -1,0 +1,28 @@
+// src/components/atoms/CardContainer/CardContainer.module.scss
+@use "src/theme/colors.scss"    as *;
+@use "src/theme/spacings.scss"  as *;
+
+.cardContainer {
+  background-color: $card-background;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+
+  padding-inline: $card-padding-inline; // 30px
+  padding-block:  $card-padding-block;  // 24px
+  display: flex;
+  flex-direction: column;
+  gap: $card-gap;                       // 16px
+
+  width: 100%;
+  max-width: 70%;                     
+  margin: 0 auto;                       
+  min-height: 38rem;
+  margin-top: 56px; 
+  margin-bottom: 72px;
+}
+
+@media (max-width: 640px) {
+  .cardContainer {
+    max-width: 90%; 
+  }
+}

@@ -1,0 +1,21 @@
+@use "src/theme/colors.scss"    as *;
+@use "src/theme/spacings.scss"  as *;
+
+.container {
+    position: relative;
+}
+
+.select {
+    width: 100%;
+    padding-block: calc($navbar-vertical-padding * 2); 
+    padding-inline: calc($navbar-horizontal-padding * 1.2); 
+
+    border: none;
+    border-radius: 8px;
+    background: $input-background;
+    font-size: 1rem;
+    color: $secondary-text;
+    appearance: none;
+    cursor: pointer;
+}
+

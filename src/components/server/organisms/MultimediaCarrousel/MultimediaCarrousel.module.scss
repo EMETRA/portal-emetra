@@ -1,0 +1,71 @@
+@use "../../../../theme/colors.scss" as *;
+
+.embla {
+  overflow: hidden;
+  width: 100%;
+  margin: 2rem 0;
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.embla__viewport {
+  overflow: hidden;
+  width: 100%;
+}
+
+.embla__container {
+  display: flex;
+  gap: 2rem;
+  min-width: 0;
+  justify-content: flex-start;
+}
+
+.embla__slide {
+  flex: 0 0 50%;
+  display: flex;
+  justify-content: center;
+  min-width: 0;
+}
+
+@media (max-width: 1016px) {
+  .embla__slide {
+    flex: 0 0 100%;
+  }
+}
+
+.embla__arrow {
+  width: 2.5rem;
+  height: 2.5rem;
+  font-size: 1.5rem;
+  cursor: pointer;
+  margin: 0 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s;
+  user-select: none;
+  outline: none;
+  border: none;
+  background: transparent;
+  color: $verde-oscuro-1;
+
+  &:disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+  }
+}
+
+.right {
+  transform: rotate(-90deg);
+}
+
+.left {
+  transform: rotate(90deg);
+}
+
+.Icon {
+  width: 3rem;
+  height: 3rem;
+  color: $verde-oscuro-1;
+}

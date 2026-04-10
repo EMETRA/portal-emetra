@@ -1,0 +1,21 @@
+.viewport {
+    // --snap-h: 100svh; 
+    block-size: 100%;
+
+    overflow-y: auto;
+    scroll-snap-type: y mandatory;
+    overscroll-behavior: contain;
+    scrollbar-width: none;
+    /* IE/Edge antiguos */
+    -ms-overflow-style: none;
+}
+
+/* cada sección/página */
+.page {
+    position: relative;   
+    block-size: 100%;
+    min-block-size: 0;
+    overflow: hidden;     
+    scroll-snap-align: var(--snap-align, start);
+    scroll-snap-stop: var(--snap-stop, always);
+}

@@ -1,0 +1,1 @@
+export {default as SolvenciaCard} from './SolvenciaCard';

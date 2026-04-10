@@ -1,0 +1,9 @@
+@use "@/theme/colors.scss" as *;
+
+.Card{
+  width: 100%;
+  background: $surface;
+  border: .1rem solid $brand-green;
+  border-radius: 1rem;
+  box-shadow: 0 .4rem 1.2rem rgba(0,0,0,.06);
+}

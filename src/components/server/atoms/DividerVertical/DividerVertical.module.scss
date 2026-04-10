@@ -1,0 +1,15 @@
+@use "../../../../theme/index.scss" as *;
+
+.divider {
+  width: 2px;
+  height: 32px;
+  background-color: $azul-2;
+  margin: 0 0.75rem;
+}
+
+@media (max-width: 640px) {
+  .divider {
+    height: 24px;
+    margin: 0 0.5rem;
+  }
+}

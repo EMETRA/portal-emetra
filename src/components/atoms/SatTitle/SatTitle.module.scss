@@ -1,0 +1,41 @@
+.Wrapper{
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;   
+  align-items: center;
+  column-gap: var(--twl-gap, 1.2rem);    
+  margin-block: 3rem;
+}
+
+/* Línea */
+.line{
+  height: var(--twl-line-thickness, 3px);    
+  background: var(--twl-line-color, #62b44b);
+  border-radius: 999px;
+}
+
+/* Título */
+.title{
+  margin: 0;
+  color: #18196b;                 
+  letter-spacing: 0.35em;         
+  font-weight: 600;
+  text-align: center;
+  white-space: nowrap;            
+  font-size: large; 
+}
+
+.uppercase .title{
+  text-transform: uppercase;
+}
+
+@media (max-width: 48rem){
+  .Wrapper{
+    grid-template-columns: 1fr;
+    grid-template-rows: auto auto auto;
+    row-gap: .75rem;
+  }
+  .title{
+    white-space: normal;          
+    letter-spacing: 0.28em;      
+  }
+}

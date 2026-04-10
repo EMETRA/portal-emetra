@@ -1,0 +1,24 @@
+.fullImagePage {
+  inline-size: 100%;
+  block-size: 100%;
+  min-block-size: 0;
+  position: relative;
+  overflow: hidden;
+}
+
+.image {
+  position: absolute;
+  inset: 0;
+  inline-size: 100%;
+  block-size: 100%;
+  object-fit: cover;
+  object-position: center;   
+  display: block;            
+}
+
+.desktop-img { display: block; }
+.mobile-img  { display: none; }
+@media (max-width: 768px) {
+  .desktop-img { display: none; }
+  .mobile-img  { display: block; }
+}

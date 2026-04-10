@@ -1,0 +1,139 @@
+@use "../../../../theme/index.scss" as *;
+@use "../../../../theme/colors.scss" as *;
+
+.WidgetLink {
+  text-decoration: none;
+  color: inherit;
+  background-color: rgba($verde-claro-10, 0.6);
+  padding-inline: 2rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: fit-content;
+  justify-content: center;
+  padding-block-end: 1.75rem;
+  padding-block-start: 1rem;
+  border-radius: 10px;
+}
+.MiniCalendar {
+  background: #fff;
+  border-radius: 10px;
+  box-shadow: 0 2px 8px #0002;
+  padding: 1rem;
+  width: fit-content;
+  font-size: 0.95rem;
+  transition: box-shadow 0.2s;
+  cursor: pointer;
+  &:hover {
+    box-shadow: 0 4px 16px #0003;
+  }
+}
+
+.Header {
+  text-align: center;
+  font-weight: bold;
+  margin-bottom: 0.5rem;
+  text-transform: capitalize;
+  font-size: 1.1em;
+}
+
+.Weekdays {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  margin-bottom: 0.2rem;
+  font-size: 0.9em;
+  color: #888;
+}
+
+.Weekday {
+  text-align: center;
+}
+
+.Grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 6px;
+  margin-top: 6px;
+}
+
+.Blank {
+  height: 32px;
+}
+
+.Cell {
+  background: #f8fafb;
+  border-radius: 4px;
+  min-height: 32px;
+  height: 32px;
+  aspect-ratio: 1;
+  text-align: center;
+  position: relative;
+  font-size: 0.95em;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  padding: 0;
+}
+
+.DayNumber {
+  font-weight: 500;
+  width: 100%;
+  text-align: center;
+  line-height: 1.2;
+  margin-bottom: 0;
+}
+
+.Dots {
+  display: flex;
+  gap: 2px;
+  margin-top: 4px;
+  justify-content: center;
+  align-items: center;
+  min-height: 10px;
+}
+
+.Dot {
+  width: 6px;
+  height: 6px;
+  background: #00bc70;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  vertical-align: middle;
+}
+
+.More {
+  color: #00bc70;
+  font-weight: bold;
+  font-size: 1.1em;
+  width: 6px;
+  height: 6px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  vertical-align: middle;
+  margin-left: 2px;
+  padding: 0;
+  line-height: 1;
+}
+
+.Predice {
+  width: 45px;
+  height: auto;
+  border-radius: 8px;
+  margin-bottom: 0.5rem;
+}
+
+.Heading {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+
+.Title {
+  color: $azul-1;
+}

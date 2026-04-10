@@ -1,0 +1,12 @@
+/** Contenedor para scroll horizontal en pantallas pequeñas */
+.wrapper {
+    width: 100%;
+    overflow-x: auto;
+}
+
+/** Asegura un mínimo ancho para las columnas seleccionables */
+.headerCell:first-child,
+.row .cell:first-child {
+    width: 2.5rem;
+    text-align: center;
+}

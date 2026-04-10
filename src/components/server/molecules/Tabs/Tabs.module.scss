@@ -1,0 +1,29 @@
+@use "src/theme/spacings.scss" as *;
+
+.tabsContainer {
+  display: inline-flex;
+  justify-content: center;
+  width: 100%;
+  gap: 4rem;
+  border-bottom: 1px solid #e0e0e0;
+
+  padding-inline: 8rem;
+  box-sizing: border-box;
+  width: 100%;          
+  max-width: 100%; 
+}
+
+@media (max-width: 640px) {
+  .tabsContainer {
+    display: flex;
+    flex-wrap: nowrap;
+    width: 100%;                  
+    justify-content: space-around;
+    padding-inline: 1rem;         
+    box-sizing: border-box;
+    overflow-x: hidden;           
+    margin: 0 0 1rem;      
+    gap: 0.5rem;       
+    padding-inline: 0rem;
+  }
+}

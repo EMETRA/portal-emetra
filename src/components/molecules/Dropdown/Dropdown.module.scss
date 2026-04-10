@@ -1,0 +1,70 @@
+@use "src/theme/sizes.scss" as *;
+@use "src/theme/colors.scss" as *;
+@use "src/theme/spacings.scss" as *;
+
+.Container {
+  display: flex;
+  flex-direction: column;
+  font-family: inherit;
+  padding-inline: $navbar-horizontal-padding;
+  padding-block: $navbar-vertical-padding;
+  width: 100%;
+}
+
+.Header {
+  box-sizing: border-box;
+  display: flex;
+  width: 100%;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 16px;
+}
+
+.Label {
+  margin: 0;
+  text-align: start;
+  color: $primary-text;
+  cursor: pointer;
+  font-weight: 500;
+}
+
+.DownIcon {
+  height: 40px;
+  width: 40px;
+  transition: transform 0.3s ease-in-out;
+  transform: rotate(-90deg);
+  cursor: pointer;
+}
+
+.DownIcon.Open {
+  transform: rotate(-180deg);
+}
+
+.DownIcon.Close {
+  transform: rotate(0deg);
+}
+
+.Children {
+  box-sizing: border-box;
+  width: 100%;
+  padding-inline-start: calc($navbar-horizontal-padding * 3);
+  height: 0;
+  overflow: hidden;
+  opacity: 0;
+  transition: height 0.5s cubic-bezier(0.24, 0.24, 0.2, 1), opacity 0.5s ease,
+  margin-top 0.5s ease;
+  margin-top: 0;
+  color: $sub-text;
+}
+
+.Children.Open {
+  margin-top: $card-gap;
+  height: auto;
+  opacity: 1;
+}
+
+.Children.Close {
+  height: 0;
+  opacity: 0;
+  margin-top: 0;
+}

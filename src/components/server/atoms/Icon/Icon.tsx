@@ -1,5 +1,3 @@
-"use client";
-
 import React from "react";
 import { IconMap, IconProps } from "./types";
 import styles from "./Icon.module.scss";

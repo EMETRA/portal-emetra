@@ -1,0 +1,23 @@
+.section {
+    block-size: 100%;
+    min-block-size: 0;
+    box-sizing: border-box;
+
+    display: grid;
+    grid-template-rows: auto 1fr;
+}
+
+.title {
+    margin: 16px;
+    font-weight: 800;
+    color: #919191;
+    font-size: clamp(20px, 3vw, 28px);
+    padding: 2rem;
+}
+
+
+@media (max-width: 768px) {
+    .title{
+        padding: 1rem;       
+    } 
+}

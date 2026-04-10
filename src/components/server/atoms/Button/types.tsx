@@ -1,11 +1,12 @@
 // Tipos de variante de botón.
-type ButtonVariant = "default" | "success" | "warning" | "danger";
+type ButtonVariant = "default" | "success" | "warning" | "danger" | "outline";
 
 // Propiedades del componente Button que extienden un botón normal de React.
 interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   onClick?: () => void;
   variant?: ButtonVariant;
   disabled?: boolean;
+  fullWidth?: boolean; 
   children?: React.ReactNode | string;
 }
 

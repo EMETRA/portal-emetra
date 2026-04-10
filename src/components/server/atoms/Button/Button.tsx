@@ -16,6 +16,7 @@ const Button: React.FC<ButtonProps> = ({
   className,
   children,
   variant,
+  fullWidth,
   ...props
 }) => {
   return (
@@ -23,6 +24,7 @@ const Button: React.FC<ButtonProps> = ({
       className={classNames(
         styles.button,
         variant && styles[variant],
+        fullWidth && styles.fullWidth,
         className
       )}
       {...props}

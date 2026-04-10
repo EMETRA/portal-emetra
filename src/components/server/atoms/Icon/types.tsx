@@ -1,5 +1,4 @@
 // Inclusión de archivos de íconos.
-import Approve from "@public/icons/Approve.svg";
 import Arrow from "@public/icons/Arrow.svg";
 import Bus from "@public/icons/Bus.svg";
 import Calendar from "@public/icons/Calendar.svg";
@@ -108,7 +107,7 @@ interface IconProps extends React.SVGProps<SVGSVGElement> {
  */
 const IconMap: Record<IconType, React.FC<React.SVGProps<SVGSVGElement>>> = {
   Camion: Camion,
-  Approve: Approve,
+  Approve: Check,
   Arrow: Arrow,
   Bus: Bus,
   Calendar: Calendar,

@@ -1,7 +1,7 @@
 import puppeteer, { type Browser } from "puppeteer";
+import { fetchBackend } from "@/lib/backend/client";
 
 export const runtime = "nodejs";
-const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL;
 type Body = {
   notification_no?: string;
   fecha_notificacion?: string;
@@ -228,8 +228,8 @@ async function getFotoRemision(
   remision: string
 ): Promise<string | null> {
   try {
-    const res = await fetch(
-      `${baseUrl}/notificado/foto/${encodeURIComponent(serie)}/${encodeURIComponent(remision)}`,
+    const res = await fetchBackend(
+      `/notificado/foto/${encodeURIComponent(serie)}/${encodeURIComponent(remision)}`,
       { cache: "no-store" }
     );
 

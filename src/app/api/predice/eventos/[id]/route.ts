@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { BackendError } from "@/lib/backend/client";
+import { apiErrorFromUnknown, apiErrorResponse } from "@/lib/api/errors";
 import { fetchPrediceEventByIdServer } from "@/lib/predice/server";
 
 type RouteContext = {
@@ -13,18 +13,11 @@ export async function GET(request: NextRequest, context: RouteContext) {
     const event = await fetchPrediceEventByIdServer(id, admin);
 
     if (!event) {
-      return NextResponse.json({ error: "Evento no encontrado" }, { status: 404 });
+      return apiErrorResponse("Evento no encontrado", 404, "NOT_FOUND");
     }
 
     return NextResponse.json(event);
   } catch (error) {
-    if (error instanceof BackendError) {
-      return NextResponse.json({ error: error.message }, { status: error.status });
-    }
-    console.error("[GET /api/predice/eventos/[id]]", error);
-    return NextResponse.json(
-      { error: "No se pudo cargar el evento" },
-      { status: 500 }
-    );
+    return apiErrorFromUnknown(error, "No se pudo cargar el evento");
   }
 }

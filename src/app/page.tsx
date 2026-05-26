@@ -8,53 +8,10 @@ import MultimediaCard from "@/components/server/molecules/MultimediaCard/Multime
 import CalendarWidgetLoader from "@/components/server/molecules/CalendarWidget/CalendarWidgetLoader";
 import { NewCard } from "@/components/molecules/NewCard";
 import NewsCarrousel from "@/components/organisms/NewsCarrousel/NewsCarrousel";
-import { FAQ, FAQ_Type } from "@/schema";
 import { FAQQuestions } from "@/components/organisms/FAQ-Questions";
-import { API_BASE_URL } from "@/lib/config";
-
-interface NewsSummaryDto {
-  id: number;
-  slug: string;
-  titulo: string;
-  resumen?: string | null;
-  estado: string;
-  visibilidad: string;
-  fecha_publicacion?: string | null;
-  idioma: string;
-  creado: string;
-  actualizado: string;
-  recurso_principal?: {
-    id: number;
-    nombre?: string | null;
-    url?: string | null;
-  } | null;
-}
-
-interface NewsListResponseDto {
-  items: NewsSummaryDto[];
-  total: number;
-  page: number;
-  limit: number;
-}
-
-interface FaqApiDto {
-  id: number;
-  categoria: string;
-  idioma: string;
-  estado: string;
-  pregunta: string;
-  respuesta: string;
-  orden?: number;
-  creado: string;
-  actualizado: string;
-}
-
-interface FaqListResponseDto {
-  items: FaqApiDto[];
-  total: number;
-  page: number;
-  limit: number;
-}
+import { fetchFaqsServer, fetchLatestNewsServer } from "@/lib/content/server";
+import { getUserErrorMessage } from "@/lib/api/errors";
+import ServiceErrorAlert from "@/components/molecules/ServiceErrorAlert/ServiceErrorAlert";
 
 function formatDateToSpanish(dateISO?: string | null) {
   if (!dateISO) {
@@ -70,100 +27,6 @@ function formatDateToSpanish(dateISO?: string | null) {
   return formatter.format(new Date(dateISO));
 }
 
-async function fetchLatestNews(): Promise<NewsSummaryDto[]> {
-  try {
-    const searchParams = new URLSearchParams({
-      estado: "borrador",
-      visibilidad: "publica",
-      idioma: "es-GT",
-      page: "1",
-      limit: "10",
-    });
-    console.log(
-      "Fetching news from:",
-      `${API_BASE_URL}/news?${searchParams.toString()}`,
-    );
-    const response = await fetch(
-      `${API_BASE_URL}/news?${searchParams.toString()}`,
-      {
-        headers: {
-          Accept: "application/json",
-        },
-        next: {
-          revalidate: 300,
-        },
-      },
-    );
-
-    if (!response.ok) {
-      throw new Error(
-        `No fue posible obtener las noticias. Código: ${response.status}`,
-      );
-    }
-
-    const data: NewsListResponseDto = await response.json();
-    return data.items ?? [];
-  } catch (error) {
-    console.error("Error al obtener las noticias más recientes:", error);
-    return [];
-  }
-}
-
-function mapCategoriaToFaqType(categoria: string): FAQ_Type {
-  const normalized = categoria?.toLowerCase();
-
-  switch (normalized) {
-    case "pilotos":
-      return FAQ_Type.PILOTOS;
-    default:
-      return FAQ_Type.PILOTOS;
-  }
-}
-
-async function fetchFaqs(): Promise<FAQ[]> {
-  try {
-    const searchParams = new URLSearchParams({
-      estado: "activo",
-      page: "1",
-      limit: "50",
-    });
-
-    const url = `${API_BASE_URL}/faq?${searchParams.toString()}`;
-    console.log("Fetching FAQs from:", url);
-
-    const response = await fetch(url, {
-      headers: {
-        Accept: "application/json",
-      },
-      next: {
-        revalidate: 300,
-      },
-    });
-
-    if (!response.ok) {
-      throw new Error(
-        `No fue posible obtener las FAQs. Código: ${response.status}`,
-      );
-    }
-
-    const data: FaqListResponseDto = await response.json();
-
-    const faqs: FAQ[] =
-      data.items?.map((item) => ({
-        id: item.id,
-        tipo: mapCategoriaToFaqType(item.categoria),
-        enLanding: false,
-        pregunta: item.pregunta,
-        respuesta: item.respuesta,
-      })) ?? [];
-
-    return faqs;
-  } catch (error) {
-    console.error("Error al obtener las FAQs:", error);
-    return [];
-  }
-}
-
 const slides: BannerSlide[] = [
   {
     backgroundImage: "/images/banner.jpg",
@@ -175,8 +38,29 @@ const slides: BannerSlide[] = [
 const DEFAULT_NEWS_IMAGE = "/images/Evento.jpg";
 
 export default async function Home() {
-  const latestNews = await fetchLatestNews();
-  const faqQuestions = await fetchFaqs();
+  let latestNews: Awaited<ReturnType<typeof fetchLatestNewsServer>> = [];
+  let newsError: string | null = null;
+
+  try {
+    latestNews = await fetchLatestNewsServer();
+  } catch (error) {
+    newsError = getUserErrorMessage(
+      error,
+      "No se pudieron cargar las noticias en este momento."
+    );
+  }
+
+  let faqQuestions: Awaited<ReturnType<typeof fetchFaqsServer>> = [];
+  let faqError: string | null = null;
+
+  try {
+    faqQuestions = await fetchFaqsServer();
+  } catch (error) {
+    faqError = getUserErrorMessage(
+      error,
+      "No se pudieron cargar las preguntas frecuentes."
+    );
+  }
 
   return (
     <div className={styles.page}>
@@ -214,7 +98,9 @@ export default async function Home() {
         </div>
       </Separator>
 
-      {latestNews.length > 0 ? (
+      {newsError ? (
+        <ServiceErrorAlert title="Noticias no disponibles" message={newsError} />
+      ) : latestNews.length > 0 ? (
         <NewsCarrousel>
           {latestNews.map((news) => (
             <NewCard
@@ -237,11 +123,18 @@ export default async function Home() {
         <h1 className={classNames(styles.Title)}>Preguntas Frecuentes</h1>
       </Separator>
       <section id="ayuda">
-        <FAQQuestions
-          questions={faqQuestions}
-          variant="No-Landing"
-          className={styles.faqQuestions}
-        />
+        {faqError ? (
+          <ServiceErrorAlert
+            title="Preguntas frecuentes no disponibles"
+            message={faqError}
+          />
+        ) : (
+          <FAQQuestions
+            questions={faqQuestions}
+            variant="No-Landing"
+            className={styles.faqQuestions}
+          />
+        )}
       </section>
     </div>
   );

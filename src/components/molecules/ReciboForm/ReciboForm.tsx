@@ -43,6 +43,13 @@ const ReciboForm: React.FC = () => {
                 body: JSON.stringify(payload)
             })
             const data = await res.json();
+
+            if (!res.ok) {
+                setMessage(data.error || data.message || 'Error al consultar la placa');
+                setMessageType('error');
+                return;
+            }
+
             setMessage(data.message);
             setMessageType(data.success ? 'success' : 'error');
             // const data = {
@@ -80,7 +87,11 @@ const ReciboForm: React.FC = () => {
                     a.click()
                     URL.revokeObjectURL(pdfUrl)   
                 } else {
-                    setMessage(json.message ?? 'No se pudieron obtener los datos del recibo.');
+                    setMessage(
+                      json.error ||
+                        json.message ||
+                        'No se pudieron obtener los datos del recibo.'
+                    );
                     setMessageType('error');
                 }
             }

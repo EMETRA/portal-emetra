@@ -1,9 +1,8 @@
 import Image from "next/image";
 import classNames from "classnames";
-import { notFound } from "next/navigation";
 import styles from "./Page.module.scss";
 import { Icon } from "@/components/server/atoms";
-import { API_BASE_URL } from "@/lib/config";
+import { fetchNewsByIdServer } from "@/lib/content/server";
 
 interface PageProps {
   params: Promise<{
@@ -53,26 +52,7 @@ interface NewsResponseDto {
 }
 
 async function fetchNewsById(id: string): Promise<NewsResponseDto> {
-  const response = await fetch(`${API_BASE_URL}/news/${id}`, {
-    headers: {
-      "Content-Type": "application/json",
-    },
-    next: {
-      revalidate: 300,
-    },
-  });
-
-  if (response.status === 404) {
-    notFound();
-  }
-
-  if (!response.ok) {
-    throw new Error(
-      `No fue posible obtener la noticia con id ${id}. Código: ${response.status}`,
-    );
-  }
-
-  return response.json();
+  return fetchNewsByIdServer(id);
 }
 
 function formatDateToSpanish(dateISO?: string | null) {

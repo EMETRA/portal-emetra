@@ -66,7 +66,7 @@ const SubscribeForm: React.FC = () => {
 
       if (!res.ok) {
         console.error("Error suscripción:", data);
-        alert(data.message || "Error al crear suscripción");
+        alert(data.error || data.message || "Error al crear suscripcion");
         return;
       }
 

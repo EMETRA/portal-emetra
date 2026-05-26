@@ -45,7 +45,12 @@ export default function VehicleQueryCard({ initialPlate = "" }: Props) {
 
       if (!consulta.ok) {
         const errorData = await consulta.json();
-        setMessage(errorData.message || "Error al consultar remisiones");
+        setMessage(
+          errorData?.error ||
+            errorData?.message ||
+            "Error al consultar remisiones"
+        );
+        setMessageType("error");
         return;
       }
 
@@ -79,7 +84,9 @@ export default function VehicleQueryCard({ initialPlate = "" }: Props) {
       if (!pdfRes.ok) {
         const errorData = await pdfRes.json().catch(() => null);
         setMessage(
-          errorData?.message || "No se pudo obtener la notificación en PDF"
+          errorData?.error ||
+            errorData?.message ||
+            "No se pudo obtener la notificacion en PDF"
         );
         setMessageType("error");
         return;

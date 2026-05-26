@@ -1,15 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
-const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL;
+import { fetchBackend } from "@/lib/backend/client";
+import { apiErrorFromUnknown, apiErrorResponse } from "@/lib/api/errors";
 
 export async function POST(req: NextRequest) {
   try {
     const { plate } = await req.json();
 
     if (!plate || typeof plate !== "string") {
-      return NextResponse.json(
-        { error: true, message: "La placa es requerida" },
-        { status: 400 }
-      );
+      return apiErrorResponse("La placa es requerida", 400, "VALIDATION_ERROR");
     }
 
     const [tplacaRaw, nplacaRaw] = plate.split("-");
@@ -17,47 +15,28 @@ export async function POST(req: NextRequest) {
     const nplaca = nplacaRaw?.trim().toUpperCase();
 
     if (!tplaca || !nplaca) {
-      return NextResponse.json(
-        { error: true, message: "Formato de placa inválido" },
-        { status: 400 }
+      return apiErrorResponse(
+        "Formato de placa invalido",
+        400,
+        "VALIDATION_ERROR"
       );
     }
 
-    
-    if (!baseUrl) {
-      throw new Error("NEXT_PUBLIC_API_BASE_URL no está configurada");
-    }
+    const path = `/notificado/consulta/${encodeURIComponent(tplaca)}/${encodeURIComponent(nplaca)}`;
+    const response = await fetchBackend(path, { method: "GET" });
 
-    const externalUrl = `${baseUrl}/notificado/consulta/${encodeURIComponent(tplaca)}/${encodeURIComponent(nplaca)}`;
-
-    const externalRes = await fetch(externalUrl, {
-      method: "GET",
-      cache: "no-store",
-    });
-
-    if (!externalRes.ok) {
-      const text = await externalRes.text();
-      console.error("Error al consultar backend:", externalRes.status, text);
-
-      return NextResponse.json(
-        {
-          error: true,
-          message: "No se pudo consultar remisiones en el servidor externo",
-        },
-        { status: 502 }
+    if (!response.ok) {
+      console.error("Error al consultar backend:", response.status);
+      return apiErrorResponse(
+        "No se pudo consultar remisiones en el servidor",
+        response.status,
+        "BACKEND_ERROR"
       );
     }
 
-    const data = await externalRes.json();
-
-    console.log("datos de consulta: ", data)
-
+    const data = await response.json();
     return NextResponse.json(data, { status: 200 });
-  } catch (err) {
-    console.error("Error en api interna:", err);
-    return NextResponse.json(
-      { error: true, message: "Error interno en la consulta de solvencia" },
-      { status: 500 }
-    );
+  } catch (error) {
+    return apiErrorFromUnknown(error, "Error interno en la consulta");
   }
 }

@@ -1,34 +1,27 @@
 import { NextResponse } from "next/server";
-
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL; 
+import { fetchBackend } from "@/lib/backend/client";
+import { apiErrorFromUnknown, apiErrorResponse } from "@/lib/api/errors";
 
 export async function POST(req: Request) {
   try {
     const dto = await req.json();
-
-    const res = await fetch(`${API_BASE_URL}/suscripcion`, {
+    const response = await fetchBackend("/suscripcion", {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
       body: JSON.stringify(dto),
     });
 
-    const data = await res.json().catch(() => null);
+    const data = await response.json().catch(() => null);
 
-    if (!res.ok) {
-      return NextResponse.json(
-        data || { message: "Error en API de suscripción" },
-        { status: res.status }
-      );
+    if (!response.ok) {
+      const message =
+        (data as { message?: string; error?: string } | null)?.error ??
+        (data as { message?: string } | null)?.message ??
+        "Error en API de suscripcion";
+      return apiErrorResponse(message, response.status, "BACKEND_ERROR");
     }
 
     return NextResponse.json(data, { status: 201 });
   } catch (error) {
-    console.error("Error en /api:", error);
-    return NextResponse.json(
-      { message: "Error interno en el servidor" },
-      { status: 500 }
-    );
+    return apiErrorFromUnknown(error, "Error interno en el servidor");
   }
 }

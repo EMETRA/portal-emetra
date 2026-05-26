@@ -58,7 +58,10 @@ export function middleware(request: NextRequest) {
   }
 
   if (pathname.startsWith("/api")) {
-    return NextResponse.json({ error: "No autorizado" }, { status: 401 });
+    return NextResponse.json(
+      { error: "No autorizado", code: "UNAUTHORIZED" },
+      { status: 401 }
+    );
   }
 
   const url = request.nextUrl.clone();

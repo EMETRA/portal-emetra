@@ -51,7 +51,13 @@ const SolvenciaForm: React.FC = () => {
             })
 
             const data = await res.json()
-            
+
+            if (!res.ok) {
+                setMessage(data.error || data.message || 'Error al validar solvencia')
+                setMessageType('error')
+                return
+            }
+
             setMessage(data.mensaje)
             setMessageType(data.valido ? 'success' : 'error')
             if (data.valido) {

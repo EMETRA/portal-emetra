@@ -8,6 +8,8 @@ import {
   fetchPrediceEventsClient,
   PrediceEventDto,
 } from "@/lib/predice/api";
+import ServiceErrorAlert from "@/components/molecules/ServiceErrorAlert/ServiceErrorAlert";
+import { getUserErrorMessage } from "@/lib/api/errors";
 import classNames from "classnames";
 import styles from "@/app/predice/Page.module.scss";
 
@@ -33,13 +35,22 @@ function parseEventDate(date?: string | null) {
 export default function PrediceContent() {
   const [events, setEvents] = useState<PrediceEventDto[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   const loadEvents = useCallback(async () => {
     try {
+      setError(null);
       const fetchedEvents = await fetchPrediceEventsClient();
       setEvents(fetchedEvents);
-    } catch (error) {
-      console.error("Error al cargar eventos de Predice:", error);
+    } catch (loadError) {
+      console.error("Error al cargar eventos de Predice:", loadError);
+      setEvents([]);
+      setError(
+        getUserErrorMessage(
+          loadError,
+          "No se pudieron cargar los eventos. Intentalo de nuevo en unos minutos."
+        )
+      );
     } finally {
       setLoading(false);
     }
@@ -69,9 +80,10 @@ export default function PrediceContent() {
   });
 
   const mapEvents = eventsWithinTwoMonths
-    .filter((event) =>
-      isValidCoordinate(event.extendedProps?.latitud) &&
-      isValidCoordinate(event.extendedProps?.longitud),
+    .filter(
+      (event) =>
+        isValidCoordinate(event.extendedProps?.latitud) &&
+        isValidCoordinate(event.extendedProps?.longitud)
     )
     .map((event) => ({
       id: String(event.id),
@@ -94,6 +106,17 @@ export default function PrediceContent() {
     );
   }
 
+  if (error) {
+    return (
+      <div className={classNames(styles.Page)}>
+        <ServiceErrorAlert
+          title="No se pudieron cargar los eventos"
+          message={error}
+        />
+      </div>
+    );
+  }
+
   return (
     <>
       <Calendar events={activeEvents} />
@@ -102,11 +125,10 @@ export default function PrediceContent() {
         <Map events={mapEvents} />
       ) : (
         <p className={classNames(styles.NoEventsMessage)}>
-          No hay eventos activos con ubicación disponible para mostrar en el
+          No hay eventos activos con ubicacion disponible para mostrar en el
           mapa.
         </p>
       )}
     </>
   );
 }
-

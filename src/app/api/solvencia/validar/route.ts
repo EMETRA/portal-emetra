@@ -1,22 +1,26 @@
 import { NextResponse } from "next/server";
-const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL; 
+import { backendFetch } from "@/lib/backend/client";
+import { apiErrorFromUnknown } from "@/lib/api/errors";
+
 export async function POST(req: Request) {
-  const body = await req.json();
-  const { tipoPlaca, placa, fechaRecibo, numeroRecibo } = body;
+  try {
+    const body = await req.json();
+    const { tipoPlaca, placa, fechaRecibo, numeroRecibo } = body;
 
-  const payload = {
-    tipo_placa: tipoPlaca,
-    numero_placa: placa,
-    fecha_recibo: fechaRecibo,
-    numero_recibo: numeroRecibo,
-  };
+    const payload = {
+      tipo_placa: tipoPlaca,
+      numero_placa: placa,
+      fecha_recibo: fechaRecibo,
+      numero_recibo: numeroRecibo,
+    };
 
-  const res = await fetch(`${BASE_URL}/solvencia/consultar-existencia-documento`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(payload),
-  });
-  const data = await res.json();//{success: true, message: "Documento emitido correctamente, impresion valida"} //await res.json();
-  return NextResponse.json(data);
+    const data = await backendFetch("/solvencia/consultar-existencia-documento", {
+      method: "POST",
+      body: JSON.stringify(payload),
+    });
+
+    return NextResponse.json(data);
+  } catch (error) {
+    return apiErrorFromUnknown(error, "Error al validar solvencia");
+  }
 }
-

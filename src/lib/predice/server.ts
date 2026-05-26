@@ -1,6 +1,5 @@
 import "server-only";
 
-import { events as mockEvents } from "@/data/local/event";
 import { BackendError, backendFetch } from "@/lib/backend/client";
 import type {
   CreatePrediceEventPayload,
@@ -14,12 +13,6 @@ function buildPredicePath(path: string, admin?: string): string {
   return `${path}${search}`;
 }
 
-function getMockEvents(): PrediceEventDto[] {
-  return Array.isArray(mockEvents.data)
-    ? (mockEvents.data as PrediceEventDto[])
-    : [];
-}
-
 export async function fetchPrediceEventsServer(
   admin: string = DEFAULT_ADMIN_KEY
 ): Promise<PrediceEventDto[]> {
@@ -30,11 +23,10 @@ export async function fetchPrediceEventsServer(
     );
     return Array.isArray(data) ? data : [];
   } catch (error) {
-    console.error("[fetchPrediceEventsServer]", error);
     if (error instanceof BackendError && error.status === 404) {
       return [];
     }
-    return getMockEvents();
+    throw error;
   }
 }
 
@@ -48,15 +40,10 @@ export async function fetchPrediceEventByIdServer(
       { next: { revalidate: 180 } }
     );
   } catch (error) {
-    console.error("[fetchPrediceEventByIdServer]", error);
     if (error instanceof BackendError && error.status === 404) {
       return null;
     }
-    const eventId = Number(id);
-    if (!Number.isFinite(eventId)) {
-      return null;
-    }
-    return getMockEvents().find((event) => event.id === eventId) ?? null;
+    throw error;
   }
 }
 

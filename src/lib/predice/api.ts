@@ -1,3 +1,4 @@
+import { parseApiErrorPayload } from "@/lib/api/errors";
 import type {
   CreatePrediceEventPayload,
   PrediceEventDto,
@@ -21,17 +22,6 @@ function buildBffUrl(path: string, admin?: string): string {
   return query ? `${path}?${query}` : path;
 }
 
-async function parseBffError(response: Response): Promise<string> {
-  const payload = (await response.json().catch(() => null)) as
-    | { error?: string; message?: string }
-    | null;
-  return (
-    payload?.error ??
-    payload?.message ??
-    `No fue posible completar la solicitud. Codigo: ${response.status}`
-  );
-}
-
 export async function createPrediceEvent(
   payload: CreatePrediceEventPayload,
   admin: string = DEFAULT_ADMIN_KEY
@@ -46,7 +36,8 @@ export async function createPrediceEvent(
   });
 
   if (!response.ok) {
-    throw new Error(await parseBffError(response));
+    const { error } = await parseApiErrorPayload(response);
+    throw new Error(error);
   }
 
   return response.json();
@@ -61,7 +52,8 @@ export async function fetchPrediceEventsClient(
   });
 
   if (!response.ok) {
-    throw new Error(await parseBffError(response));
+    const { error } = await parseApiErrorPayload(response);
+    throw new Error(error);
   }
 
   const data = (await response.json()) as PrediceEventDto[];
@@ -85,7 +77,8 @@ export async function fetchPrediceEventByIdClient(
   }
 
   if (!response.ok) {
-    throw new Error(await parseBffError(response));
+    const { error } = await parseApiErrorPayload(response);
+    throw new Error(error);
   }
 
   return (await response.json()) as PrediceEventDto;

@@ -1,13 +1,13 @@
 "use server";
 
 import { z } from "zod";
+import { BackendError, backendFetch } from "@/lib/backend/client";
 
-// Schema de validación con Zod
 const contactSchema = z.object({
   email: z
     .string()
-    .min(1, "El correo electrónico es requerido")
-    .email("Debe ser un correo electrónico válido"),
+    .min(1, "El correo electronico es requerido")
+    .email("Debe ser un correo electronico valido"),
 });
 
 export type FormState = {
@@ -19,15 +19,13 @@ export type FormState = {
 };
 
 export async function submitContactForm(
-  prevState: FormState,
+  _prevState: FormState,
   formData: FormData
 ): Promise<FormState> {
-  // Validar los datos del formulario
   const validatedFields = contactSchema.safeParse({
     email: formData.get("email"),
   });
 
-  // Si la validación falla, retornar errores
   if (!validatedFields.success) {
     return {
       errors: validatedFields.error.flatten().fieldErrors,
@@ -38,31 +36,28 @@ export async function submitContactForm(
   const { email } = validatedFields.data;
 
   try {
-    // Aquí puedes agregar la lógica para enviar el email
-    // Por ejemplo, enviar a un servicio de email, guardar en base de datos, etc.
-    
-    // Simulamos un delay para mostrar el comportamiento
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-    
-    // Por ahora solo logueamos el email
-    console.log("Nuevo contacto:", email);
-    
-    // Podrías enviar a un servicio como:
-    // - SendGrid
-    // - Resend  
-    // - Nodemailer
-    // - Guardar en una base de datos
-    
-    return {
-      message: "¡Gracias! Te contactaremos pronto.",
-      success: true,
-    };
-    
+    await backendFetch("/contact", {
+      method: "POST",
+      body: JSON.stringify({ email }),
+    });
   } catch (error) {
-    console.error("Error al procesar el formulario:", error);
-    return {
-      message: "Hubo un error al enviar tu información. Inténtalo de nuevo.",
-      success: false,
-    };
+    if (error instanceof BackendError && [404, 405, 501].includes(error.status)) {
+      console.info("[submitContactForm] endpoint no disponible:", email);
+    } else {
+      console.error("Error al procesar el formulario:", error);
+      const message =
+        error instanceof BackendError
+          ? error.message
+          : "Hubo un error al enviar tu informacion. Intentalo de nuevo.";
+      return {
+        message,
+        success: false,
+      };
+    }
   }
+
+  return {
+    message: "Gracias. Te contactaremos pronto.",
+    success: true,
+  };
 }

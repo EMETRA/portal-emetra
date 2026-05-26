@@ -33,6 +33,7 @@
     "react-leaflet": "^5.0.0",
     "recharts": "^3.3.0",
     "sass": "^1.89.2",
+    "server-only": "^0.0.1",
     "simplify-js": "^1.2.4",
     "yup": "^1.7.0",
     "zod": "^4.0.14"

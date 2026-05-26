@@ -2,11 +2,13 @@
 /* eslint-disable jsx-a11y/alt-text */
 
 "use client";
-import React from "react";
+
+import React, { useMemo } from "react";
 import Link from "next/link";
 import styles from "./CalendarWidget.module.scss";
-import { events } from "@/data/local/event";
 import classNames from "classnames";
+import type { PrediceEventDto } from "@/lib/predice/types";
+import { buildEventCountByDate } from "@/lib/events/utils";
 
 const daysShort = ["D", "L", "M", "X", "J", "V", "S"];
 
@@ -14,32 +16,18 @@ function getDaysInMonth(year: number, month: number) {
   return new Date(year, month + 1, 0).getDate();
 }
 
-function getEventsByDate(year: number, month: number) {
-  return events.data
-    .filter(
-      (e) =>
-        e.extendedProps &&
-        e.extendedProps.status === "ACTIVO" &&
-        typeof e.start === "string"
-    )
-    .reduce<Record<string, number>>((acc, e) => {
-      const [day, m, y] = e.start.split("/");
-      if (parseInt(y) === year && parseInt(m) - 1 === month) {
-        const key = `${year}-${m.padStart(2, "0")}-${day.padStart(2, "0")}`;
-        acc[key] = (acc[key] || 0) + 1;
-      }
-      return acc;
-    }, {});
-}
-
-const CalendarWidget: React.FC = () => {
+const CalendarWidget: React.FC<{ events: PrediceEventDto[] }> = ({ events }) => {
   const today = new Date();
   const year = today.getFullYear();
   const month = today.getMonth();
   const daysInMonth = getDaysInMonth(year, month);
   const firstDay = new Date(year, month, 1).getDay();
   const blanks = Array.from({ length: firstDay });
-  const eventsByDate = getEventsByDate(year, month);
+
+  const eventsByDate = useMemo(
+    () => buildEventCountByDate(events, year, month),
+    [events, year, month]
+  );
 
   return (
     <Link href="/predice" className={styles.WidgetLink}>

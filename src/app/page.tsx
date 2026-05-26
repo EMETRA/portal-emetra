@@ -5,7 +5,7 @@ import classNames from "classnames";
 import { Icon } from "@/components/server/atoms";
 import MultimediaCarrousel from "@/components/server/organisms/MultimediaCarrousel/MultimediaCarrousel";
 import MultimediaCard from "@/components/server/molecules/MultimediaCard/MultimediaCard";
-import CalendarWidget from "@/components/server/molecules/CalendarWidget/CalendarWidget";
+import CalendarWidgetLoader from "@/components/server/molecules/CalendarWidget/CalendarWidgetLoader";
 import { NewCard } from "@/components/molecules/NewCard";
 import NewsCarrousel from "@/components/organisms/NewsCarrousel/NewsCarrousel";
 import { FAQ, FAQ_Type } from "@/schema";
@@ -188,7 +188,7 @@ export default async function Home() {
       </section>
       <ServicesRow />
       <div className={classNames(styles.Services)}>
-        <CalendarWidget />
+        <CalendarWidgetLoader />
         <div className={classNames(styles.VideosHeading)}>
           <h2 className={classNames(styles.VideosTitle)}>
             Videos sobre nosotros

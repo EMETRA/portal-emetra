@@ -1,4 +1,8 @@
-ARG BASE_IMAGE=mirror.gcr.io/library/node:20-alpine
+# Dependencias: instalar en el host (WSL/Linux) antes del build de imagen.
+#   pnpm install --frozen-lockfile
+# Luego:
+#   docker compose build
+ARG BASE_IMAGE=mirror.gcr.io/library/node:20-bookworm-slim
 FROM ${BASE_IMAGE} AS base
 
 RUN corepack enable && corepack prepare pnpm@10.11.0 --activate
@@ -7,7 +11,10 @@ FROM base AS builder
 WORKDIR /app
 
 COPY package.json pnpm-lock.yaml ./
-RUN pnpm install --frozen-lockfile
+COPY node_modules ./node_modules
+
+RUN test -d node_modules/next \
+    || (echo "Falta node_modules. En el host ejecuta: pnpm install --frozen-lockfile" && exit 1)
 
 COPY . .
 
@@ -20,8 +27,8 @@ WORKDIR /app
 
 ENV NODE_ENV=production
 
-RUN addgroup --system --gid 1001 nodejs \
-    && adduser --system --uid 1001 nextjs
+RUN groupadd --system --gid 1001 nodejs \
+    && useradd --system --uid 1001 --gid nodejs nextjs
 
 COPY --from=builder /app/public ./public
 COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./

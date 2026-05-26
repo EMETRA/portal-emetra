@@ -1,3 +1,4 @@
+# Antes del build: pnpm install --frozen-lockfile (instala node_modules en el host; la imagen solo los copia).
 services:
   portal:
     build:

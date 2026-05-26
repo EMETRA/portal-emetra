@@ -8,7 +8,9 @@
     "start": "next start",
     "lint": "next lint",
     "storybook": "storybook dev -p 6006",
-    "build-storybook": "storybook build"
+    "build-storybook": "storybook build",
+    "docker:build": "pnpm install --frozen-lockfile && docker compose build",
+    "docker:up": "pnpm install --frozen-lockfile && docker compose up -d --build"
   },
   "dependencies": {
     "@emotion/react": "^11.14.0",

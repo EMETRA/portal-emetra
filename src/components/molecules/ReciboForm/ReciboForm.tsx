@@ -33,8 +33,8 @@ const ReciboForm: React.FC = () => {
         }
         setLoading(true);
         const payload = {
-            tipoPlaca: tipoPlaca.trim(),
-            placa: placa.trim().toUpperCase(),
+            tipo_placa: tipoPlaca.trim(),
+            numero_placa: placa.trim().toUpperCase(),
         };
         try{
             const res = await fetch('/api/solvencia/recibo', {
@@ -43,13 +43,16 @@ const ReciboForm: React.FC = () => {
                 body: JSON.stringify(payload)
             })
             const data = await res.json();
-            setMessage(data.message);
-            setMessageType(data.success ? 'success' : 'error');
-            // const data = {
-            //     success: true,
-            //     recibo: "12345678",
-            // }
-            if(data.success){
+
+            if (!res.ok) {
+                setMessage(data.error || data.message || 'Error al consultar la placa');
+                setMessageType('error');
+                return;
+            }
+
+            setMessage(data.mensaje);
+            setMessageType(data.valido ? 'success' : 'error');
+            if (data.valido) {
                 //generar pdf recibo
                 console.log('Recibo más reciente:', data.recibo);
 
@@ -80,7 +83,11 @@ const ReciboForm: React.FC = () => {
                     a.click()
                     URL.revokeObjectURL(pdfUrl)   
                 } else {
-                    setMessage(json.message ?? 'No se pudieron obtener los datos del recibo.');
+                    setMessage(
+                      json.error ||
+                        json.message ||
+                        'No se pudieron obtener los datos del recibo.'
+                    );
                     setMessageType('error');
                 }
             }

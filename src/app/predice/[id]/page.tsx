@@ -8,6 +8,7 @@ import {
   fetchPrediceEventByIdClient,
   type PrediceEventDto,
 } from "@/lib/predice/api";
+import ServiceErrorAlert from "@/components/molecules/ServiceErrorAlert/ServiceErrorAlert";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
 import React, { useEffect, useState } from "react";
@@ -72,12 +73,14 @@ export default function Page() {
   const [event, setEvent] = useState<PrediceEventDto | null>(null);
   const [loading, setLoading] = useState(true);
   const [notFound, setNotFound] = useState(false);
+  const [loadError, setLoadError] = useState<string | null>(null);
 
   useEffect(() => {
     if (!id) return;
 
     async function loadEvent() {
       try {
+        setLoadError(null);
         const fetchedEvent = await fetchPrediceEventByIdClient(id);
         if (!fetchedEvent) {
           setNotFound(true);
@@ -86,7 +89,11 @@ export default function Page() {
         }
       } catch (error) {
         console.error("Error al cargar el evento:", error);
-        setNotFound(true);
+        setLoadError(
+          error instanceof Error
+            ? error.message
+            : "No se pudo cargar la informacion del evento."
+        );
       } finally {
         setLoading(false);
       }
@@ -103,12 +110,23 @@ export default function Page() {
     );
   }
 
+  if (loadError) {
+    return (
+      <div className={classNames(styles.Page)}>
+        <ServiceErrorAlert title="Evento no disponible" message={loadError} />
+        <Link href="/predice" className={classNames(styles.BackLink)}>
+          Volver al calendario
+        </Link>
+      </div>
+    );
+  }
+
   if (notFound || !event) {
     return (
       <div className={classNames(styles.Page)}>
         <p>Evento no encontrado</p>
         <Link href="/predice" className={classNames(styles.BackLink)}>
-          ← Volver
+          Volver al calendario
         </Link>
       </div>
     );

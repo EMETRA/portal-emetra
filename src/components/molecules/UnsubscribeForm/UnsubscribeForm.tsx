@@ -43,7 +43,7 @@ const UnsubscribeForm: React.FC = () => {
 
       if (!res.ok) {
         setStatus("error");
-        setMessage(data.message || "Error al eliminar la suscripción");
+        setMessage(data.error || data.message || "Error al eliminar la suscripcion");
       }else{
         setStatus("success");
         setMessage(data.message || "Se eliminó la suscripción correctamente");

@@ -30,22 +30,41 @@ export default function VehicleQueryCard({ initialPlate = "" }: Props) {
     });
   };
 
+  const parsePlate = (value: string) => {
+    const normalized = value.replace(/\s+/g, "");
+    const [tplacaRaw, nplacaRaw] = normalized.split("-");
+    const tplaca = tplacaRaw?.trim().toUpperCase();
+    const nplaca = nplacaRaw?.trim().toUpperCase();
+    if (!tplaca || !nplaca) {
+      return null;
+    }
+    return { tplaca, nplaca };
+  };
+
   const previewPDF = async () => {
     try {
       setLoading(true);
       setMessage(null);
       setMessageType(null);
 
-      //Consultar remisiones
-      const consulta = await fetch("/api/sat/consulta", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ plate }),
-      });
+      const plateParts = parsePlate(plate);
+      if (!plateParts) {
+        setMessage("Formato de placa invalido");
+        setMessageType("error");
+        return;
+      }
+
+      const consultaParams = new URLSearchParams(plateParts);
+      const consulta = await fetch(`/api/sat/consulta?${consultaParams.toString()}`);
 
       if (!consulta.ok) {
         const errorData = await consulta.json();
-        setMessage(errorData.message || "Error al consultar remisiones");
+        setMessage(
+          errorData?.error ||
+            errorData?.message ||
+            "Error al consultar remisiones"
+        );
+        setMessageType("error");
         return;
       }
 
@@ -73,13 +92,15 @@ export default function VehicleQueryCard({ initialPlate = "" }: Props) {
       const pdfRes = await fetch("/api/sat/getpdf", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ plate }),
+        body: JSON.stringify(plateParts),
       });
 
       if (!pdfRes.ok) {
         const errorData = await pdfRes.json().catch(() => null);
         setMessage(
-          errorData?.message || "No se pudo obtener la notificación en PDF"
+          errorData?.error ||
+            errorData?.message ||
+            "No se pudo obtener la notificacion en PDF"
         );
         setMessageType("error");
         return;

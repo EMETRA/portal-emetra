@@ -1,7 +1,11 @@
 import "server-only";
 
 import { NextRequest, NextResponse } from "next/server";
-import { buildBackendHeaders, buildBackendUrl } from "@/lib/backend/client";
+import {
+  buildBackendUrl,
+  buildProxyUpstreamHeaders,
+  getBackendBaseUrl,
+} from "@/lib/backend/client";
 
 const HOP_BY_HOP_HEADERS = new Set([
   "connection",
@@ -52,23 +56,35 @@ export async function proxyBackendRequest(
     }
   }
 
-  const headers = buildBackendHeaders({
-    headers: req.headers,
-    body,
-  });
+  const headers = buildProxyUpstreamHeaders(req.headers, body);
+  const targetUrl = buildBackendUrl(options.path);
 
   let backendResponse: Response;
   try {
-    backendResponse = await fetch(buildBackendUrl(options.path), {
+    backendResponse = await fetch(targetUrl, {
       method,
       headers,
       body,
       cache: "no-store",
     });
   } catch (error) {
-    console.error("[proxyBackendRequest] network error:", options.path, error);
+    const cause =
+      error instanceof Error && "cause" in error ? error.cause : undefined;
+    console.error("[proxyBackendRequest] network error:", {
+      path: options.path,
+      targetUrl,
+      backendBaseUrl: getBackendBaseUrl(),
+      message: error instanceof Error ? error.message : String(error),
+      cause,
+    });
     const detail = error instanceof Error ? error.message : String(error);
-    return new NextResponse(detail, {
+    const debugBody = [
+      detail,
+      "",
+      `target: ${targetUrl}`,
+      `API_BASE_URL: ${getBackendBaseUrl()}`,
+    ].join("\n");
+    return new NextResponse(debugBody, {
       status: 502,
       statusText: "Bad Gateway",
       headers: { "Content-Type": "text/plain; charset=utf-8" },

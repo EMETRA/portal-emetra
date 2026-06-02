@@ -29,20 +29,89 @@ export function buildBackendUrl(path: string): string {
   return `${getBackendBaseUrl()}${path.startsWith("/") ? path : `/${path}`}`;
 }
 
+/** Headers that must not be forwarded from the browser to the backend. */
+const UPSTREAM_STRIP_HEADERS = new Set([
+  "connection",
+  "keep-alive",
+  "proxy-authenticate",
+  "proxy-authorization",
+  "te",
+  "trailers",
+  "transfer-encoding",
+  "upgrade",
+  "host",
+  "content-length",
+  "cookie",
+  "authorization",
+]);
+
+/** Safe request headers to forward from the BFF client call to the backend. */
+const UPSTREAM_ALLOW_HEADERS = new Set([
+  "accept",
+  "accept-language",
+  "content-type",
+  "content-language",
+  "if-match",
+  "if-none-match",
+  "if-modified-since",
+  "if-unmodified-since",
+  "cache-control",
+]);
+
+export function pickForwardRequestHeaders(
+  incoming: Headers
+): Headers {
+  const headers = new Headers();
+  incoming.forEach((value, key) => {
+    const lower = key.toLowerCase();
+    if (
+      UPSTREAM_STRIP_HEADERS.has(lower) ||
+      lower.startsWith("sec-") ||
+      lower.startsWith("x-forwarded")
+    ) {
+      return;
+    }
+    if (UPSTREAM_ALLOW_HEADERS.has(lower)) {
+      headers.set(key, value);
+    }
+  });
+  return headers;
+}
+
 export function buildBackendHeaders(init?: RequestInit): Headers {
   const headers = new Headers(init?.headers);
+  applyBackendAuthHeaders(headers, init?.body);
+  return headers;
+}
+
+export function buildProxyUpstreamHeaders(
+  incoming: Headers,
+  body?: ArrayBuffer | null
+): Headers {
+  const headers = pickForwardRequestHeaders(incoming);
+  applyBackendAuthHeaders(headers, body);
+  if (!headers.has("Accept")) {
+    headers.set("Accept", "application/json");
+  }
+  return headers;
+}
+
+function applyBackendAuthHeaders(
+  headers: Headers,
+  body?: BodyInit | ArrayBuffer | null
+): void {
   const token = process.env.BACKEND_TOKEN?.trim();
   if (token) {
     headers.set("Authorization", `Bearer ${token}`);
   }
   const hasBody =
-    init?.body !== undefined &&
-    init?.body !== null &&
-    !(typeof init.body === "string" && init.body.length === 0);
+    body !== undefined &&
+    body !== null &&
+    !(typeof body === "string" && body.length === 0) &&
+    !(body instanceof ArrayBuffer && body.byteLength === 0);
   if (!headers.has("Content-Type") && hasBody) {
     headers.set("Content-Type", "application/json");
   }
-  return headers;
 }
 
 export async function fetchBackend(

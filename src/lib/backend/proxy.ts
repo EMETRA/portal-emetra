@@ -41,8 +41,8 @@ export type ProxyBackendOptions = {
 };
 
 /**
- * Forwards the incoming request to the backend and returns the response as-is
- * (status, headers, and body). Backend error payloads are not rewritten.
+ * Mediador: el navegador solo habla con /api/*; este servidor reenvia al backend
+ * y devuelve la respuesta tal cual. El cliente nunca contacta API_BASE_URL.
  */
 export async function proxyBackendRequest(
   req: NextRequest,

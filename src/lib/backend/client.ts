@@ -1,6 +1,6 @@
 import "server-only";
 
-import { API_BASE_URL } from "@/lib/config";
+import { API_BASE_URL } from "@/lib/config.server";
 import { fetchUpstream, formatUpstreamFetchError } from "@/lib/backend/fetch-upstream";
 
 export class BackendError extends Error {

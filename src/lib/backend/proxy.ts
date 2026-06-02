@@ -81,9 +81,6 @@ export async function proxyBackendRequest(
       formatUpstreamFetchError(error),
       "",
       buildUpstreamDebugContext(targetUrl),
-      "",
-      "Prueba dentro del contenedor:",
-      `curl -v "${targetUrl}"`,
     ].join("\n");
     return new NextResponse(debugBody, {
       status: 502,

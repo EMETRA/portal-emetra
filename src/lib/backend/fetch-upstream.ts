@@ -2,6 +2,10 @@ import "server-only";
 
 import { getBackendBaseUrl } from "@/lib/backend/client";
 
+function shouldSkipTlsVerify(): boolean {
+  return process.env.BACKEND_TLS_INSECURE !== "0";
+}
+
 export function formatUpstreamFetchError(error: unknown): string {
   const lines: string[] = [];
   let current: unknown = error;
@@ -25,26 +29,22 @@ export function formatUpstreamFetchError(error: unknown): string {
   return lines.filter(Boolean).join(" | ");
 }
 
-/**
- * fetch del servidor (Node) hacia el backend.
- * IPv4: NODE_OPTIONS=--dns-result-order=ipv4first (ver docker-compose).
- * TLS: ca-certificates en la imagen Docker; solo diagnostico BACKEND_TLS_INSECURE=1.
- */
 export async function fetchUpstream(
   url: string,
   init?: RequestInit
 ): Promise<Response> {
-  const tlsInsecure = process.env.BACKEND_TLS_INSECURE === "1";
+  const useHttps = url.startsWith("https://");
+  const skipTls = useHttps && shouldSkipTlsVerify();
   const previousTlsSetting = process.env.NODE_TLS_REJECT_UNAUTHORIZED;
 
-  if (tlsInsecure) {
+  if (skipTls) {
     process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
   }
 
   try {
     return await fetch(url, init);
   } finally {
-    if (tlsInsecure) {
+    if (skipTls) {
       if (previousTlsSetting === undefined) {
         delete process.env.NODE_TLS_REJECT_UNAUTHORIZED;
       } else {
@@ -58,7 +58,6 @@ export function buildUpstreamDebugContext(targetUrl: string): string {
   return [
     `target: ${targetUrl}`,
     `API_BASE_URL: ${getBackendBaseUrl()}`,
-    `NODE_OPTIONS: ${process.env.NODE_OPTIONS ?? "(unset)"}`,
-    `BACKEND_TLS_INSECURE: ${process.env.BACKEND_TLS_INSECURE ?? "(unset)"}`,
+    `BACKEND_TLS_INSECURE: ${process.env.BACKEND_TLS_INSECURE ?? "(unset, skip verify on https)"}`,
   ].join("\n");
 }

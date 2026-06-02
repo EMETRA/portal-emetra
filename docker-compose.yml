@@ -9,8 +9,8 @@ services:
       - "3002:3000"
     environment:
       NODE_ENV: production
-      # Node fetch (undici) dentro del contenedor: preferir IPv4 y CA del sistema
-      NODE_OPTIONS: "--dns-result-order=ipv4first"
+      # TLS del backend: en este entorno no siempre es verificable (solo servidor -> backend)
+      BACKEND_TLS_INSECURE: "1"
     env_file:
       - path: .env
         required: false

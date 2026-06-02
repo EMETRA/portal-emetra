@@ -1,6 +1,7 @@
 import "server-only";
 
 import { API_BASE_URL } from "@/lib/config";
+import { fetchUpstream, formatUpstreamFetchError } from "@/lib/backend/fetch-upstream";
 
 export class BackendError extends Error {
   constructor(
@@ -119,15 +120,14 @@ export async function fetchBackend(
   init?: RequestInit
 ): Promise<Response> {
   try {
-    return await fetch(buildBackendUrl(path), {
+    return await fetchUpstream(buildBackendUrl(path), {
       ...init,
       headers: buildBackendHeaders(init),
       cache: init?.cache ?? "no-store",
     });
   } catch (error) {
     console.error("[fetchBackend] network error:", path, error);
-    const detail = error instanceof Error ? error.message : String(error);
-    throw new BackendError(detail, 503, "NETWORK_ERROR");
+    throw new BackendError(formatUpstreamFetchError(error), 503, "NETWORK_ERROR");
   }
 }
 

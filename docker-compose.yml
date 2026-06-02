@@ -9,6 +9,8 @@ services:
       - "3002:3000"
     environment:
       NODE_ENV: production
+      # Node fetch (undici) dentro del contenedor: preferir IPv4 y CA del sistema
+      NODE_OPTIONS: "--dns-result-order=ipv4first"
     env_file:
       - path: .env
         required: false

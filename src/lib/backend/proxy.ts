@@ -4,8 +4,12 @@ import { NextRequest, NextResponse } from "next/server";
 import {
   buildBackendUrl,
   buildProxyUpstreamHeaders,
-  getBackendBaseUrl,
 } from "@/lib/backend/client";
+import {
+  buildUpstreamDebugContext,
+  fetchUpstream,
+  formatUpstreamFetchError,
+} from "@/lib/backend/fetch-upstream";
 
 const HOP_BY_HOP_HEADERS = new Set([
   "connection",
@@ -61,28 +65,25 @@ export async function proxyBackendRequest(
 
   let backendResponse: Response;
   try {
-    backendResponse = await fetch(targetUrl, {
+    backendResponse = await fetchUpstream(targetUrl, {
       method,
       headers,
       body,
       cache: "no-store",
     });
   } catch (error) {
-    const cause =
-      error instanceof Error && "cause" in error ? error.cause : undefined;
     console.error("[proxyBackendRequest] network error:", {
       path: options.path,
       targetUrl,
-      backendBaseUrl: getBackendBaseUrl(),
-      message: error instanceof Error ? error.message : String(error),
-      cause,
+      detail: formatUpstreamFetchError(error),
     });
-    const detail = error instanceof Error ? error.message : String(error);
     const debugBody = [
-      detail,
+      formatUpstreamFetchError(error),
       "",
-      `target: ${targetUrl}`,
-      `API_BASE_URL: ${getBackendBaseUrl()}`,
+      buildUpstreamDebugContext(targetUrl),
+      "",
+      "Prueba dentro del contenedor:",
+      `curl -v "${targetUrl}"`,
     ].join("\n");
     return new NextResponse(debugBody, {
       status: 502,

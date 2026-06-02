@@ -1,12 +1,9 @@
-import { NextResponse } from "next/server";
-import { apiErrorFromUnknown } from "@/lib/api/errors";
-import { fetchRoutesServer } from "@/lib/routes/server";
+import { NextRequest } from "next/server";
+import { proxyBackendRequest } from "@/lib/backend/proxy";
 
-export async function GET() {
-  try {
-    const items = await fetchRoutesServer();
-    return NextResponse.json({ items });
-  } catch (error) {
-    return apiErrorFromUnknown(error, "No se pudieron cargar las rutas");
-  }
+export async function GET(req: NextRequest) {
+  return proxyBackendRequest(req, {
+    path: "/routes",
+    forwardBody: false,
+  });
 }

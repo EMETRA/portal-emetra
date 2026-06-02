@@ -33,8 +33,8 @@ const ReciboForm: React.FC = () => {
         }
         setLoading(true);
         const payload = {
-            tipoPlaca: tipoPlaca.trim(),
-            placa: placa.trim().toUpperCase(),
+            tipo_placa: tipoPlaca.trim(),
+            numero_placa: placa.trim().toUpperCase(),
         };
         try{
             const res = await fetch('/api/solvencia/recibo', {
@@ -50,13 +50,9 @@ const ReciboForm: React.FC = () => {
                 return;
             }
 
-            setMessage(data.message);
-            setMessageType(data.success ? 'success' : 'error');
-            // const data = {
-            //     success: true,
-            //     recibo: "12345678",
-            // }
-            if(data.success){
+            setMessage(data.mensaje);
+            setMessageType(data.valido ? 'success' : 'error');
+            if (data.valido) {
                 //generar pdf recibo
                 console.log('Recibo más reciente:', data.recibo);
 

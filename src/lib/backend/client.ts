@@ -25,7 +25,7 @@ export function getBackendBaseUrl(): string {
   return normalizeBaseUrl(API_BASE_URL);
 }
 
-function buildBackendUrl(path: string): string {
+export function buildBackendUrl(path: string): string {
   return `${getBackendBaseUrl()}${path.startsWith("/") ? path : `/${path}`}`;
 }
 
@@ -35,11 +35,12 @@ export function buildBackendHeaders(init?: RequestInit): Headers {
   if (token) {
     headers.set("Authorization", `Bearer ${token}`);
   }
-  if (!headers.has("Content-Type") && init?.body) {
+  const hasBody =
+    init?.body !== undefined &&
+    init?.body !== null &&
+    !(typeof init.body === "string" && init.body.length === 0);
+  if (!headers.has("Content-Type") && hasBody) {
     headers.set("Content-Type", "application/json");
-  }
-  if (!headers.has("Accept")) {
-    headers.set("Accept", "application/json");
   }
   return headers;
 }

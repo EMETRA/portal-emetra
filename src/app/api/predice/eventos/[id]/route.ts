@@ -1,23 +1,17 @@
-import { NextRequest, NextResponse } from "next/server";
-import { apiErrorFromUnknown, apiErrorResponse } from "@/lib/api/errors";
-import { fetchPrediceEventByIdServer } from "@/lib/predice/server";
+import { NextRequest } from "next/server";
+import {
+  backendPathWithRequestQuery,
+  proxyBackendRequest,
+} from "@/lib/backend/proxy";
 
 type RouteContext = {
   params: Promise<{ id: string }>;
 };
 
-export async function GET(request: NextRequest, context: RouteContext) {
-  try {
-    const { id } = await context.params;
-    const admin = request.nextUrl.searchParams.get("admin") ?? undefined;
-    const event = await fetchPrediceEventByIdServer(id, admin);
-
-    if (!event) {
-      return apiErrorResponse("Evento no encontrado", 404, "NOT_FOUND");
-    }
-
-    return NextResponse.json(event);
-  } catch (error) {
-    return apiErrorFromUnknown(error, "No se pudo cargar el evento");
-  }
+export async function GET(req: NextRequest, context: RouteContext) {
+  const { id } = await context.params;
+  return proxyBackendRequest(req, {
+    path: backendPathWithRequestQuery(req, `/predice/eventos/${encodeURIComponent(id)}`),
+    forwardBody: false,
+  });
 }

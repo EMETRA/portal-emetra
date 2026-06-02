@@ -38,10 +38,10 @@ const SolvenciaForm: React.FC = () => {
 
         setLoading(true)
         const payload = {
-            tipoPlaca: tipoPlaca.trim(),
-            placa: placa.trim().toUpperCase(),
-            fechaRecibo: fechaRecibo.trim(),
-            numeroRecibo: numeroRecibo.trim(),
+            tipo_placa: tipoPlaca.trim(),
+            numero_placa: placa.trim().toUpperCase(),
+            fecha_recibo: fechaRecibo.trim(),
+            numero_recibo: numeroRecibo.trim(),
         }
         try {
             const res = await fetch('/api/solvencia/validar', {

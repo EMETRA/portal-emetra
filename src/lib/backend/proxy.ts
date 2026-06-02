@@ -67,7 +67,12 @@ export async function proxyBackendRequest(
     });
   } catch (error) {
     console.error("[proxyBackendRequest] network error:", options.path, error);
-    return new NextResponse(null, { status: 502, statusText: "Bad Gateway" });
+    const detail = error instanceof Error ? error.message : String(error);
+    return new NextResponse(detail, {
+      status: 502,
+      statusText: "Bad Gateway",
+      headers: { "Content-Type": "text/plain; charset=utf-8" },
+    });
   }
 
   const responseHeaders = new Headers();

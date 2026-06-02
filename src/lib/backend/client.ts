@@ -57,11 +57,8 @@ export async function fetchBackend(
     });
   } catch (error) {
     console.error("[fetchBackend] network error:", path, error);
-    throw new BackendError(
-      "No se pudo conectar con el servicio",
-      503,
-      "NETWORK_ERROR"
-    );
+    const detail = error instanceof Error ? error.message : String(error);
+    throw new BackendError(detail, 503, "NETWORK_ERROR");
   }
 }
 

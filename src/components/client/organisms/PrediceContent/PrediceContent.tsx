@@ -9,7 +9,6 @@ import {
   PrediceEventDto,
 } from "@/lib/predice/api";
 import ServiceErrorAlert from "@/components/molecules/ServiceErrorAlert/ServiceErrorAlert";
-import { getUserErrorMessage } from "@/lib/api/errors";
 import classNames from "classnames";
 import styles from "@/app/predice/Page.module.scss";
 
@@ -46,10 +45,9 @@ export default function PrediceContent() {
       console.error("Error al cargar eventos de Predice:", loadError);
       setEvents([]);
       setError(
-        getUserErrorMessage(
-          loadError,
-          "No se pudieron cargar los eventos. Intentalo de nuevo en unos minutos."
-        )
+        loadError instanceof Error
+          ? loadError.message
+          : "No se pudieron cargar los eventos."
       );
     } finally {
       setLoading(false);

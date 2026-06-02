@@ -1,10 +1,9 @@
-import { parseApiErrorPayload } from "@/lib/api/errors";
+import { assertOkResponse } from "@/lib/bff/raw";
 
 export class BffError extends Error {
   constructor(
     message: string,
-    public readonly status: number,
-    public readonly code?: string
+    public readonly status: number
   ) {
     super(message);
     this.name = "BffError";
@@ -25,9 +24,11 @@ export async function fetchBffJson<T>(
   });
 
   if (!response.ok) {
-    const { error, code } = await parseApiErrorPayload(response);
-    throw new BffError(error, response.status, code);
+    const body = await response.text();
+    throw new BffError(body || `HTTP ${response.status}`, response.status);
   }
 
   return response.json() as Promise<T>;
 }
+
+export { assertOkResponse };

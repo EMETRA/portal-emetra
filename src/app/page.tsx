@@ -2,30 +2,11 @@ import { Separator } from "@/components/atoms/Separator";
 import styles from "./page.module.css";
 import { Banner, BannerSlide, ServicesRow } from "@/components/organisms";
 import classNames from "classnames";
-import { Icon } from "@/components/server/atoms";
 import MultimediaCarrousel from "@/components/server/organisms/MultimediaCarrousel/MultimediaCarrousel";
 import MultimediaCard from "@/components/server/molecules/MultimediaCard/MultimediaCard";
-import CalendarWidgetLoader from "@/components/server/molecules/CalendarWidget/CalendarWidgetLoader";
-import { NewCard } from "@/components/molecules/NewCard";
-import NewsCarrousel from "@/components/organisms/NewsCarrousel/NewsCarrousel";
-import { FAQQuestions } from "@/components/organisms/FAQ-Questions";
-import { fetchFaqsServer, fetchLatestNewsServer } from "@/lib/content/server";
-import { getUserErrorMessage } from "@/lib/api/errors";
-import ServiceErrorAlert from "@/components/molecules/ServiceErrorAlert/ServiceErrorAlert";
-
-function formatDateToSpanish(dateISO?: string | null) {
-  if (!dateISO) {
-    return "Fecha no disponible";
-  }
-
-  const formatter = new Intl.DateTimeFormat("es-GT", {
-    day: "2-digit",
-    month: "long",
-    year: "numeric",
-  });
-
-  return formatter.format(new Date(dateISO));
-}
+import CalendarWidgetFetcher from "@/components/client/CalendarWidgetFetcher/CalendarWidgetFetcher";
+import HomeNewsSection from "@/components/client/HomeNewsSection/HomeNewsSection";
+import HomeFaqSection from "@/components/client/HomeFaqSection/HomeFaqSection";
 
 const slides: BannerSlide[] = [
   {
@@ -35,33 +16,7 @@ const slides: BannerSlide[] = [
   },
 ];
 
-const DEFAULT_NEWS_IMAGE = "/images/Evento.jpg";
-
-export default async function Home() {
-  let latestNews: Awaited<ReturnType<typeof fetchLatestNewsServer>> = [];
-  let newsError: string | null = null;
-
-  try {
-    latestNews = await fetchLatestNewsServer();
-  } catch (error) {
-    newsError = getUserErrorMessage(
-      error,
-      "No se pudieron cargar las noticias en este momento."
-    );
-  }
-
-  let faqQuestions: Awaited<ReturnType<typeof fetchFaqsServer>> = [];
-  let faqError: string | null = null;
-
-  try {
-    faqQuestions = await fetchFaqsServer();
-  } catch (error) {
-    faqError = getUserErrorMessage(
-      error,
-      "No se pudieron cargar las preguntas frecuentes."
-    );
-  }
-
+export default function Home() {
   return (
     <div className={styles.page}>
       <Banner slides={slides} />
@@ -72,7 +27,7 @@ export default async function Home() {
       </section>
       <ServicesRow />
       <div className={classNames(styles.Services)}>
-        <CalendarWidgetLoader />
+        <CalendarWidgetFetcher />
         <div className={classNames(styles.VideosHeading)}>
           <h2 className={classNames(styles.VideosTitle)}>
             Videos sobre nosotros
@@ -91,51 +46,8 @@ export default async function Home() {
           </MultimediaCarrousel>
         </div>
       </div>
-      <Separator>
-        <div className={classNames(styles.Heading)}>
-          <Icon name="Notification" className={classNames(styles.Icon)} />
-          <h1 className={classNames(styles.Title)}>ÚLTIMAS NOTICIAS</h1>
-        </div>
-      </Separator>
-
-      {newsError ? (
-        <ServiceErrorAlert title="Noticias no disponibles" message={newsError} />
-      ) : latestNews.length > 0 ? (
-        <NewsCarrousel>
-          {latestNews.map((news) => (
-            <NewCard
-              key={news.id}
-              id={news.id.toString()}
-              title={news.titulo}
-              date={formatDateToSpanish(
-                news.fecha_publicacion ?? news.creado,
-              )}
-              image={news.recurso_principal?.url ?? DEFAULT_NEWS_IMAGE}
-            />
-          ))}
-        </NewsCarrousel>
-      ) : (
-        <p className={styles.noNewsMessage}>
-          No hay noticias disponibles por el momento.
-        </p>
-      )}
-      <Separator>
-        <h1 className={classNames(styles.Title)}>Preguntas Frecuentes</h1>
-      </Separator>
-      <section id="ayuda">
-        {faqError ? (
-          <ServiceErrorAlert
-            title="Preguntas frecuentes no disponibles"
-            message={faqError}
-          />
-        ) : (
-          <FAQQuestions
-            questions={faqQuestions}
-            variant="No-Landing"
-            className={styles.faqQuestions}
-          />
-        )}
-      </section>
+      <HomeNewsSection />
+      <HomeFaqSection />
     </div>
   );
 }

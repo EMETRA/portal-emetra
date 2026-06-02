@@ -9,7 +9,6 @@ import {
   type PrediceEventDto,
 } from "@/lib/predice/api";
 import ServiceErrorAlert from "@/components/molecules/ServiceErrorAlert/ServiceErrorAlert";
-import { getUserErrorMessage } from "@/lib/api/errors";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
 import React, { useEffect, useState } from "react";
@@ -91,10 +90,9 @@ export default function Page() {
       } catch (error) {
         console.error("Error al cargar el evento:", error);
         setLoadError(
-          getUserErrorMessage(
-            error,
-            "No se pudo cargar la informacion del evento."
-          )
+          error instanceof Error
+            ? error.message
+            : "No se pudo cargar la informacion del evento."
         );
       } finally {
         setLoading(false);

@@ -1,4 +1,4 @@
-import { parseApiErrorPayload } from "@/lib/api/errors";
+import { assertOkResponse } from "@/lib/bff/raw";
 import type {
   CreatePrediceEventPayload,
   PrediceEventDto,
@@ -35,11 +35,7 @@ export async function createPrediceEvent(
     body: JSON.stringify(payload),
   });
 
-  if (!response.ok) {
-    const { error } = await parseApiErrorPayload(response);
-    throw new Error(error);
-  }
-
+  await assertOkResponse(response);
   return response.json();
 }
 
@@ -51,11 +47,7 @@ export async function fetchPrediceEventsClient(
     cache: "no-store",
   });
 
-  if (!response.ok) {
-    const { error } = await parseApiErrorPayload(response);
-    throw new Error(error);
-  }
-
+  await assertOkResponse(response);
   const data = (await response.json()) as PrediceEventDto[];
   return Array.isArray(data) ? data : [];
 }
@@ -76,10 +68,6 @@ export async function fetchPrediceEventByIdClient(
     return null;
   }
 
-  if (!response.ok) {
-    const { error } = await parseApiErrorPayload(response);
-    throw new Error(error);
-  }
-
+  await assertOkResponse(response);
   return (await response.json()) as PrediceEventDto;
 }

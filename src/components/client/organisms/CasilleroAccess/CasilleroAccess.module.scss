@@ -1,4 +1,4 @@
-@use "../../theme/colors.scss" as *;
+@use "../../../../theme/colors.scss" as *;
 
 .page {
   min-height: 100vh;
@@ -48,36 +48,6 @@
   }
 }
 
-.tabs {
-  display: grid;
-  grid-template-columns: 1fr 1px 1fr;
-  align-items: center;
-  gap: 20px;
-}
-
-.tab,
-.activeTab {
-  min-height: 44px;
-  border: 0;
-  border-radius: 8px;
-  background: transparent;
-  color: #333;
-  cursor: pointer;
-  font: inherit;
-}
-
-.activeTab {
-  background: $verde-claro-1;
-  color: #fff;
-  font-weight: 700;
-}
-
-.tabDivider {
-  width: 1px;
-  height: 44px;
-  background: #d4d4d4;
-}
-
 .loginForm {
   width: min(390px, 100%);
   margin: 0 auto;
@@ -112,37 +82,6 @@
   row-gap: 18px;
 }
 
-.personType {
-  grid-column: 1 / -1;
-  width: min(480px, 100%);
-  margin: -14px auto 4px;
-  padding: 4px;
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 4px;
-  border-radius: 9px;
-  background: #f2f2f2;
-}
-
-.personTypeButton,
-.activePersonType {
-  min-height: 38px;
-  padding: 8px 12px;
-  border: 0;
-  border-radius: 7px;
-  background: transparent;
-  color: #555;
-  cursor: pointer;
-  font: inherit;
-  font-size: 0.82rem;
-  font-weight: 600;
-}
-
-.activePersonType {
-  background: $azul-2;
-  color: #fff;
-}
-
 .field {
   display: grid;
   gap: 7px;
@@ -157,46 +96,6 @@
   font-size: 0.82rem;
 }
 
-.fileInput {
-  min-height: 44px;
-  padding-left: 16px;
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
-  align-items: center;
-  gap: 12px;
-  overflow: hidden;
-  border-radius: 7px;
-  background: $input-background;
-  color: $tertiary-text;
-  cursor: pointer;
-  font-size: 0.78rem;
-  font-weight: 600;
-
-  span {
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-  }
-
-  strong {
-    align-self: stretch;
-    padding: 0 16px;
-    display: flex;
-    align-items: center;
-    background: $verde-oscuro-1;
-    color: #fff;
-    font-size: 0.75rem;
-  }
-
-  input {
-    position: absolute;
-    width: 1px;
-    height: 1px;
-    opacity: 0;
-    pointer-events: none;
-  }
-}
-
 .loginActions {
   display: grid;
   justify-items: center;
@@ -209,30 +108,6 @@
   display: grid;
   justify-items: center;
   gap: 7px;
-}
-
-.humanCheck {
-  width: 280px;
-  min-height: 60px;
-  padding: 12px;
-  display: grid;
-  grid-template-columns: auto 1fr auto;
-  align-items: center;
-  gap: 10px;
-  border: 1px solid #ddd;
-  background: #fafafa;
-  font-size: 0.72rem;
-
-  input {
-    width: 22px;
-    height: 22px;
-    accent-color: $verde-oscuro-1;
-  }
-
-  strong {
-    color: $azul-2;
-    font-size: 0.65rem;
-  }
 }
 
 .terms {
@@ -309,16 +184,8 @@
     }
   }
 
-  .tabs {
-    gap: 8px;
-  }
-
   .registerForm {
     grid-template-columns: 1fr;
-  }
-
-  .personType {
-    grid-column: 1;
   }
 
   .terms,
@@ -326,9 +193,6 @@
     grid-column: 1;
   }
 
-  .humanCheck {
-    width: min(280px, 100%);
-  }
 }
 
 @media (max-width: 480px) {
@@ -343,8 +207,7 @@
     align-items: flex-start;
   }
 
-  .titleRow,
-  .tabs {
+  .titleRow {
     display: none;
   }
 
@@ -380,8 +243,7 @@
     font-size: 0.76rem;
   }
 
-  .input,
-  .fileInput {
+  .input {
     min-height: 44px;
     font-size: 0.72rem;
   }
@@ -389,18 +251,6 @@
   .loginActions {
     gap: 10px;
     margin-top: 8px;
-  }
-
-  .humanCheck {
-    width: min(230px, 100%);
-    min-height: 48px;
-    padding: 8px;
-    font-size: 0.58rem;
-
-    input {
-      width: 17px;
-      height: 17px;
-    }
   }
 
   .submitButton {
@@ -433,10 +283,6 @@
 
   .registerForm + * {
     margin: 0;
-  }
-
-  .personType {
-    margin: -48px auto 4px;
   }
 
   .registerForm > .submitButton {

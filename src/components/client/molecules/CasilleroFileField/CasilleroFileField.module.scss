@@ -1,0 +1,53 @@
+@use "../../../../theme/colors.scss" as *;
+
+.field {
+  display: grid;
+  gap: 7px;
+  font-size: 0.9rem;
+  font-weight: 700;
+}
+
+.input {
+  min-height: 44px;
+  padding-left: 16px;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 12px;
+  overflow: hidden;
+  border-radius: 7px;
+  background: $input-background;
+  color: $tertiary-text;
+  cursor: pointer;
+  font-size: 0.78rem;
+  font-weight: 600;
+
+  span {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  strong {
+    align-self: stretch;
+    padding: 0 16px;
+    display: flex;
+    align-items: center;
+    background: $verde-oscuro-1;
+    color: #fff;
+    font-size: 0.75rem;
+  }
+
+  input {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    opacity: 0;
+    pointer-events: none;
+  }
+}
+
+@media (max-width: 480px) {
+  .field { font-size: 0.76rem; }
+  .input { font-size: 0.72rem; }
+}

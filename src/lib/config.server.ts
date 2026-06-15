@@ -5,4 +5,4 @@ import "server-only";
  * El navegador no tiene acceso de red al backend; solo llama a /api/...
  */
 export const API_BASE_URL =
-  process.env.API_BASE_URL?.trim() || "http://api-emetra.muniguate.com";
+  process.env.API_BASE_URL?.trim() || "http://EMETRA-panel.muniguate.com/web";

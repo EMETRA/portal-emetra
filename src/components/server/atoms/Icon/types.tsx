@@ -19,6 +19,7 @@ import Eye from "@/assets/icons/Eye.svg";
 import EyeOff from "@/assets/icons/EyeOff.svg";
 import Files from "@/assets/icons/Files.svg";
 import Image from "@/assets/icons/Image.svg";
+import Home from "@/assets/icons/Home.svg";
 import Info from "@/assets/icons/Info.svg";
 import Location from "@/assets/icons/Location.svg";
 import Logout from "@/assets/icons/Logout.svg";
@@ -70,6 +71,7 @@ type IconType =
   | "EyeOff"
   | "Files"
   | "Image"
+  | "Home"
   | "Info"
   | "Location"
   | "Logout"
@@ -125,6 +127,7 @@ const IconMap: Record<IconType, React.FC<React.SVGProps<SVGSVGElement>>> = {
   EyeOff: EyeOff,
   Files: Files,
   Image: Image,
+  Home: Home,
   Info: Info,
   Location: Location,
   Logout: Logout,

@@ -1,6 +1,7 @@
 "use client";
 
 import { FormEvent, useState } from "react";
+import { useRouter } from "next/navigation";
 import { Button, Input } from "@/components/server/atoms";
 import CasilleroTabs from "@/components/client/molecules/CasilleroTabs/CasilleroTabs";
 import CasilleroPersonTypeSelector from "@/components/client/molecules/CasilleroPersonTypeSelector/CasilleroPersonTypeSelector";
@@ -25,6 +26,7 @@ const fields = {
 } as const;
 
 export default function CasilleroAccess() {
+  const router = useRouter();
   const [view, setView] = useState<View>("login");
   const [personType, setPersonType] = useState<PersonType>("individual");
   const [fileNames, setFileNames] = useState({ rtu: "", mandate: "" });
@@ -89,11 +91,12 @@ export default function CasilleroAccess() {
       }
     }
 
-    setMessage(
-      view === "login"
-        ? "El inicio de sesión se conectará al servicio de Casillero."
-        : "El registro se conectará al servicio de Casillero."
-    );
+    if (view === "login") {
+      router.push("/casillero/dashboard");
+      return;
+    }
+
+    setMessage("El registro se conectará al servicio de Casillero.");
   };
 
   const isLogin = view === "login";

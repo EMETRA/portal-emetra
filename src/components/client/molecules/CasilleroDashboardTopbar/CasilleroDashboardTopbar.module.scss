@@ -1,0 +1,96 @@
+@use "../../../../theme/colors.scss" as *;
+
+.topbar {
+  height: 40px;
+  display: grid;
+  grid-template-columns: auto auto 1fr auto;
+  align-items: center;
+  gap: 14px;
+  padding: 0 28px;
+  background: $quintary-text;
+  color: #fff;
+
+  h1 {
+    font-size: 1.25rem;
+    text-align: center;
+  }
+}
+
+.menuButton {
+  display: inline-flex;
+  border: 0;
+  background: transparent;
+  color: #fff;
+  cursor: pointer;
+
+  svg {
+    width: 24px;
+    height: 24px;
+  }
+}
+
+.actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 0.74rem;
+  font-weight: 700;
+
+  svg {
+    width: 18px;
+    height: 18px;
+  }
+}
+
+.searchButton {
+  display: none;
+}
+
+@media (max-width: 900px) {
+  .topbar {
+    padding: 0 14px;
+
+    h1 {
+      font-size: 0.9rem;
+    }
+  }
+
+  .actions span {
+    display: none;
+  }
+}
+
+@media (max-width: 520px) {
+  .topbar {
+    height: 40px;
+    grid-template-columns: auto 1fr auto;
+    gap: 12px;
+    padding: 0 14px;
+
+    h1 {
+      font-size: 0.82rem;
+    }
+  }
+
+  .actions {
+    display: none;
+  }
+
+  .searchSlot {
+    display: none;
+  }
+
+  .searchButton {
+    display: inline-flex;
+    justify-self: end;
+    border: 0;
+    background: transparent;
+    color: #fff;
+    cursor: pointer;
+
+    svg {
+      width: 22px;
+      height: 22px;
+    }
+  }
+}

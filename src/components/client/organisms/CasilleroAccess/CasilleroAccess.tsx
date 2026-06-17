@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { Button, Input } from "@/components/server/atoms";
 import CasilleroTabs from "@/components/client/molecules/CasilleroTabs/CasilleroTabs";
 import CasilleroPersonTypeSelector from "@/components/client/molecules/CasilleroPersonTypeSelector/CasilleroPersonTypeSelector";
-import CasilleroFileField from "@/components/client/molecules/CasilleroFileField/CasilleroFileField";
+import CasilleroDriveLinkField from "@/components/client/molecules/CasilleroDriveLinkField/CasilleroDriveLinkField";
 import styles from "./CasilleroAccess.module.scss";
 
 type View = "login" | "register" | "recover-email" | "recover-code" | "recover-password";
@@ -29,7 +29,6 @@ export default function CasilleroAccess() {
   const router = useRouter();
   const [view, setView] = useState<View>("login");
   const [personType, setPersonType] = useState<PersonType>("individual");
-  const [fileNames, setFileNames] = useState({ rtu: "", mandate: "" });
   const [message, setMessage] = useState("");
 
   const changeView = (nextView: View) => {
@@ -39,7 +38,6 @@ export default function CasilleroAccess() {
 
   const changePersonType = (nextType: PersonType) => {
     setPersonType(nextType);
-    setFileNames({ rtu: "", mandate: "" });
     setMessage("");
   };
 
@@ -79,6 +77,8 @@ export default function CasilleroAccess() {
       const confirmEmail = String(formData.get("confirm-email") ?? "");
       const password = String(formData.get("password") ?? "");
       const confirmPassword = String(formData.get("confirm-password") ?? "");
+      const rtuLink = String(formData.get("rtu-link") ?? "").trim();
+      const mandateLink = String(formData.get("legal-mandate-link") ?? "").trim();
 
       if (email !== confirmEmail) {
         setMessage("Los correos electrónicos no coinciden.");
@@ -88,6 +88,18 @@ export default function CasilleroAccess() {
       if (password !== confirmPassword) {
         setMessage("Las contraseñas no coinciden.");
         return;
+      }
+
+      if (personType === "legal") {
+        if (!isGoogleDriveUrl(rtuLink) || !isGoogleDriveUrl(mandateLink)) {
+          setMessage("Los enlaces de RTU y Mandato deben ser enlaces válidos de Google Drive.");
+          return;
+        }
+
+        if (normalizeUrl(rtuLink) === normalizeUrl(mandateLink)) {
+          setMessage("El enlace de RTU y el Mandato Representante Legal no pueden ser el mismo.");
+          return;
+        }
       }
     }
 
@@ -102,6 +114,25 @@ export default function CasilleroAccess() {
   const isLogin = view === "login";
   const isRegister = view === "register";
   const isRecovery = view.startsWith("recover-");
+
+  function isGoogleDriveUrl(value: string) {
+    try {
+      const url = new URL(value);
+      return url.hostname === "drive.google.com" || url.hostname.endsWith(".drive.google.com");
+    } catch {
+      return false;
+    }
+  }
+
+  function normalizeUrl(value: string) {
+    try {
+      const url = new URL(value);
+      url.hash = "";
+      return url.toString().replace(/\/$/, "");
+    } catch {
+      return value.trim().replace(/\/$/, "");
+    }
+  }
 
   const renderRecoveryFields = () => {
     if (view === "recover-email") {
@@ -210,7 +241,7 @@ export default function CasilleroAccess() {
               />
             )}
 
-            {isRegister && personType === "individual" && (
+            {isRegister && (
               <>
                 <label className={styles.field} htmlFor="dpi">
                   <span>DPI</span>
@@ -225,17 +256,15 @@ export default function CasilleroAccess() {
 
             {isRegister && personType === "legal" && (
               <>
-                <CasilleroFileField
-                  id="rtu"
+                <CasilleroDriveLinkField
+                  id="rtu-link"
                   label="RTU"
-                  fileName={fileNames.rtu}
-                  onChange={(fileName) => setFileNames((current) => ({ ...current, rtu: fileName }))}
+                  placeholder="https://drive.google.com/..."
                 />
-                <CasilleroFileField
-                  id="legal-mandate"
+                <CasilleroDriveLinkField
+                  id="legal-mandate-link"
                   label="Mandato Representante Legal"
-                  fileName={fileNames.mandate}
-                  onChange={(fileName) => setFileNames((current) => ({ ...current, mandate: fileName }))}
+                  placeholder="https://drive.google.com/..."
                 />
               </>
             )}

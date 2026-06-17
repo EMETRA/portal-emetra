@@ -35,7 +35,8 @@ const fine: FineDetail = {
         "El vehículo fue detectado excediendo el límite permitido de velocidad sobre la Calzada Roosevelt en dirección norte, a la altura de la 14 avenida, según registro realizado por agente municipal de tránsito.",
 };
 
-export default function FineDetailPage() {
+export default function FineDetailPage(id: { fineId: string }) {
+    console.log("Fine ID:", id.fineId); // TODO: remove after wiring to real data
     const [isModalOpen, setIsModalOpen] = useState(false);
 
     return (

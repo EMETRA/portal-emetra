@@ -6,9 +6,9 @@ import CasilleroDashboardLayout from "@/components/client/templates/CasilleroDas
 export default function CasilleroDashboardPage() {
   return (
     <CasilleroDashboardLayout>
-      {/* <CasilleroDashboardHome /> */}
+      <CasilleroDashboardHome />
       {/* <ConsultaMultasPage /> */}
-      <FineDetailPage />
+      {/* <FineDetailPage /> */}
     </CasilleroDashboardLayout> 
   );
 }

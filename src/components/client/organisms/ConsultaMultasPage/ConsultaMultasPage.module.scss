@@ -1,0 +1,27 @@
+// ConsultaMultasPage.module.scss
+.topGrid {
+    display: grid;
+    grid-template-columns: minmax(280px, 1fr) minmax(320px, 1.5fr);
+    gap: 2.5rem;
+    margin-bottom: 2.5rem;
+
+}
+
+@media (max-width: 900px) {
+    .topGrid {
+        gap: 1.25rem;
+        margin-bottom: 1.5rem;
+        margin-top: -1.5rem;
+    }
+}
+
+@media (max-width: 520px) {
+    .topGrid {
+        grid-template-columns: 1fr;
+    }
+}
+
+.wrapper {
+    padding: 0 0rem;
+    margin-top: -3.5rem;
+}

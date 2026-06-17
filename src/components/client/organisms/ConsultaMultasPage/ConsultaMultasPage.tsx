@@ -10,6 +10,7 @@ import { Fine, FineCategory, FINE_CATEGORIES } from "@/types/fines";
 import styles from "./ConsultaMultasPage.module.scss";
 import { useMediaQuery } from "@/hooks/useMediaQuery";
 import FineListSummaryBar from "../../molecules/FineListSummaryBar/FineListSummaryBar";
+import { useRouter } from "next/navigation";
 
 // TODO: replace with the real query, e.g. useConsultarMultasPorPlaca
 const vehicle = { plate: "P111BBB", model: "Toyota corolla", color: "Gris", year: 2020 };
@@ -26,6 +27,7 @@ const fines: Fine[] = [
 ];
 
 export default function ConsultaMultasPage() {
+    const router = useRouter();
     const isMobile = useMediaQuery("(max-width: 520px)");
     const [filter, setFilter] = useState<"todas" | FineCategory>("todas");
     const [selectedPlate, setSelectedPlate] = useState(vehicle.plate);
@@ -51,6 +53,10 @@ export default function ConsultaMultasPage() {
     }, []);
 
     const totalAmount = fines.reduce((sum, f) => sum + f.amount, 0);
+
+    const handleViewDetail = (fineId: string) => {
+        router.push(`/casillero/dashboard/multas/${fineId}`);
+    };
 
     return (
         <div className={styles.wrapper}>
@@ -78,7 +84,7 @@ export default function ConsultaMultasPage() {
         {isMobile && (
             <FineListSummaryBar count={filteredFines.length} total={filteredTotal} />
         )}
-        <FineCardCarousel fines={filteredFines} />
+        <FineCardCarousel fines={filteredFines} onViewDetail={handleViewDetail} />
         </div>
     );
 }

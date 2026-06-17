@@ -30,7 +30,7 @@ export default function CasilleroDashboardLayout({ children }: Props) {
       />
 
       <div className={styles.body}>
-        <CasilleroDashboardSidebar open={sidebarOpen} />
+        <CasilleroDashboardSidebar open={sidebarOpen} onClose={() => setSidebarOpen(false)} />
         <section className={styles.content}>{children}</section>
       </div>
     </main>

@@ -9,7 +9,7 @@ const user = {
 
 export default function CasilleroDashboardHome() {
   return (
-    <>
+    <div className={styles.wrapper}>
       <div className={styles.summaryGrid}>
         <CasilleroDashboardCard title={user.greeting} icon="User">
           <p>Información de Usuario:</p>
@@ -26,6 +26,6 @@ export default function CasilleroDashboardHome() {
       <CasilleroDashboardCard title="Anuncios" icon="Publicidad" wide>
         <div className={styles.announcementBody} />
       </CasilleroDashboardCard>
-    </>
+    </div>
   );
 }

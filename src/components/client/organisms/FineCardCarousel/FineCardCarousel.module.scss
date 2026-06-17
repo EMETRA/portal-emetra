@@ -1,0 +1,76 @@
+// FineCardCarousel.module.scss (full updated file for context)
+.wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.viewport {
+    flex: 1;
+    overflow: hidden;
+}
+
+.track {
+    display: flex;
+    transition: transform 0.35s ease;
+    will-change: transform;
+}
+
+.noTransition {
+    transition: none;
+}
+
+.page {
+    flex: 0 0 100%;
+    min-width: 0;
+}
+
+.grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.5rem;
+}
+
+@media (max-width: 900px) {
+    .grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1rem;
+    }
+}
+
+.gridMobile {
+    grid-template-columns: 1fr !important;
+    flex: 1;
+    width: 100%;
+}
+
+.arrow {
+    background: none;
+    border: none;
+    color: #6dbf6c;
+    font-size: 5rem;
+    cursor: pointer;
+    padding: 0 0.5rem;
+    flex-shrink: 0;
+
+    &:disabled {
+        opacity: 0.3;
+        cursor: default;
+    }
+}
+
+.counter {
+    position: absolute;
+    bottom: -1.75rem;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 0.85rem;
+    color: #6b6b6b;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .track {
+        transition: none;
+    }
+}

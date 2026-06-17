@@ -1,0 +1,32 @@
+.card {
+    background: #fff;
+    border-radius: 0.75rem;
+    padding: 1.25rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    min-height: 12rem;
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    font-weight: 700;
+    color: #1b2a6b;
+}
+
+.meta {
+    margin-top: auto;
+    color: #6b6b6b;
+    font-size: 0.85rem;
+}
+
+.detailLink {
+    align-self: flex-end;
+    background: none;
+    border: none;
+    color: #1b2a6b;
+    cursor: pointer;
+    font-size: 0.85rem;
+    font-weight: 600;
+}

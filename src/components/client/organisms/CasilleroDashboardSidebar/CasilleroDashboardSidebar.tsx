@@ -16,10 +16,10 @@ type Props = {
 };
 
 const items = [
-  { label: "Listado de placas", href: "/casillero/dashboard/placas" },
+  { label: "Listado de placas", href: "/casillero/dashboard/multas" }, // TODO: update with real path
   { label: "Mis remisiones", href: "/casillero/dashboard/multas" },
-  { label: "Historial", href: "/casillero/dashboard/historial" },
-  { label: "Buzón", href: "/casillero/dashboard/buzon" },
+  { label: "Historial", href: "/casillero/dashboard/multas" }, // TODO: update with real path
+  { label: "Buzón", href: "/casillero/dashboard/multas" }, // TODO: update with real path
 ];
 
 export default function CasilleroDashboardSidebar({ open, onClose }: Props) {

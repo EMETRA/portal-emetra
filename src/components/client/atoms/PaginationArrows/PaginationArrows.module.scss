@@ -1,0 +1,28 @@
+.pagination {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1.25rem;
+    margin-top: 1.5rem;
+}
+
+.arrow {
+    background: none;
+    border: none;
+    color: #6dbf6c;
+    font-size: 1.75rem;
+    line-height: 1;
+    cursor: pointer;
+    padding: 0 0.25rem;
+
+    &:disabled {
+        opacity: 0.3;
+        cursor: default;
+    }
+}
+
+.label {
+    color: #6b6b6b;
+    font-size: 0.85rem;
+    font-weight: 600;
+}

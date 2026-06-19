@@ -10,7 +10,7 @@ interface FineCardCarouselProps {
 }
 
 export default function FineCardCarousel({ fines, onViewDetail }: FineCardCarouselProps) {
-    const isMobile = useMediaQuery("(max-width: 900px)");
+    const isMobile = useMediaQuery("(max-width: 768px)");
     const isTablet = useMediaQuery("(max-width: 1400px)");
 
     const itemsPerPage = isTablet ? 4 : 3;

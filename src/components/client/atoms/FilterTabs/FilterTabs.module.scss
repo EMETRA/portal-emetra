@@ -3,7 +3,7 @@
     gap: 0.75rem;
     overflow-x: auto;
     padding-bottom: 0.25rem;
-    margin-bottom: 1.5rem;
+    width: 100%;
 
     &::-webkit-scrollbar {
         display: none;
@@ -25,19 +25,4 @@
     border-color: #6dbf6c;
     color: #fff;
     font-weight: 600;
-}
-
-.tabsWrapper {
-    position: relative;
-}
-
-.tabsWrapper::after {
-    content: "";
-    position: absolute;
-    top: 0;
-    right: 0;
-    bottom: 0;
-    width: 2rem;
-    // background: linear-gradient(to right, transparent, #f5f5f5);
-    pointer-events: none;
 }

@@ -5,14 +5,15 @@
     margin-bottom: 2.5rem;
 }
 
+// tablet
 @media (max-width: 1400px) {
     .topGrid {
         gap: 1.25rem;
         margin-bottom: 1.5rem;
-        margin-top: -1.5rem;
     }
 }
 
+// mobile
 @media (max-width: 768px) {
     .topGrid {
         grid-template-columns: 1fr;
@@ -23,8 +24,21 @@
     background: #fff;
     border-radius: 1.25rem;
     padding: 1.75rem;
-    box-shadow: 0 2px 10px rgba(27, 42, 107, 0.06);
-    // margin-bottom: 1.5rem; // the extra bottom space they asked for
-    // overflow: hidden;
-    // margin-bottom: 0.5rem; 
+    box-shadow: 0 0 12px rgba(27, 42, 107, 0.12);
+    margin-bottom: 1.5rem;
+}
+
+.tabsRow {
+    display: flex;
+    justify-content: flex-start; // mobile: tabs start from left so scroll makes sense
+    margin-bottom: 1.5rem;
+    min-width: 0;
+    overflow: hidden;
+}
+
+
+@media (min-width: 768px) {
+    .tabsRow {
+        justify-content: flex-end;
+    }
 }

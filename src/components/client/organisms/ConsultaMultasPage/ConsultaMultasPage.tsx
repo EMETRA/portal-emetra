@@ -28,7 +28,7 @@ const fines: Fine[] = [
 
 export default function ConsultaMultasPage() {
     const router = useRouter();
-    const isMobile = useMediaQuery("(max-width: 520px)");
+    const isMobile = useMediaQuery("(max-width: 768px)");
     const [filter, setFilter] = useState<"todas" | FineCategory>("todas");
     const [selectedPlate, setSelectedPlate] = useState(vehicle.plate);
 
@@ -58,8 +58,8 @@ export default function ConsultaMultasPage() {
         router.push(`/casillero/dashboard/multas/${fineId}`);
     };
 
-    return (
-        <div className={styles.wrapper}>
+return (
+    <div className={styles.wrapper}>
         <SatTitle>Consulta de Multas</SatTitle>
 
         <div className={styles.topGrid}>
@@ -80,11 +80,19 @@ export default function ConsultaMultasPage() {
             />
         </div>
 
-        <FineFilterTabs value={filter} onChange={setFilter} />
-        {isMobile && (
-            <FineListSummaryBar count={filteredFines.length} total={filteredTotal} />
-        )}
-        <FineCardCarousel fines={filteredFines} onViewDetail={handleViewDetail} />
+        <div className={styles.listCard}>
+            <div className={styles.tabsRow}>
+                <FineFilterTabs value={filter} onChange={setFilter} />
+            </div>
+
+            {isMobile && (
+                <FineListSummaryBar count={filteredFines.length} total={filteredTotal} />
+            )}
+
+            <div className={styles.carouselSection}>
+                <FineCardCarousel fines={filteredFines} onViewDetail={handleViewDetail} />
+            </div>
         </div>
-    );
+    </div>
+);
 }

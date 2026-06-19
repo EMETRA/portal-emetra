@@ -10,8 +10,8 @@ interface FineCardCarouselProps {
 }
 
 export default function FineCardCarousel({ fines, onViewDetail }: FineCardCarouselProps) {
-    const isMobile = useMediaQuery("(max-width: 520px)");
-    const isTablet = useMediaQuery("(max-width: 900px)");
+    const isMobile = useMediaQuery("(max-width: 900px)");
+    const isTablet = useMediaQuery("(max-width: 1400px)");
 
     const itemsPerPage = isTablet ? 4 : 3;
 
@@ -40,60 +40,64 @@ export default function FineCardCarousel({ fines, onViewDetail }: FineCardCarous
     }, [itemsPerPage, fines.length, isMobile]);
 
     return (
-        <div className={styles.wrapper}>
-        {!isMobile && (
-            <button
-            type="button"
-            className={styles.arrow}
-            onClick={() => setPage((p) => Math.max(0, p - 1))}
-            disabled={page === 0}
-            aria-label="Anterior"
-            >
-            ‹
-            </button>
-        )}
+        <div className={styles.carouselWrapper}>
+            <div className={styles.wrapper}>
+                {!isMobile && (
+                    <button
+                        type="button"
+                        className={styles.arrow}
+                        onClick={() => setPage((p) => Math.max(0, p - 1))}
+                        disabled={page === 0}
+                        aria-label="Anterior"
+                    >
+                        ‹
+                    </button>
+                )}
 
-        {isMobile ? (
-            <div className={`${styles.grid} ${styles.gridMobile}`}>
-            {fines.map((fine) => (
-                <FineCard key={fine.id} fine={fine} onViewDetail={onViewDetail} />
-            ))}
-            </div>
-        ) : (
-            <div className={styles.viewport}>
-            <div
-                className={`${styles.track} ${skipTransition ? styles.noTransition : ""}`}
-                style={{ transform: `translateX(-${page * 100}%)` }}
-            >
-                {pages.map((pageFines, idx) => (
-                <div className={styles.page} key={idx}>
-                    <div className={styles.grid}>
-                    {pageFines.map((fine) => (
-                        <FineCard key={fine.id} fine={fine} onViewDetail={onViewDetail} />
-                    ))}
+                {isMobile ? (
+                    <div className={`${styles.grid} ${styles.gridMobile}`}>
+                        {fines.map((fine) => (
+                            <FineCard key={fine.id} fine={fine} onViewDetail={onViewDetail} />
+                        ))}
                     </div>
-                </div>
-                ))}
-            </div>
-            </div>
-        )}
+                ) : (
+                    <div className={styles.viewport}>
+                        <div
+                            className={`${styles.track} ${skipTransition ? styles.noTransition : ""}`}
+                            style={{ transform: `translateX(-${page * 100}%)` }}
+                        >
+                            {pages.map((pageFines, idx) => (
+                                <div className={styles.page} key={idx}>
+                                    <div className={styles.grid}>
+                                        {pageFines.map((fine) => (
+                                            <FineCard key={fine.id} fine={fine} onViewDetail={onViewDetail} />
+                                        ))}
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                )}
 
-        {!isMobile && (
-            <button
-            type="button"
-            className={styles.arrow}
-            onClick={() => setPage((p) => Math.min(totalPages - 1, p + 1))}
-            disabled={page >= totalPages - 1}
-            aria-label="Siguiente"
-            >
-            ›
-            </button>
-        )}
-        {!isMobile && (
-        <p className={styles.counter}>
-            Mostrando {Math.min((page + 1) * itemsPerPage, fines.length)} de {fines.length}
-        </p>
-        )}
+                {!isMobile && (
+                    <button
+                        type="button"
+                        className={styles.arrow}
+                        onClick={() => setPage((p) => Math.min(totalPages - 1, p + 1))}
+                        disabled={page >= totalPages - 1}
+                        aria-label="Siguiente"
+                    >
+                        ›
+                    </button>
+                )}
+            </div>
+
+            {/* Counter is now OUTSIDE .wrapper — normal flow, no absolute positioning */}
+            {!isMobile && (
+                <p className={styles.counter}>
+                    Mostrando {Math.min((page + 1) * itemsPerPage, fines.length)} de {fines.length}
+                </p>
+            )}
         </div>
     );
 }

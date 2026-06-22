@@ -1,0 +1,155 @@
+// AssociateErrorModal.module.scss
+.overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.55);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1.5rem;
+    z-index: 1000;
+}
+
+.panel {
+    position: relative;
+    background: #fff;
+    border-radius: 1.25rem;
+    padding: 2rem;
+    max-width: 1200px;
+    width: 100%;
+    max-height: 90vh;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+}
+
+.closeButton {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    width: 2rem;
+    height: 2rem;
+    border-radius: 50%;
+    border: none;
+    background: #e2e2e2;
+    color: #555;
+    font-size: 1.25rem;
+    line-height: 1;
+    cursor: pointer;
+}
+
+.errorIcon {
+    width: 3rem;
+    height: 3rem;
+    border-radius: 50%;
+    background: #e04444;
+    color: #fff;
+    font-size: 1.5rem;
+    font-weight: 900;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.title {
+    color: #1b2a6b;
+    font-size: 1.1rem;
+    font-weight: 700;
+    text-align: center;
+    margin: 0;
+}
+
+.subtitle {
+    color: #6b6b6b;
+    font-size: 0.9rem;
+    text-align: left;
+    width: 100%;
+    margin: 0;
+}
+
+.textarea {
+    width: 100%;
+    background: #f3f3f3;
+    border: none;
+    border-radius: 0.75rem;
+    padding: 1rem;
+    font-size: 0.95rem;
+    color: #1b2a6b;
+    resize: none;
+
+    &:focus {
+        outline: none;
+        box-shadow: 0 0 0 2px rgba(109, 191, 108, 0.4);
+    }
+}
+
+.dropzone {
+    width: 100%;
+    border: 2px dashed #1b2a6b;
+    border-radius: 0.75rem;
+    background: #eef0fb;
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    cursor: pointer;
+    transition: background 0.15s;
+
+    &:hover, &.dragging {
+        background: #dde1f8;
+    }
+}
+
+.hiddenInput {
+    display: none;
+}
+
+.uploadIcon {
+    margin-bottom: 0.25rem;
+}
+
+.dropText {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #1b2a6b;
+    text-align: center;
+    margin: 0;
+}
+
+.clickLink {
+    color: #6dbf6c;
+    font-weight: 700;
+    text-decoration: underline;
+}
+
+.maxSize {
+    color: #8a8a8a;
+    font-size: 0.8rem;
+    text-align: center;
+    margin: 0;
+}
+
+.fileName {
+    color: #1b2a6b;
+    font-size: 0.85rem;
+    font-weight: 600;
+    margin: 0;
+}
+
+.sendButton {
+    background: #6dbf6c;
+    color: #fff;
+    border: none;
+    border-radius: 999px;
+    padding: 0.85rem 2rem;
+    font-weight: 600;
+    cursor: pointer;
+    width: 100%;
+    max-width: 220px;
+
+    &:hover { opacity: 0.9; }
+}

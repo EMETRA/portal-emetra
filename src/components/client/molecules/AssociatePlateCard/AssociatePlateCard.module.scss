@@ -1,0 +1,83 @@
+// AssociatePlateCard.module.scss
+.card {
+    margin-bottom: 1.5rem;
+}
+
+.fields {
+    display: grid;
+    grid-template-columns: 1fr 1fr auto;
+    gap: 1.5rem;
+    align-items: end;
+}
+
+.field {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.label {
+    font-weight: 600;
+    font-size: 0.9rem;
+    color: #1b2a6b;
+}
+
+.nitAndButton {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    align-items: flex-start;
+}
+
+.nit {
+    font-size: 0.9rem;
+    color: #1b2a6b;
+    margin: 0;
+    white-space: nowrap;
+}
+
+.asociarButton {
+    background: #6dbf6c;
+    color: #fff;
+    border: none;
+    border-radius: 999px;
+    padding: 0.75rem 1.75rem;
+    font-weight: 600;
+    cursor: pointer;
+    white-space: nowrap;
+
+    &:hover {
+        opacity: 0.9;
+    }
+}
+
+// tablet
+@media (max-width: 1400px) {
+    .fields {
+        grid-template-columns: 1fr 1fr 1fr;
+    }
+}
+
+// mobile
+@media (max-width: 768px) {
+    .fields {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+
+    .nitAndButton {
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+        width: 100%;
+    }
+
+    .asociarButton {
+        width: 100%;
+    }
+
+    .nitAndButton {
+        flex-direction: column;
+        align-items: stretch;
+    }
+}

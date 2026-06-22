@@ -11,6 +11,7 @@ import styles from "./ConsultaMultasPage.module.scss";
 import { useMediaQuery } from "@/hooks/useMediaQuery";
 import FineListSummaryBar from "../../molecules/FineListSummaryBar/FineListSummaryBar";
 import { useRouter } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 
 // TODO: replace with the real query, e.g. useConsultarMultasPorPlaca
 const vehicle = { plate: "P111BBB", model: "Toyota corolla", color: "Gris", year: 2020 };
@@ -29,8 +30,10 @@ const fines: Fine[] = [
 export default function ConsultaMultasPage() {
     const router = useRouter();
     const isMobile = useMediaQuery("(max-width: 768px)");
+    const searchParams = useSearchParams();
+    const preselectedPlate = searchParams.get("plate") ?? vehicle.plate;
     const [filter, setFilter] = useState<"todas" | FineCategory>("todas");
-    const [selectedPlate, setSelectedPlate] = useState(vehicle.plate);
+    const [selectedPlate, setSelectedPlate] = useState(preselectedPlate);
 
     const filteredFines = useMemo(
         () => (filter === "todas" ? fines : fines.filter((f) => f.category === filter)),

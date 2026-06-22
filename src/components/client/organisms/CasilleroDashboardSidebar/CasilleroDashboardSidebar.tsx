@@ -16,7 +16,7 @@ type Props = {
 };
 
 const items = [
-  { label: "Listado de placas", href: "/casillero/dashboard/multas" }, // TODO: update with real path
+  { label: "Listado de placas", href: "/casillero/dashboard/placas" },
   { label: "Mis remisiones", href: "/casillero/dashboard/multas" },
   { label: "Historial", href: "/casillero/dashboard/historial" },
   { label: "Buzón", href: "/casillero/dashboard/multas" }, // TODO: update with real path

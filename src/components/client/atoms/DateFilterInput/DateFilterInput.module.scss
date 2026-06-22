@@ -1,0 +1,41 @@
+.field {
+    margin: 1.25rem 0 1rem;
+}
+
+.label {
+    display: block;
+    font-weight: 700;
+    color: #1b2a6b;
+    font-size: 0.9rem;
+    margin-bottom: 0.5rem;
+}
+
+.wrapper {
+    position: relative;
+    background: #f3f3f3;
+    border-radius: 0.75rem;
+    cursor: pointer;
+}
+
+.input {
+    width: 100%;
+    background: transparent;
+    border: none;
+    padding: 0.85rem 2.5rem 0.85rem 1.1rem;
+    font-size: 0.95rem;
+    color: #1b2a6b;
+    cursor: pointer;
+
+    &::-webkit-calendar-picker-indicator {
+        opacity: 0;
+    }
+}
+
+.icon {
+    position: absolute;
+    right: 1.1rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #1b2a6b;
+    pointer-events: none;
+}

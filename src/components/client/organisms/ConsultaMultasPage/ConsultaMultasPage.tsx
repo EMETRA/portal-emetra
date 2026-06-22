@@ -10,6 +10,7 @@ import { Fine, FineCategory, FINE_CATEGORIES } from "@/types/fines";
 import styles from "./ConsultaMultasPage.module.scss";
 import { useMediaQuery } from "@/hooks/useMediaQuery";
 import FineListSummaryBar from "../../molecules/FineListSummaryBar/FineListSummaryBar";
+import { useRouter } from "next/navigation";
 
 // TODO: replace with the real query, e.g. useConsultarMultasPorPlaca
 const vehicle = { plate: "P111BBB", model: "Toyota corolla", color: "Gris", year: 2020 };
@@ -26,7 +27,8 @@ const fines: Fine[] = [
 ];
 
 export default function ConsultaMultasPage() {
-    const isMobile = useMediaQuery("(max-width: 520px)");
+    const router = useRouter();
+    const isMobile = useMediaQuery("(max-width: 768px)");
     const [filter, setFilter] = useState<"todas" | FineCategory>("todas");
     const [selectedPlate, setSelectedPlate] = useState(vehicle.plate);
 
@@ -52,8 +54,12 @@ export default function ConsultaMultasPage() {
 
     const totalAmount = fines.reduce((sum, f) => sum + f.amount, 0);
 
-    return (
-        <div className={styles.wrapper}>
+    const handleViewDetail = (fineId: string) => {
+        router.push(`/casillero/dashboard/multas/${fineId}`);
+    };
+
+return (
+    <div className={styles.wrapper}>
         <SatTitle>Consulta de Multas</SatTitle>
 
         <div className={styles.topGrid}>
@@ -74,11 +80,19 @@ export default function ConsultaMultasPage() {
             />
         </div>
 
-        <FineFilterTabs value={filter} onChange={setFilter} />
-        {isMobile && (
-            <FineListSummaryBar count={filteredFines.length} total={filteredTotal} />
-        )}
-        <FineCardCarousel fines={filteredFines} />
+        <div className={styles.listCard}>
+            <div className={styles.tabsRow}>
+                <FineFilterTabs value={filter} onChange={setFilter} />
+            </div>
+
+            {isMobile && (
+                <FineListSummaryBar count={filteredFines.length} total={filteredTotal} />
+            )}
+
+            <div className={styles.carouselSection}>
+                <FineCardCarousel fines={filteredFines} onViewDetail={handleViewDetail} />
+            </div>
         </div>
-    );
+    </div>
+);
 }

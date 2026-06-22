@@ -1,0 +1,99 @@
+.card {
+    margin-bottom: 1.5rem;
+}
+
+.topGrid {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 2rem;
+    align-items: start;
+}
+
+.leftCol {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.codeRow {
+    display: flex;
+    gap: 2rem;
+}
+
+.code {
+    color: #1b2a6b;
+    font-size: 1.25rem;
+    font-weight: 700;
+    margin: 0;
+}
+
+.rightCol {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    justify-content: space-between;
+    min-height: 8rem;
+}
+
+.totalLabel {
+    color: #1b2a6b;
+    font-size: 1.25rem;
+    font-weight: 700;
+}
+
+.verImagenButton,
+.verImagenButtonMobile {
+    background-color: #6dbf6c;
+    color: #fff;
+    border: none;
+    border-radius: 999px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.verImagenButton {
+    padding: 0.75rem 1.75rem;
+    white-space: nowrap;
+}
+
+.verImagenButtonMobile {
+    width: 100%;
+    padding: 0.85rem;
+    margin-top: 1rem;
+}
+
+.description {
+    color: #1b2a6b;
+    font-size: 1rem;
+    margin: 0;
+}
+
+.meta,
+.article {
+    color: #6b6b6b;
+    font-size: 0.9rem;
+    margin: 0;
+}
+
+.dot {
+    margin: 0 0.4rem;
+}
+
+.mobileBadgeRow {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin: 0.6rem 0 0.75rem;
+}
+
+.amount {
+    color: #1b2a6b;
+    font-size: 1.1rem;
+    font-weight: 700;
+}
+
+.mobileBody {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+}

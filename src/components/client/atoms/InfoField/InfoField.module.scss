@@ -1,0 +1,20 @@
+.field {
+    margin-bottom: 1rem;
+
+    &:last-child {
+        margin-bottom: 0;
+    }
+}
+
+.label {
+    font-weight: 700;
+    color: #1b2a6b;
+    font-size: 0.9rem;
+    margin: 0 0 0.15rem;
+}
+
+.value {
+    color: #6b6b6b;
+    font-size: 0.9rem;
+    margin: 0;
+}

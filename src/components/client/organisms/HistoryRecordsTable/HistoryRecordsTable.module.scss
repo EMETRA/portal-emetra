@@ -1,0 +1,61 @@
+.wrapper {
+    width: 100%;
+    // overflow-x: auto;
+}
+
+.table {
+    width: 100%;
+    border-collapse: collapse;
+    // min-width: 580px;
+}
+
+@media (max-width: 768px) {
+    .wrapper {
+        overflow-x: auto;
+    }
+
+    .table {
+        min-width: 520px;
+    }
+}
+
+
+.table thead tr {
+    background: #b9d94a;
+}
+
+.table th {
+    text-align: left;
+    color: #1b2a6b;
+    font-weight: 700;
+    padding: 0.9rem 1.25rem;
+}
+
+.table th:first-child { border-radius: 0.75rem 0 0 0; }
+.table th:last-child  { border-radius: 0 0.75rem 0 0; }
+
+.table td {
+    padding: 1rem 1.25rem;
+    border-bottom: 1px solid #ececec;
+    color: #4a4a4a;
+    font-size: 0.95rem;
+}
+
+.table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+.downloadLink {
+    background: none;
+    border: none;
+    color: #1b2a6b;
+    font-weight: 600;
+    cursor: pointer;
+    font-size: 0.9rem;
+}
+
+.empty {
+    text-align: center;
+    color: #8a8a8a;
+    padding: 2rem 0;
+}

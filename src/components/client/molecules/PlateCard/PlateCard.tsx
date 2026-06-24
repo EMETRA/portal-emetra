@@ -16,18 +16,29 @@ export default function PlateCard({
     showDetail = true,
     onDelete,
     onViewDetail,
-    }: PlateCardProps) {
+}: PlateCardProps) {
     return (
-        <article className={styles.card}>
+        <article
+        className={`${styles.card} ${!showDetail ? styles.clickable : ""}`}
+        onClick={!showDetail ? onViewDetail : undefined} // only mobile
+        >
         <button
             type="button"
             className={styles.deleteButton}
-            onClick={onDelete}
+            onClick={(e) => {
+            e.stopPropagation();
+            onDelete();
+            }}
             aria-label="Eliminar placa"
         >
             <svg width="18" height="20" viewBox="0 0 18 20" fill="none">
-            <path d="M1 5h16M6 5V3h6v2M7 9v6M11 9v6M2 5l1 13a1 1 0 001 1h10a1 1 0 001-1L16 5H2z"
-                stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+            <path
+                d="M1 5h16M6 5V3h6v2M7 9v6M11 9v6M2 5l1 13a1 1 0 001 1h10a1 1 0 001-1L16 5H2z"
+                stroke="currentColor"
+                strokeWidth="1.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+            />
             </svg>
         </button>
 
@@ -40,7 +51,11 @@ export default function PlateCard({
         </p>
 
         {showDetail && (
-            <button type="button" className={styles.detailLink} onClick={onViewDetail}>
+            <button
+            type="button"
+            className={styles.detailLink}
+            onClick={onViewDetail} 
+            >
             ver detalle +
             </button>
         )}

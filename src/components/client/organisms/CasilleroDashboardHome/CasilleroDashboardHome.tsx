@@ -19,7 +19,7 @@ export default function CasilleroDashboardHome() {
 
         <CasilleroDashboardCard title="Notificaciones" icon="Notification">
           <h2>Tienes notificaciones nuevas en tu buzón</h2>
-          <a href="#">ir a buzón +</a>
+          <a href="/casillero/buzon">ir a buzón +</a>
         </CasilleroDashboardCard>
       </div>
 

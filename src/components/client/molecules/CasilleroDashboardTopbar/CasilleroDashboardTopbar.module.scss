@@ -39,6 +39,11 @@
   svg {
     width: 18px;
     height: 18px;
+    cursor: pointer;
+
+    &:hover {
+      opacity: 0.8;
+    }
   }
 }
 

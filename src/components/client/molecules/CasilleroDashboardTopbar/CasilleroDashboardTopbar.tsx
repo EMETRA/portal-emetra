@@ -1,6 +1,7 @@
 import { Icon } from "@/components/server/atoms";
 import CasilleroSearchBox from "@/components/client/molecules/CasilleroSearchBox/CasilleroSearchBox";
 import styles from "./CasilleroDashboardTopbar.module.scss";
+import { useRouter } from "next/navigation";
 
 type Props = {
   userName: string;
@@ -9,6 +10,7 @@ type Props = {
 };
 
 export default function CasilleroDashboardTopbar({ userName, sidebarOpen, onMenuClick }: Props) {
+  const router = useRouter();
   return (
     <div className={styles.topbar}>
       <button className={styles.menuButton} type="button" onClick={onMenuClick} aria-label={sidebarOpen ? "Cerrar menú" : "Abrir menú"}>
@@ -19,9 +21,9 @@ export default function CasilleroDashboardTopbar({ userName, sidebarOpen, onMenu
       </div>
       <h1>Casillero Electrónico</h1>
       <div className={styles.actions}>
-        <Icon name="Notification" />
-        <Icon name="Home" />
-        <Icon name="User" />
+        <Icon name="Notification" onClick={() => router.push("/casillero/buzon")} aria-label="Ir a buzón"/>
+        <Icon name="Home" onClick={() => router.push("/casillero/dashboard")} aria-label="Ir a inicio"/>
+        <Icon name="User" onClick={() => router.push("/casillero/user-profile")} aria-label="Ir a perfil"/>
         <span>{userName}</span>
         <Icon name="Down" />
       </div>

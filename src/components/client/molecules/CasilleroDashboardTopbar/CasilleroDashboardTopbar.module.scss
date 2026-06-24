@@ -99,3 +99,26 @@
     }
   }
 }
+
+.mobileHomeButton {
+  display: none; 
+}
+
+@media (max-width: 520px) {
+  .topbar {
+    grid-template-columns: auto 1fr auto auto;
+  }
+
+  .mobileHomeButton {
+    display: inline-flex;
+    border: 0;
+    background: transparent;
+    color: #fff;
+    cursor: pointer;
+
+    svg {
+      width: 22px;
+      height: 22px;
+    }
+  }
+}

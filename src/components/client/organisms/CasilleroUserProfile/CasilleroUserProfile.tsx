@@ -7,6 +7,7 @@ import SatTitle from "@/components/atoms/SatTitle/SatTitle";
 import CardGeneral from "@/components/client/atoms/CardGeneral/CardGeneral";
 import Text from "@/components/atoms/Text/Text";
 import { Button, Input } from "@/components/server/atoms";
+import { editProfileSchema } from "./editProfile.schema";
 import styles from "./CasilleroUserProfile.module.scss";
 
 const mockUser = {
@@ -31,8 +32,14 @@ export default function CasilleroUserProfile() {
     setIsEditing(!isEditing);
   };
 
-  const handleSave = () => {
-    setIsEditing(false);
+  const handleSave = async  () => {
+    try {
+      await editProfileSchema.validate({ email, phone });
+      alert(`Perfil actualizado correctamente: ${email} ${phone}`);
+      setIsEditing(false);
+    } catch (error) {
+      alert((error as Error).message);
+    }
   };
 
   const handleDeactivate = () => {

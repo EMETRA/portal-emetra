@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from 'react'
+import React, { useMemo, useState } from 'react'
 import {
     Table,
     TableHead,
@@ -16,12 +16,16 @@ import { Button, Input } from "@/components/server/atoms";
 import { IconButton } from "@/components/atoms/IconButton";
 import { Trash } from "lucide-react";
 import { useMediaQuery } from "@/hooks/useMediaQuery";
+import PaginationArrows from "@/components/client/atoms/PaginationArrows/PaginationArrows";
 import { newEmployeeSchema } from "./newEmployee.schema";
 import styles from "./CasilleroEmployeeManagement.module.scss";
+
+const ITEMS_PER_PAGE = 5;
 
 export default function CasilleroEmployeeManagement() {
   const [nit, setNit] = useState("");
   const [dpi, setDpi] = useState("");
+  const [page, setPage] = useState(0);
 
   const isMobile = useMediaQuery("(max-width: 426px)");
 
@@ -101,6 +105,24 @@ export default function CasilleroEmployeeManagement() {
     },
   ]
 
+  const totalEmployees = DUMMY_DATA.length;
+  const totalPages = Math.max(1, Math.ceil(totalEmployees / ITEMS_PER_PAGE));
+
+  const paginatedEmployees = useMemo(() => {
+    const start = page * ITEMS_PER_PAGE;
+    return DUMMY_DATA.slice(start, start + ITEMS_PER_PAGE);
+  }, [page]);
+
+  const visibleUpTo = Math.min((page + 1) * ITEMS_PER_PAGE, totalEmployees);
+
+  const handlePrevPage = () => {
+    setPage((currentPage) => Math.max(0, currentPage - 1));
+  };
+
+  const handleNextPage = () => {
+    setPage((currentPage) => Math.min(totalPages - 1, currentPage + 1));
+  };
+
   const renderEmployeeInfo = (key: string, value: string) => {
     return (
       <div className={styles.employeeItemInfo}>
@@ -148,7 +170,7 @@ export default function CasilleroEmployeeManagement() {
           <h2 className={styles.title}>Empleados</h2>
           {isMobile ? (
             <div className={styles.employeesList}>
-              {DUMMY_DATA.map((employee) => (
+              {paginatedEmployees.map((employee) => (
                 <div key={employee.id} className={styles.employeeItem}>
                   <div className={styles.employeeItemHeader}>
                     {renderEmployeeInfo("NIT", employee.nit)}
@@ -170,7 +192,7 @@ export default function CasilleroEmployeeManagement() {
                 </TableRow>
               </TableHead>
               <TableBody>
-                {DUMMY_DATA.map((employee) => (
+                {paginatedEmployees.map((employee) => (
                   <TableRow key={employee.id} className={styles.row}>
                     <TableCell>{employee.nit}</TableCell>
                     <TableCell>{employee.dpi}</TableCell>
@@ -183,6 +205,18 @@ export default function CasilleroEmployeeManagement() {
               </TableBody>
             </Table>
           )}
+
+          <div className={styles.paginationFooter}>
+            <PaginationArrows
+              page={page}
+              totalPages={totalPages}
+              onPrev={handlePrevPage}
+              onNext={handleNextPage}
+            />
+            <Text className={styles.paginationSummary}>
+              Mostrando {visibleUpTo} de {totalEmployees}
+            </Text>
+          </div>
         </CardGeneral>
       </div>
     </div>

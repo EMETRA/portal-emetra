@@ -3,7 +3,7 @@
 .topbar {
   height: 40px;
   display: grid;
-  grid-template-columns: auto auto 1fr auto;
+  grid-template-columns: auto auto auto 1fr auto;
   align-items: center;
   gap: 14px;
   padding: 0 28px;
@@ -47,10 +47,68 @@
   }
 }
 
+.modeSwitcher {
+  display: flex;
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 999px;
+  padding: 2px;
+  gap: 2px;
+}
+
+.modeBtn {
+  padding: 3px 12px;
+  border: none;
+  border-radius: 999px;
+  background: transparent;
+  color: rgba(255, 255, 255, 0.65);
+  font-size: 0.7rem;
+  font-weight: 700;
+  cursor: pointer;
+  white-space: nowrap;
+
+  &:hover:not(.modeBtnActive) {
+    color: #fff;
+  }
+}
+
+.modeBtnActive {
+  background: #fff;
+  color: #1b2a6b;
+}
+
+.mobileModeToggle {
+  display: none;
+}
+
+.mobileModeBtn {
+  width: 22px;
+  height: 22px;
+  border: none;
+  border-radius: 50%;
+  background: transparent;
+  color: rgba(255, 255, 255, 0.65);
+  font-size: 0.65rem;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.mobileModeBtnActive {
+  background: #fff;
+  color: #1b2a6b;
+}
+
+.mobileHomeButton {
+  display: none;
+}
+
 .searchButton {
   display: none;
 }
 
+//
 @media (max-width: 900px) {
   .topbar {
     padding: 0 14px;
@@ -63,18 +121,30 @@
   .actions span {
     display: none;
   }
+
+  .modeBtn {
+    padding: 3px 8px;
+    font-size: 0.62rem;
+  }
 }
 
+// Mobile
 @media (max-width: 520px) {
   .topbar {
     height: 40px;
-    grid-template-columns: auto 1fr auto;
-    gap: 12px;
+    // menu | h1 | mobileHomeButton | mobileModeToggle | searchButton
+    grid-template-columns: auto 1fr auto auto auto;
+    gap: 8px;
     padding: 0 14px;
 
     h1 {
       font-size: 0.82rem;
     }
+  }
+
+  // hide desktop elements
+  .modeSwitcher {
+    display: none;
   }
 
   .actions {
@@ -85,9 +155,9 @@
     display: none;
   }
 
-  .searchButton {
+  // show mobile elements
+  .mobileHomeButton {
     display: inline-flex;
-    justify-self: end;
     border: 0;
     background: transparent;
     color: #fff;
@@ -98,19 +168,18 @@
       height: 22px;
     }
   }
-}
 
-.mobileHomeButton {
-  display: none; 
-}
-
-@media (max-width: 520px) {
-  .topbar {
-    grid-template-columns: auto 1fr auto auto;
+  .mobileModeToggle {
+    display: flex;
+    background: rgba(255, 255, 255, 0.15);
+    border-radius: 999px;
+    padding: 2px;
+    gap: 2px;
   }
 
-  .mobileHomeButton {
+  .searchButton {
     display: inline-flex;
+    justify-self: end;
     border: 0;
     background: transparent;
     color: #fff;

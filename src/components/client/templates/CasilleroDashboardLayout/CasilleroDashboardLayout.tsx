@@ -26,7 +26,7 @@ export default function CasilleroDashboardLayout({ children }: Props) {
       <CasilleroDashboardTopbar
         userName={dummyUser.name}
         sidebarOpen={sidebarOpen}
-        onMenuClick={() => setSidebarOpen((open) => !open)}
+        onMenuClickAction={() => setSidebarOpen((open) => !open)}
       />
 
       <div className={styles.body}>

@@ -5,6 +5,7 @@ import SatTitle from "@/components/atoms/SatTitle/SatTitle";
 import CardGeneral from "@/components/client/atoms/CardGeneral/CardGeneral";
 import Text from "@/components/atoms/Text/Text";
 import { Button, Input } from "@/components/server/atoms";
+import { CasilleroPopUp } from "@/components/client/molecules/CasilleroPopUp/CasilleroPopUp";
 import styles from "./CasilleroDeleteAccount.module.scss";
 
 const confirmationMessage = "Eliminar mi cuenta";
@@ -13,8 +14,11 @@ export default function CasilleroDeleteAccount() {
   const [confirmMessage, setConfirmMessage] = useState("");
   const [password, setPassword] = useState("");
 
+  const [isPopUpOpen, setIsPopUpOpen] = useState(false);
+  const [popUpVariant, setPopUpVariant] = useState<"success" | "error" | "warning">("success");
+
   const handleDeleteAccount = () => {
-    if (confirmMessage !== confirmationMessage) {
+    if (confirmMessage.toLowerCase() !== confirmationMessage.toLowerCase()) {
       alert("El mensaje de confirmación no es correcto.");
       return;
     }
@@ -24,7 +28,8 @@ export default function CasilleroDeleteAccount() {
       return;
     }
 
-    console.log("Eliminar cuenta");
+    setPopUpVariant("success");
+    setIsPopUpOpen(true);
   };
 
   return (
@@ -85,6 +90,13 @@ export default function CasilleroDeleteAccount() {
           </Button>
         </div>
       </CardGeneral>
+      <CasilleroPopUp
+        isOpen={isPopUpOpen}
+        variant={popUpVariant}
+        title="Cuenta eliminada"
+        description="Tu cuenta ha sido eliminada correctamente."
+        onClose={() => setIsPopUpOpen(false)}
+      />
     </div>
   );
 }

@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import SatTitle from "@/components/atoms/SatTitle/SatTitle";
 import CardGeneral from "@/components/client/atoms/CardGeneral/CardGeneral";
 import { Button, Input } from "@/components/server/atoms";
+import { passwordSchema } from "@/schema/casillero";
 import styles from "./CasilleroChangePassword.module.scss";
 
 type View = "email" | "code" | "password";
@@ -14,7 +15,7 @@ export default function CasilleroChangePassword() {
   const [view, setView] = useState<View>("email");
   const [error, setError] = useState("");
 
-  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
     if (view === "email") {
@@ -32,6 +33,13 @@ export default function CasilleroChangePassword() {
     const formData = new FormData(event.currentTarget);
     const password = String(formData.get("change-password") ?? "");
     const confirmPassword = String(formData.get("change-confirm-password") ?? "");
+
+    try {
+      await passwordSchema.validate(password);
+    } catch (error) {
+      setError((error as Error).message);
+      return;
+    }
 
     if (password !== confirmPassword) {
       setError("Las contraseñas no coinciden.");

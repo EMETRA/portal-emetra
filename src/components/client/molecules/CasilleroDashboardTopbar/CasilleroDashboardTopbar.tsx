@@ -9,11 +9,11 @@ import { useModeStore } from "@/store/useModeStore";
 
 type Props = {
   userName: string;
-  sidebarOpen: boolean;
+  // sidebarOpen: boolean;
   onMenuClickAction: () => void;
 };
 
-export default function CasilleroDashboardTopbar({ userName, sidebarOpen, onMenuClickAction }: Props) {
+export default function CasilleroDashboardTopbar({ userName, onMenuClickAction }: Props) {
   const router = useRouter();
   const { mode, setMode } = useModeStore();
 

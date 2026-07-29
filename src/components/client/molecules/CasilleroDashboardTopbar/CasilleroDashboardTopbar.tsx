@@ -9,7 +9,7 @@ import { useModeStore } from "@/store/useModeStore";
 
 type Props = {
   userName: string;
-  // sidebarOpen: boolean;
+  sidebarOpen: boolean;
   onMenuClickAction: () => void;
 };
 

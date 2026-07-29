@@ -24,17 +24,17 @@ const PERSONAL_ITEMS = [
 ];
 
 const COMPANY_ITEMS = [
-    { label: "Remisiones empresa", href: "/casillero/dashboard/multas-empresa" },
-    { label: "Historial empresa", href: "/casillero/dashboard/historial-empresa" },
-    { label: "Conductores", href: "/casillero/dashboard/conductores" },
+    { label: "Listado de placas", href: "/casillero/dashboard/placas" },
+    { label: "Mis remisiones", href: "/casillero/dashboard/multas" },
+    { label: "Historial", href: "/casillero/dashboard/historial" },
     { label: "Buzón", href: "/casillero/buzon" },
-    { label: "Gestión de empresa", href: "/casillero/employee-management" },
+    { label: "Gestión de empleados", href: "/casillero/employee-management" },
 ];
 
 export default function CasilleroDashboardSidebar({ open, onClose }: Props) {
     const pathname = usePathname();
     const isMobile = useMediaQuery("(max-width: 520px)");
-    const { mode } = useModeStore(); // only reading, no setMode needed
+    const { mode } = useModeStore();
 
     const items = mode === "empresa" ? COMPANY_ITEMS : PERSONAL_ITEMS;
 

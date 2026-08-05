@@ -1,10 +1,11 @@
 .Alert {
-  margin: 1rem 0;
+  margin: 1rem;
   padding: 1rem;
   border: 1px solid #ffccc7;
   border-radius: 8px;
   background: #fff2f0;
   color: #a8071a;
+  overflow-x: auto;
 }
 
 .Title {

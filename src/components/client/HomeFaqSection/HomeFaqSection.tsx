@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { SectionTitle } from "@/components/server/molecules/SectionTitle";
 import { FAQQuestions } from "@/components/organisms/FAQ-Questions";
 import { Separator } from "@/components/atoms/Separator";
 import ServiceErrorAlert from "@/components/molecules/ServiceErrorAlert/ServiceErrorAlert";
@@ -48,9 +49,7 @@ export default function HomeFaqSection() {
 
   return (
     <>
-      <Separator>
-        <h1 className={classNames(styles.Title)}>Preguntas Frecuentes</h1>
-      </Separator>
+      <SectionTitle>Preguntas Frecuentes</SectionTitle>
       <section id="ayuda">
         {error ? (
           <ServiceErrorAlert

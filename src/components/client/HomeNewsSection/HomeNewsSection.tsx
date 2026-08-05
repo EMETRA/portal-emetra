@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Icon } from "@/components/server/atoms";
+import { SectionTitle } from "@/components/server/molecules/SectionTitle";
 import { NewCard } from "@/components/molecules/NewCard";
 import NewsCarrousel from "@/components/organisms/NewsCarrousel/NewsCarrousel";
 import { Separator } from "@/components/atoms/Separator";
@@ -64,12 +64,7 @@ export default function HomeNewsSection() {
 
   return (
     <>
-      <Separator>
-        <div className={classNames(styles.Heading)}>
-          <Icon name="Notification" className={classNames(styles.Icon)} />
-          <h1 className={classNames(styles.Title)}>ÚLTIMAS NOTICIAS</h1>
-        </div>
-      </Separator>
+      <SectionTitle iconName="Notification">ÚLTIMAS NOTICIAS</SectionTitle>
 
       {error ? (
         <ServiceErrorAlert title="Noticias no disponibles" message={error} />

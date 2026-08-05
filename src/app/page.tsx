@@ -2,6 +2,7 @@ import { Separator } from "@/components/atoms/Separator";
 import styles from "./page.module.css";
 import { Banner, BannerSlide, ServicesRow } from "@/components/organisms";
 import classNames from "classnames";
+import { SectionTitle } from "@/components/server/molecules/SectionTitle";
 import MultimediaCarrousel from "@/components/server/organisms/MultimediaCarrousel/MultimediaCarrousel";
 import MultimediaCard from "@/components/server/molecules/MultimediaCard/MultimediaCard";
 import CalendarWidgetFetcher from "@/components/client/CalendarWidgetFetcher/CalendarWidgetFetcher";
@@ -21,9 +22,7 @@ export default function Home() {
     <div className={styles.page}>
       <Banner slides={slides} />
       <section id="servicios">
-        <Separator>
-          <h1 className={classNames(styles.Title)}>Nuestros Servicios</h1>
-        </Separator>
+        <SectionTitle>Nuestros Servicios</SectionTitle>
       </section>
       <ServicesRow />
       <div className={classNames(styles.Services)}>

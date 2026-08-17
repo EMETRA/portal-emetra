@@ -1,0 +1,134 @@
+@use "../../../../theme/colors.scss" as *;
+
+.card,
+.wideCard {
+  overflow: hidden;
+  border-radius: 12px;
+  background: #fff;
+  box-shadow: 0 4px 8px rgb(0 0 0 / 20%);
+
+  header {
+    min-height: 40px;
+    padding: 0 18px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: $verde-claro-1;
+    color: $quintary-text;
+    font-weight: 800;
+  }
+
+  svg {
+    width: 22px;
+    height: 22px;
+  }
+}
+
+.card {
+  min-height: 174px;
+}
+
+.wideCard {
+  min-height: 174px;
+}
+
+.body {
+  padding: 28px 28px 18px;
+  font-weight: 700;
+
+  p + p {
+    margin-top: 14px;
+  }
+
+  h2 {
+    max-width: 280px;
+    color: $azul-2;
+    font-size: 1.45rem;
+    line-height: 1.05;
+  }
+
+  a {
+    display: block;
+    margin-top: 54px;
+    color: $quintary-text;
+    font-weight: 800;
+    text-align: right;
+    text-decoration: none;
+  }
+}
+
+@media (max-width: 900px) {
+  .card {
+    min-height: 96px;
+  }
+
+  .wideCard {
+    min-height: 126px;
+  }
+
+  .card,
+  .wideCard {
+    border-radius: 8px;
+
+    header {
+      min-height: 24px;
+      padding-inline: 10px;
+      font-size: 0.72rem;
+    }
+
+    svg {
+      width: 14px;
+      height: 14px;
+    }
+  }
+
+  .body {
+    padding: 14px 12px;
+    font-size: 0.62rem;
+
+    p + p {
+      margin-top: 8px;
+    }
+
+    h2 {
+      font-size: 0.85rem;
+    }
+
+    a {
+      margin-top: 20px;
+      font-size: 0.6rem;
+    }
+  }
+}
+
+@media (max-width: 520px) {
+  .card,
+  .wideCard {
+    min-height: 126px;
+    border-radius: 9px;
+
+    header {
+      min-height: 28px;
+      padding-inline: 12px;
+      font-size: 0.8rem;
+    }
+  }
+
+  .body {
+    padding: 17px 14px;
+    font-size: 0.72rem;
+
+    p + p {
+      margin-top: 10px;
+    }
+
+    h2 {
+      font-size: 1rem;
+    }
+
+    a {
+      margin-top: 28px;
+      font-size: 0.68rem;
+    }
+  }
+}

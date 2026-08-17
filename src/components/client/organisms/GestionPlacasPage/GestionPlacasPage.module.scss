@@ -1,0 +1,41 @@
+// GestionPlacasPage.module.scss
+.listCard {
+    background: #fff;
+    border-radius: 1.25rem;
+    padding: 1.75rem;
+    box-shadow: 0 0 12px rgba(27, 42, 107, 0.12);
+    margin-bottom: 1.5rem;
+}
+
+.tabsRow {
+    display: flex;
+    justify-content: flex-start;
+    margin-bottom: 1.25rem;
+    min-width: 0;
+    overflow: hidden;
+}
+
+@media (min-width: 769px) {
+    .tabsRow {
+        justify-content: flex-end;
+    }
+}
+
+.searchRow {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    margin-bottom: 1.25rem;
+}
+
+.searchLabel {
+    font-weight: 700;
+    color: #1b2a6b;
+    font-size: 0.9rem;
+}
+
+.plateCount {
+    font-size: 0.85rem;
+    color: #6b6b6b;
+    margin: 0;
+}

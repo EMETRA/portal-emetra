@@ -1,0 +1,64 @@
+.card {
+    position: relative;
+    background: #fff;
+    border-radius: 0.85rem;
+    padding: 1.25rem 1rem 0.85rem;
+    box-shadow: 0 0 12px rgba(27, 42, 107, 0.1);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.4rem;
+    min-height: 8rem;
+}
+
+.clickable {
+    cursor: pointer;
+
+    &:hover {
+        box-shadow: 0 0 16px rgba(27, 42, 107, 0.18);
+    }
+
+    &:active {
+        transform: scale(0.98);
+    }
+}
+
+.deleteButton {
+    position: absolute;
+    top: 0.75rem;
+    right: 0.75rem;
+    background: none;
+    border: none;
+    color: #6b6b6b;
+    cursor: pointer;
+    padding: 0.25rem;
+
+    &:hover {
+        color: #d65c5c;
+    }
+}
+
+.plateCode {
+    color: #1b2a6b;
+    font-size: 1.3rem;
+    font-weight: 700;
+    margin: 0.75rem 0 0;
+    text-align: center;
+}
+
+.remisiones {
+    color: #6b6b6b;
+    font-size: 0.85rem;
+    margin: 0;
+}
+
+.detailLink {
+    align-self: flex-end;
+    background: none;
+    border: none;
+    color: #1b2a6b;
+    font-size: 0.8rem;
+    font-weight: 600;
+    cursor: pointer;
+    margin-top: auto;
+}

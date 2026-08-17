@@ -1,0 +1,20 @@
+@use "../../../../theme/colors.scss" as *;
+
+.wrapper {
+  width: 100%;
+}
+
+.layout {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.row {
+  cursor: pointer;
+  
+  &:hover {
+    font-weight: 600;
+  }
+  
+}

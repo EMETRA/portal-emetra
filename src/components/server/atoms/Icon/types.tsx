@@ -49,6 +49,7 @@ import TucTuc from "@/assets/icons/TucTuc.svg";
 import Facebook from "@/assets/icons/Facebook.svg";
 import Twitter from "@/assets/icons/Twitter.svg";
 import Instagram from "@/assets/icons/Instagram.svg";
+import Whatsapp from "@/assets/icons/Whatsapp.svg";
 
 type IconType =
   | "Camion"
@@ -99,7 +100,8 @@ type IconType =
   | "Back"
   | "Facebook"
   | "Twitter"
-  | "Instagram";
+  | "Instagram"
+  | "Whatsapp";
 
 interface IconProps extends React.SVGProps<SVGSVGElement> {
   className?: string;
@@ -156,6 +158,7 @@ const IconMap: Record<IconType, React.FC<React.SVGProps<SVGSVGElement>>> = {
   Facebook: Facebook,
   Twitter: Twitter,
   Instagram: Instagram,
+  Whatsapp: Whatsapp,
 };
 
 export type { IconProps, IconType };

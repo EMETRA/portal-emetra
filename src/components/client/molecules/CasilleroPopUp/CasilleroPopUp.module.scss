@@ -25,6 +25,10 @@
     align-items: flex-start;
 }
 
+.description {
+    white-space: pre-line;
+}
+
 .mainIcon {
     color: $secondary-text;
     cursor: pointer;

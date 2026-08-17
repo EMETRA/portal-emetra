@@ -9,7 +9,7 @@ import {
     TableCell,
     TableHeaderCell,
 } from '@/components/atoms/Table/'
-import SatTitle from "@/components/atoms/SatTitle/SatTitle";
+import { SectionTitle } from "@/components/server/molecules/SectionTitle";
 import CardGeneral from "@/components/client/atoms/CardGeneral/CardGeneral";
 import Text from "@/components/atoms/Text/Text";
 import { Button, Input } from "@/components/server/atoms";
@@ -134,7 +134,7 @@ export default function CasilleroEmployeeManagement() {
 
   return (
     <div className={styles.wrapper}>
-      <SatTitle uppercase={false}>Gestión de empleados</SatTitle>
+      <SectionTitle>Gestión de empleados</SectionTitle>
 
       <div className={styles.layout}>
         <CardGeneral className={styles.newEmployeeCard} padding="lg">

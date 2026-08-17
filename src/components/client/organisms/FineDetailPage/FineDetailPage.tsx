@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import SatTitle from "@/components/atoms/SatTitle/SatTitle";
+import { SectionTitle } from "@/components/server/molecules/SectionTitle";
 import FineDetailHeader from "@/components/client/organisms/FineDetailHeader/FineDetailHeader";
 import InfoCard from "@/components/client/molecules/InfoCard/InfoCard";
 import EvidenceModal from "@/components/client/organisms/EvidenceModal/EvidenceModal";
@@ -41,7 +41,7 @@ export default function FineDetailPage(id: { fineId: string }) {
 
     return (
         <>
-        <SatTitle>Detalle de Multa</SatTitle>
+        <SectionTitle>Detalle de Multa</SectionTitle>
 
         <FineDetailHeader
             series={fine.series}

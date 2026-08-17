@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import SatTitle from "@/components/atoms/SatTitle/SatTitle";
+import { SectionTitle } from "@/components/server/molecules/SectionTitle";
 import CardGeneral from "@/components/client/atoms/CardGeneral/CardGeneral";
 import Text from "@/components/atoms/Text/Text";
 import { Button, Input } from "@/components/server/atoms";
@@ -34,7 +34,7 @@ export default function CasilleroDeleteAccount() {
 
   return (
     <div className={styles.wrapper}>
-      <SatTitle uppercase={false}>Darme de baja</SatTitle>
+      <SectionTitle>Darme de baja</SectionTitle>
 
       <CardGeneral className={styles.card} padding="lg">
         <div className={styles.layout}>

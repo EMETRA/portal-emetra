@@ -2,7 +2,7 @@
 
 import { FormEvent, useState } from "react";
 import { useRouter } from "next/navigation";
-import SatTitle from "@/components/atoms/SatTitle/SatTitle";
+import { SectionTitle } from "@/components/server/molecules/SectionTitle";
 import CardGeneral from "@/components/client/atoms/CardGeneral/CardGeneral";
 import { Button, Input } from "@/components/server/atoms";
 import { passwordSchema } from "@/schema/casillero";
@@ -118,7 +118,7 @@ export default function CasilleroChangePassword() {
 
   return (
     <div className={styles.wrapper}>
-      <SatTitle uppercase={false}>Cambiar contraseña</SatTitle>
+      <SectionTitle>Cambiar contraseña</SectionTitle>
 
       <CardGeneral className={styles.card} padding="lg">
         <h2 className={styles.title}>Cambiar contraseña</h2>

@@ -9,7 +9,7 @@ import {
     TableCell,
     TableHeaderCell,
 } from '@/components/atoms/Table/'
-import SatTitle from "@/components/atoms/SatTitle/SatTitle";
+import { SectionTitle } from "@/components/server/molecules/SectionTitle";
 import { CasilleroNotification } from '@/components/client/molecules/CasilleroNotificationModal';
 import styles from "./CasilleroBuzon.module.scss";
 
@@ -81,7 +81,7 @@ export default function CasilleroBuzon() {
 
   return (
     <div className={styles.wrapper}>
-      <SatTitle uppercase={false}>Notificaciones</SatTitle>
+      <SectionTitle>Notificaciones</SectionTitle>
 
       <div className={styles.layout}>
         <Table>

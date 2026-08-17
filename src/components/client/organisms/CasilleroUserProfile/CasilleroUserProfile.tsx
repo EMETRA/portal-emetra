@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import classNames from "classnames";
-import SatTitle from "@/components/atoms/SatTitle/SatTitle";
+import { SectionTitle } from "@/components/server/molecules/SectionTitle";
 import CardGeneral from "@/components/client/atoms/CardGeneral/CardGeneral";
 import Text from "@/components/atoms/Text/Text";
 import { Button, Input } from "@/components/server/atoms";
@@ -52,7 +52,7 @@ export default function CasilleroUserProfile() {
 
   return (
     <div className={styles.wrapper}>
-      <SatTitle uppercase={false}>Perfil de usuario</SatTitle>
+      <SectionTitle>Perfil de usuario</SectionTitle>
 
       <CardGeneral className={styles.card} padding="lg">
         <div className={styles.layout}>

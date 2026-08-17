@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import SatTitle from "@/components/atoms/SatTitle/SatTitle";
+import { SectionTitle } from "@/components/server/molecules/SectionTitle";
 import PlateSearchCard from "@/components/client/molecules/PlateSearchCard/PlateSearchCard";
 import VehicleSummaryCard from "@/components/client/molecules/VehicleSummaryCard/VehicleSummaryCard";
 import FineFilterTabs from "@/components/client/molecules/FineFilterTabs/FineFilterTabs";
@@ -63,7 +63,7 @@ export default function ConsultaMultasPage() {
 
 return (
     <div className={styles.wrapper}>
-        <SatTitle>Consulta de Multas</SatTitle>
+        <SectionTitle>Consulta de Multas</SectionTitle>
 
         <div className={styles.topGrid}>
             <PlateSearchCard

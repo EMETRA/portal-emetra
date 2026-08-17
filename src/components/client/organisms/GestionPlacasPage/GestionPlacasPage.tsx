@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
-import SatTitle from "@/components/atoms/SatTitle/SatTitle";
+import { SectionTitle } from "@/components/server/molecules/SectionTitle";
 import AssociatePlateCard from "@/components/client/molecules/AssociatePlateCard/AssociatePlateCard";
 import PlateCardCarousel from "@/components/client/organisms/PlateCardCarousel/PlateCardCarousel";
 import DeletePlateModal from "@/components/client/molecules/DeletePlateModal/DeletePlateModal";
@@ -87,7 +87,7 @@ export default function GestionPlacasPage() {
 
     return (
         <div className={styles.wrapper}>
-        <SatTitle>Gestión de Placas</SatTitle>
+        <SectionTitle>Gestión de Placas</SectionTitle>
 
         <AssociatePlateCard
             plateType={plateType}

@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import SatTitle from "@/components/atoms/SatTitle/SatTitle";
+import { SectionTitle } from "@/components/server/molecules/SectionTitle";
 import PlateSearchCard from "@/components/client/molecules/PlateSearchCard/PlateSearchCard";
 import VehicleSolvencyCard from "@/components/client/molecules/VehicleSolvencyCard/VehicleSolvencyCard";
 import HistoryRecordsTable from "@/components/client/organisms/HistoryRecordsTable/HistoryRecordsTable";
@@ -79,7 +79,7 @@ export default function HistorialRemisionesPage() {
 
     return (
         <div className={styles.wrapper}>
-            <SatTitle>Historial de remisiones</SatTitle>
+            <SectionTitle>Historial de remisiones</SectionTitle>
 
             <div className={styles.topGrid}>
                 <PlateSearchCard

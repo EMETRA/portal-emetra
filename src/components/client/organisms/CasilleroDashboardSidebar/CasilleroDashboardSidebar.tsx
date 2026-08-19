@@ -21,6 +21,7 @@ const PERSONAL_ITEMS = [
     { label: "Mis remisiones", href: "/casillero/dashboard/multas" },
     { label: "Historial", href: "/casillero/dashboard/historial" },
     { label: "Buzón", href: "/casillero/buzon" },
+    { label: "Mis solicitudes", href: "/casillero/dashboard/solicitudes" },
 ];
 
 const COMPANY_ITEMS = [
@@ -28,6 +29,7 @@ const COMPANY_ITEMS = [
     { label: "Mis remisiones", href: "/casillero/dashboard/multas" },
     { label: "Historial", href: "/casillero/dashboard/historial" },
     { label: "Buzón", href: "/casillero/buzon" },
+    { label: "Mis solicitudes", href: "/casillero/dashboard/solicitudes" },
     { label: "Gestión de empleados", href: "/casillero/employee-management" },
 ];
 

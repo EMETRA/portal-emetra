@@ -1,0 +1,25 @@
+// SolicitudStatusBadge.module.scss
+.badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.3rem 1rem;
+    border-radius: 999px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.en_proceso {
+    background: #c9a227;
+    color: #fff;
+    }
+
+.recibido {
+    background: #2196f3;
+    color: #fff;
+}
+
+.resuelto {
+    background: #6dbf6c;
+    color: #fff;
+}

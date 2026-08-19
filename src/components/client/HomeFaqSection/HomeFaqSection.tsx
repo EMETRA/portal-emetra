@@ -3,7 +3,6 @@
 import { useEffect, useState } from "react";
 import { SectionTitle } from "@/components/server/molecules/SectionTitle";
 import { FAQQuestions } from "@/components/organisms/FAQ-Questions";
-import { Separator } from "@/components/atoms/Separator";
 import ServiceErrorAlert from "@/components/molecules/ServiceErrorAlert/ServiceErrorAlert";
 import { assertOkResponse } from "@/lib/bff/raw";
 import {
@@ -11,7 +10,6 @@ import {
   type FaqListResponseDto,
 } from "@/lib/content/mappers";
 import type { FAQ } from "@/schema";
-import classNames from "classnames";
 import styles from "@/app/page.module.css";
 
 const FAQ_API = "/api/faq?estado=activo&page=1&limit=50";

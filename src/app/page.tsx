@@ -1,4 +1,3 @@
-import { Separator } from "@/components/atoms/Separator";
 import styles from "./page.module.css";
 import { Banner, BannerSlide, ServicesRow } from "@/components/organisms";
 import classNames from "classnames";

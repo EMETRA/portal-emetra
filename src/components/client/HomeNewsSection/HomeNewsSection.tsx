@@ -4,12 +4,10 @@ import { useEffect, useState } from "react";
 import { SectionTitle } from "@/components/server/molecules/SectionTitle";
 import { NewCard } from "@/components/molecules/NewCard";
 import NewsCarrousel from "@/components/organisms/NewsCarrousel/NewsCarrousel";
-import { Separator } from "@/components/atoms/Separator";
 import ServiceErrorAlert from "@/components/molecules/ServiceErrorAlert/ServiceErrorAlert";
 import { assertOkResponse } from "@/lib/bff/raw";
 import type { NewsListResponseDto } from "@/lib/content/mappers";
 import type { NewsSummaryDto } from "@/lib/content/types";
-import classNames from "classnames";
 import styles from "@/app/page.module.css";
 
 const DEFAULT_NEWS_IMAGE = "/images/Evento.jpg";

@@ -50,6 +50,9 @@ import Facebook from "@/assets/icons/Facebook.svg";
 import Twitter from "@/assets/icons/Twitter.svg";
 import Instagram from "@/assets/icons/Instagram.svg";
 import Whatsapp from "@/assets/icons/Whatsapp.svg";
+import GoogleAuthenticator from "@/assets/icons/GoogleAuthenticator.svg";
+import MicrosoftAuthenticator from "@/assets/icons/MicrosoftAuthenticator.svg";
+import Mail from "@/assets/icons/Mail.svg";
 
 type IconType =
   | "Camion"
@@ -101,7 +104,10 @@ type IconType =
   | "Facebook"
   | "Twitter"
   | "Instagram"
-  | "Whatsapp";
+  | "Whatsapp"
+  | "GoogleAuthenticator"
+  | "MicrosoftAuthenticator"
+  | "Mail";
 
 interface IconProps extends React.SVGProps<SVGSVGElement> {
   className?: string;
@@ -128,12 +134,15 @@ const IconMap: Record<IconType, React.FC<React.SVGProps<SVGSVGElement>>> = {
   Eye: Eye,
   EyeOff: EyeOff,
   Files: Files,
+  GoogleAuthenticator: GoogleAuthenticator,
   Image: Image,
   Home: Home,
   Info: Info,
   Location: Location,
   Logout: Logout,
+  Mail: Mail,
   Menu: Menu,
+  MicrosoftAuthenticator: MicrosoftAuthenticator,
   Moto: Moto,
   Multa: Multa,
   Next: Next,

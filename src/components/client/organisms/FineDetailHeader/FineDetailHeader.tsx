@@ -1,6 +1,6 @@
 "use client";
 
-import Card from "@/components/atoms/card/Card";
+// import Card from "@/components/atoms/card/Card";
 
 import { useMediaQuery } from "@/hooks/useMediaQuery";
 import { FineCategory } from "@/types/fines";

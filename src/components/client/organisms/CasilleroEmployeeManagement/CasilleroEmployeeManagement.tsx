@@ -111,7 +111,7 @@ export default function CasilleroEmployeeManagement() {
   const paginatedEmployees = useMemo(() => {
     const start = page * ITEMS_PER_PAGE;
     return DUMMY_DATA.slice(start, start + ITEMS_PER_PAGE);
-  }, [page]);
+  }, [page, DUMMY_DATA]);
 
   const visibleUpTo = Math.min((page + 1) * ITEMS_PER_PAGE, totalEmployees);
 

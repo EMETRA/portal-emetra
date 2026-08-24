@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import classNames from "classnames";
@@ -132,7 +133,7 @@ export default function CasilleroUserProfile() {
               </Text>
             </div>
 
-            <img
+            <Image
               className={styles.avatar}
               src={mockUser.profileImage}
               alt="Foto de perfil"

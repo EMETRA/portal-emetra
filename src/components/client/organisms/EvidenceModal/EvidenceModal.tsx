@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { useEffect } from "react";
 import styles from "./EvidenceModal.module.scss";
 
@@ -56,7 +57,7 @@ export default function EvidenceModal({
             Evidencia y documentos
             </h2>
 
-            <img src={imageUrl} alt="Evidencia de la infracción" className={styles.image} />
+            <Image src={imageUrl} alt="Evidencia de la infracción" className={styles.image} />
 
             <button type="button" className={styles.downloadImageLink} onClick={onDownloadImage}>
             descargar imagen ↓

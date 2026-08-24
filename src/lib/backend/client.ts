@@ -1,7 +1,18 @@
 import "server-only";
 
-import { API_BASE_URL } from "@/lib/config.server";
-import { fetchUpstream, formatUpstreamFetchError } from "@/lib/backend/fetch-upstream";
+import type { NextRequest } from "next/server";
+import {
+  buildUpstreamUrl,
+  type UpstreamAuthContext,
+  type UpstreamConfig,
+} from "@/lib/backend/upstream";
+import { portalUpstream } from "@/lib/backend/upstreams";
+import {
+  fetchUpstream,
+  formatUpstreamFetchError,
+} from "@/lib/backend/fetch-upstream";
+
+export { buildUpstreamUrl };
 
 export class BackendError extends Error {
   constructor(
@@ -12,22 +23,6 @@ export class BackendError extends Error {
     super(message);
     this.name = "BackendError";
   }
-}
-
-function normalizeBaseUrl(url: string): string {
-  const trimmed = url.trim().replace(/\/$/, "");
-  if (trimmed.startsWith("http://") || trimmed.startsWith("https://")) {
-    return trimmed;
-  }
-  return `http://${trimmed}`;
-}
-
-export function getBackendBaseUrl(): string {
-  return normalizeBaseUrl(API_BASE_URL);
-}
-
-export function buildBackendUrl(path: string): string {
-  return `${getBackendBaseUrl()}${path.startsWith("/") ? path : `/${path}`}`;
 }
 
 /** Headers that must not be forwarded from the browser to the backend. */
@@ -59,9 +54,7 @@ const UPSTREAM_ALLOW_HEADERS = new Set([
   "cache-control",
 ]);
 
-export function pickForwardRequestHeaders(
-  incoming: Headers
-): Headers {
+export function pickForwardRequestHeaders(incoming: Headers): Headers {
   const headers = new Headers();
   incoming.forEach((value, key) => {
     const lower = key.toLowerCase();
@@ -79,39 +72,70 @@ export function pickForwardRequestHeaders(
   return headers;
 }
 
-export function buildBackendHeaders(init?: RequestInit): Headers {
+export function getBackendBaseUrl(): string {
+  return portalUpstream.getBaseUrl();
+}
+
+export function buildBackendUrl(path: string): string {
+  return buildUpstreamUrl(portalUpstream, path);
+}
+
+export async function buildUpstreamHeaders(
+  config: UpstreamConfig,
+  init?: RequestInit,
+  ctx?: UpstreamAuthContext
+): Promise<Headers> {
   const headers = new Headers(init?.headers);
-  applyBackendAuthHeaders(headers, init?.body);
+  await config.applyAuth(headers, {
+    req: ctx?.req,
+    body: ctx?.body ?? init?.body ?? null,
+  });
   return headers;
 }
 
-export function buildProxyUpstreamHeaders(
+export async function buildBackendHeaders(
+  init?: RequestInit
+): Promise<Headers> {
+  return buildUpstreamHeaders(portalUpstream, init);
+}
+
+export async function buildProxyUpstreamHeaders(
+  config: UpstreamConfig,
   incoming: Headers,
-  body?: ArrayBuffer | null
-): Headers {
+  body?: ArrayBuffer | null,
+  req?: NextRequest
+): Promise<Headers> {
   const headers = pickForwardRequestHeaders(incoming);
-  applyBackendAuthHeaders(headers, body);
+  await config.applyAuth(headers, { req, body });
   if (!headers.has("Accept")) {
     headers.set("Accept", "application/json");
   }
   return headers;
 }
 
-function applyBackendAuthHeaders(
-  headers: Headers,
-  body?: BodyInit | ArrayBuffer | null
-): void {
-  const token = process.env.BACKEND_TOKEN?.trim();
-  if (token) {
-    headers.set("Authorization", `Bearer ${token}`);
-  }
-  const hasBody =
-    body !== undefined &&
-    body !== null &&
-    !(typeof body === "string" && body.length === 0) &&
-    !(body instanceof ArrayBuffer && body.byteLength === 0);
-  if (!headers.has("Content-Type") && hasBody) {
-    headers.set("Content-Type", "application/json");
+export async function fetchUpstreamRaw(
+  config: UpstreamConfig,
+  path: string,
+  init?: RequestInit,
+  ctx?: UpstreamAuthContext
+): Promise<Response> {
+  try {
+    return await fetchUpstream(
+      buildUpstreamUrl(config, path),
+      {
+        ...init,
+        headers: await buildUpstreamHeaders(config, init, ctx),
+        cache: init?.cache ?? "no-store",
+      },
+      config
+    );
+  } catch (error) {
+    console.error(`[fetchUpstreamRaw:${config.id}] network error:`, path, error);
+    throw new BackendError(
+      formatUpstreamFetchError(error),
+      503,
+      "NETWORK_ERROR"
+    );
   }
 }
 
@@ -119,16 +143,7 @@ export async function fetchBackend(
   path: string,
   init?: RequestInit
 ): Promise<Response> {
-  try {
-    return await fetchUpstream(buildBackendUrl(path), {
-      ...init,
-      headers: buildBackendHeaders(init),
-      cache: init?.cache ?? "no-store",
-    });
-  } catch (error) {
-    console.error("[fetchBackend] network error:", path, error);
-    throw new BackendError(formatUpstreamFetchError(error), 503, "NETWORK_ERROR");
-  }
+  return fetchUpstreamRaw(portalUpstream, path, init);
 }
 
 async function readBackendErrorMessage(response: Response): Promise<string> {
@@ -153,11 +168,13 @@ async function readBackendErrorMessage(response: Response): Promise<string> {
   return `Error del servicio (${response.status})`;
 }
 
-export async function backendFetch<T>(
+export async function upstreamFetch<T>(
+  config: UpstreamConfig,
   path: string,
-  init?: RequestInit
+  init?: RequestInit,
+  ctx?: UpstreamAuthContext
 ): Promise<T> {
-  const response = await fetchBackend(path, init);
+  const response = await fetchUpstreamRaw(config, path, init, ctx);
 
   if (!response.ok) {
     throw new BackendError(
@@ -173,11 +190,20 @@ export async function backendFetch<T>(
   return response.json() as Promise<T>;
 }
 
-export async function backendFetchText(
+export async function backendFetch<T>(
   path: string,
   init?: RequestInit
+): Promise<T> {
+  return upstreamFetch<T>(portalUpstream, path, init);
+}
+
+export async function upstreamFetchText(
+  config: UpstreamConfig,
+  path: string,
+  init?: RequestInit,
+  ctx?: UpstreamAuthContext
 ): Promise<string> {
-  const response = await fetchBackend(path, init);
+  const response = await fetchUpstreamRaw(config, path, init, ctx);
 
   if (!response.ok) {
     throw new BackendError(
@@ -187,4 +213,11 @@ export async function backendFetchText(
   }
 
   return response.text();
+}
+
+export async function backendFetchText(
+  path: string,
+  init?: RequestInit
+): Promise<string> {
+  return upstreamFetchText(portalUpstream, path, init);
 }

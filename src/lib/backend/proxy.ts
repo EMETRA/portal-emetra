@@ -2,14 +2,17 @@ import "server-only";
 
 import { NextRequest, NextResponse } from "next/server";
 import {
-  buildBackendUrl,
   buildProxyUpstreamHeaders,
+  buildUpstreamUrl,
 } from "@/lib/backend/client";
 import {
   buildUpstreamDebugContext,
   fetchUpstream,
   formatUpstreamFetchError,
 } from "@/lib/backend/fetch-upstream";
+import type { UpstreamConfig } from "@/lib/backend/upstream";
+import { portalUpstream } from "@/lib/backend/upstreams";
+import { readCasilleroAuthTokenFromCookies } from "@/lib/casillero/session";
 
 const HOP_BY_HOP_HEADERS = new Set([
   "connection",
@@ -32,22 +35,40 @@ function copyResponseHeaders(source: Headers, target: Headers): void {
   });
 }
 
-export type ProxyBackendOptions = {
+export type ProxyUpstreamOptions = {
   /** Backend path, optionally with query string (e.g. `/routes?page=1`). */
   path: string;
   method?: string;
   /** Defaults to true for methods other than GET and HEAD. */
   forwardBody?: boolean;
+  /**
+   * When true, require an auth token for this upstream before calling it.
+   * For casillero this means the httpOnly session cookie must be present.
+   */
+  requireAuth?: boolean;
 };
 
+export type ProxyBackendOptions = ProxyUpstreamOptions;
+
 /**
- * Mediador: el navegador solo habla con /api/*; este servidor reenvia al backend
- * y devuelve la respuesta tal cual. El cliente nunca contacta API_BASE_URL.
+ * Mediador genérico: el navegador solo habla con /api/*; este servidor reenvía
+ * al upstream configurado y devuelve la respuesta tal cual.
  */
-export async function proxyBackendRequest(
+export async function proxyUpstreamRequest(
+  config: UpstreamConfig,
   req: NextRequest,
-  options: ProxyBackendOptions
+  options: ProxyUpstreamOptions
 ): Promise<NextResponse> {
+  if (options.requireAuth && config.id === "casillero") {
+    const token = readCasilleroAuthTokenFromCookies(req.cookies);
+    if (!token) {
+      return NextResponse.json(
+        { error: "No autorizado", code: "UNAUTHORIZED" },
+        { status: 401 }
+      );
+    }
+  }
+
   const method = options.method ?? req.method;
   const forwardBody =
     options.forwardBody ?? !["GET", "HEAD"].includes(method.toUpperCase());
@@ -60,19 +81,28 @@ export async function proxyBackendRequest(
     }
   }
 
-  const headers = buildProxyUpstreamHeaders(req.headers, body);
-  const targetUrl = buildBackendUrl(options.path);
+  const headers = await buildProxyUpstreamHeaders(
+    config,
+    req.headers,
+    body,
+    req
+  );
+  const targetUrl = buildUpstreamUrl(config, options.path);
 
   let backendResponse: Response;
   try {
-    backendResponse = await fetchUpstream(targetUrl, {
-      method,
-      headers,
-      body,
-      cache: "no-store",
-    });
+    backendResponse = await fetchUpstream(
+      targetUrl,
+      {
+        method,
+        headers,
+        body,
+        cache: "no-store",
+      },
+      config
+    );
   } catch (error) {
-    console.error("[proxyBackendRequest] network error:", {
+    console.error(`[proxyUpstreamRequest:${config.id}] network error:`, {
       path: options.path,
       targetUrl,
       detail: formatUpstreamFetchError(error),
@@ -80,7 +110,7 @@ export async function proxyBackendRequest(
     const debugBody = [
       formatUpstreamFetchError(error),
       "",
-      buildUpstreamDebugContext(targetUrl),
+      buildUpstreamDebugContext(targetUrl, config),
     ].join("\n");
     return new NextResponse(debugBody, {
       status: 502,
@@ -99,6 +129,17 @@ export async function proxyBackendRequest(
   });
 }
 
+/**
+ * Mediador portal: el navegador solo habla con /api/*; este servidor reenvía
+ * al backend del portal y devuelve la respuesta tal cual.
+ */
+export async function proxyBackendRequest(
+  req: NextRequest,
+  options: ProxyBackendOptions
+): Promise<NextResponse> {
+  return proxyUpstreamRequest(portalUpstream, req, options);
+}
+
 /** Appends the incoming request query string to a backend path. */
 export function backendPathWithRequestQuery(
   req: NextRequest,
@@ -112,3 +153,5 @@ export function backendPathWithRequestQuery(
     ? `${backendPath}&${query.slice(1)}`
     : `${backendPath}${query}`;
 }
+
+export const upstreamPathWithRequestQuery = backendPathWithRequestQuery;

@@ -1,10 +1,9 @@
 import "server-only";
 
-import { getBackendBaseUrl } from "@/lib/backend/client";
-
-function shouldSkipTlsVerify(): boolean {
-  return process.env.BACKEND_TLS_INSECURE !== "0";
-}
+import {
+  shouldSkipTlsVerify,
+  type UpstreamConfig,
+} from "@/lib/backend/upstream";
 
 export function formatUpstreamFetchError(error: unknown): string {
   const lines: string[] = [];
@@ -31,10 +30,13 @@ export function formatUpstreamFetchError(error: unknown): string {
 
 export async function fetchUpstream(
   url: string,
-  init?: RequestInit
+  init?: RequestInit,
+  config?: UpstreamConfig
 ): Promise<Response> {
   const useHttps = url.startsWith("https://");
-  const skipTls = useHttps && shouldSkipTlsVerify();
+  const skipTls =
+    useHttps &&
+    (config ? shouldSkipTlsVerify(config) : process.env.BACKEND_TLS_INSECURE !== "0");
   const previousTlsSetting = process.env.NODE_TLS_REJECT_UNAUTHORIZED;
 
   if (skipTls) {
@@ -54,10 +56,22 @@ export async function fetchUpstream(
   }
 }
 
-export function buildUpstreamDebugContext(targetUrl: string): string {
+export function buildUpstreamDebugContext(
+  targetUrl: string,
+  config?: UpstreamConfig
+): string {
+  if (config) {
+    const tlsEnv = config.tlsInsecureEnv;
+    return [
+      `target: ${targetUrl}`,
+      `upstream: ${config.id}`,
+      `${config.baseUrlEnvName}: ${config.getBaseUrl()}`,
+      `${tlsEnv}: ${process.env[tlsEnv] ?? "(unset, skip verify on https)"}`,
+    ].join("\n");
+  }
+
   return [
     `target: ${targetUrl}`,
-    `API_BASE_URL: ${getBackendBaseUrl()}`,
     `BACKEND_TLS_INSECURE: ${process.env.BACKEND_TLS_INSECURE ?? "(unset, skip verify on https)"}`,
   ].join("\n");
 }

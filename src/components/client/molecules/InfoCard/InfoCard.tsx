@@ -1,4 +1,4 @@
-import Card from "@/components/atoms/card/Card";
+// import Card from "@/components/atoms/card/Card";
 import styles from "./InfoCard.module.scss";
 import { JSX } from "react";
 import CardGeneral from "../../atoms/CardGeneral/CardGeneral";

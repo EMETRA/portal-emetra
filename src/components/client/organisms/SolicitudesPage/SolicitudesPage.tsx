@@ -41,7 +41,7 @@ export default function SolicitudesPage() {
         [page, itemsPerPage]
     );
 
-    const start = page * itemsPerPage + 1;
+    // const start = page * itemsPerPage + 1;
     const end = Math.min((page + 1) * itemsPerPage, MOCK_SOLICITUDES.length);
 
     return (

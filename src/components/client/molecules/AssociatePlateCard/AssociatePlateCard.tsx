@@ -1,4 +1,4 @@
-import Card from "@/components/atoms/card/Card";
+// import Card from "@/components/atoms/card/Card";
 import styles from "./AssociatePlateCard.module.scss";
 import TextInput from "../../atoms/TextInput/TextInput";
 import { PLATE_TYPES } from "@/types/plates";

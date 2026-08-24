@@ -1,13 +1,13 @@
-import Card from "@/components/atoms/card/Card";
-import Select from "@/components/atoms/Select/Select";
+// import Card from "@/components/atoms/card/Card";
+// import Select from "@/components/atoms/Select/Select";
 import styles from "./PlateSearchCard.module.scss";
 import SelectGeneral from "../../atoms/SelectGeneral/SelectGeneral";
 import CardGeneral from "../../atoms/CardGeneral/CardGeneral";
 
-interface PlateOption {
-    value: string;
-    label: string;
-}
+// interface PlateOption {
+//     value: string;
+//     label: string;
+// }
 
 interface PlateSearchCardProps {
     label?: string;

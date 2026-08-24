@@ -1,4 +1,4 @@
-import Card from "@/components/atoms/card/Card";
+// import Card from "@/components/atoms/card/Card";
 import styles from "./VehicleSolvencyCard.module.scss";
 import CardGeneral from "../../atoms/CardGeneral/CardGeneral";
 

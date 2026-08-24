@@ -49,7 +49,7 @@ export default function HistorialRemisionesPage() {
     const [pendingRecord, setPendingRecord] = useState<HistoryRecord | null>(null);
     const [filter, setFilter] = useState<FilterValue>("todas");
     const [dateFilter, setDateFilter] = useState("");
-    const [pendingId, setPendingId] = useState<string | null>(null); // <- added here
+    // const [pendingId, setPendingId] = useState<string | null>(null); // <- added here
 
     const filteredRecords = useMemo(() => {
         let result = allRecords;

@@ -244,7 +244,6 @@ export default function CasilleroAccess() {
                 type="button"
                 role="radio"
                 aria-checked={isSelected}
-                aria-pressed={isSelected}
                 aria-label={method.label}
                 className={isSelected ? `${styles.methodButton} ${styles.selected}` : styles.methodButton}
                 onClick={() => {

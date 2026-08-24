@@ -42,79 +42,76 @@ export default function CasilleroEmployeeManagement() {
     }
   }
 
-  const DUMMY_DATA = [
-    {
-      id: '1',
-      nit: '12345678',
-      dpi: '1234567890101',
-      name: 'Daniel Esteban Morales Urizar  ',
-    },
-    {
-      id: '2',
-      nit: '12345679',
-      dpi: '1234567890102',
-      name: 'Juan Perez Garcia',
-    },
-    {
-      id: '3',
-      nit: '12345680',
-      dpi: '1234567890103',
-      name: 'Maria Lopez Gomez',
-    },
-    {
-      id: '4',
-      nit: '12345681',
-      dpi: '1234567890104',
-      name: 'Pedro Ramirez Sanchez',
-    },
-    {
-      id: '5',
-      nit: '12345682',
-      dpi: '1234567890105',
-      name: 'Ana Garcia Lopez',
-    },
-    {
-      id: '6',
-      nit: '12345683',
-      dpi: '1234567890106',
-      name: 'Luis Hernandez Gomez',
-    },
-    {
-      id: '7',
-      nit: '12345684',
-      dpi: '1234567890107',
-      name: 'Jose Rodriguez Lopez',
-    },
-    {
-      id: '8',
-      nit: '12345685',
-      dpi: '1234567890108',
-      name: 'Ana Garcia Lopez',
-    },
-    {
-      id: '9',
-      nit: '12345686',
-      dpi: '1234567890109',
-      name: 'Pedro Ramirez Sanchez',
-    },
-    {
-      id: '10',
-      nit: '12345687',
-      dpi: '1234567890110',
-      name: 'Ana Garcia Lopez',
-    },
-  ]
-
-  const totalEmployees = DUMMY_DATA.length;
-  const totalPages = Math.max(1, Math.ceil(totalEmployees / ITEMS_PER_PAGE));
-
+  
+  
   const paginatedEmployees = useMemo(() => {
+    const DUMMY_DATA = [
+      {
+        id: '1',
+        nit: '12345678',
+        dpi: '1234567890101',
+        name: 'Daniel Esteban Morales Urizar  ',
+      },
+      {
+        id: '2',
+        nit: '12345679',
+        dpi: '1234567890102',
+        name: 'Juan Perez Garcia',
+      },
+      {
+        id: '3',
+        nit: '12345680',
+        dpi: '1234567890103',
+        name: 'Maria Lopez Gomez',
+      },
+      {
+        id: '4',
+        nit: '12345681',
+        dpi: '1234567890104',
+        name: 'Pedro Ramirez Sanchez',
+      },
+      {
+        id: '5',
+        nit: '12345682',
+        dpi: '1234567890105',
+        name: 'Ana Garcia Lopez',
+      },
+      {
+        id: '6',
+        nit: '12345683',
+        dpi: '1234567890106',
+        name: 'Luis Hernandez Gomez',
+      },
+      {
+        id: '7',
+        nit: '12345684',
+        dpi: '1234567890107',
+        name: 'Jose Rodriguez Lopez',
+      },
+      {
+        id: '8',
+        nit: '12345685',
+        dpi: '1234567890108',
+        name: 'Ana Garcia Lopez',
+      },
+      {
+        id: '9',
+        nit: '12345686',
+        dpi: '1234567890109',
+        name: 'Pedro Ramirez Sanchez',
+      },
+      {
+        id: '10',
+        nit: '12345687',
+        dpi: '1234567890110',
+        name: 'Ana Garcia Lopez',
+      },
+    ]
+    
     const start = page * ITEMS_PER_PAGE;
     return DUMMY_DATA.slice(start, start + ITEMS_PER_PAGE);
-  }, [page, DUMMY_DATA]);
-
-  const visibleUpTo = Math.min((page + 1) * ITEMS_PER_PAGE, totalEmployees);
-
+  }, [page]);
+  
   const handlePrevPage = () => {
     setPage((currentPage) => Math.max(0, currentPage - 1));
   };
@@ -131,6 +128,10 @@ export default function CasilleroEmployeeManagement() {
       </div>
     )
   }
+
+  const totalEmployees = paginatedEmployees.length;
+  const totalPages = Math.max(1, Math.ceil(totalEmployees / ITEMS_PER_PAGE));
+  const visibleUpTo = Math.min((page + 1) * ITEMS_PER_PAGE, totalEmployees);
 
   return (
     <div className={styles.wrapper}>

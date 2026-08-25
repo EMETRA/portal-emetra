@@ -72,11 +72,36 @@ export default function CardPaymentForm({ onPagar, loading }: CardPaymentFormPro
         </div>
 
         <div className={styles.cvvHint}>
+        <div className={styles.cvvTooltipWrapper}>
             <span className={styles.cvvLink}>¿Qué es esto?</span>
-            <svg width="32" height="24" viewBox="0 0 32 24" fill="none" aria-hidden="true">
-            <path d="M2 20 C8 20 10 4 28 4" stroke="#1b2a6b" strokeWidth="1.5" strokeLinecap="round" fill="none" />
-            <path d="M24 2 L28 6 L24 10" stroke="#1b2a6b" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-            </svg>
+            <div className={styles.tooltip}>
+            El código de seguridad (CVV) son los 3 dígitos que se encuentran en el reverso de tu tarjeta.</div>
+        </div>
+        <svg
+        width="28"
+        height="32"
+        viewBox="0 0 28 32"
+        fill="none"
+        aria-hidden="true"
+        className={styles.cvvArrow}
+        >
+        {/* curva de abajo-derecha hacia arriba-izquierda */}
+        <path
+            d="M24 28 C24 16 8 16 4 4"
+            stroke="#1b2a6b"
+            strokeWidth="1.5"
+            strokeLinecap="round"
+            fill="none"
+        />
+        {/* punta de flecha apuntando arriba */}
+        <path
+            d="M2 8 L4 2 L9 6"
+            stroke="#1b2a6b"
+            strokeWidth="1.5"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+        />
+        </svg>
         </div>
 
         <SecurityLogos />

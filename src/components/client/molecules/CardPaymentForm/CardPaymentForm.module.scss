@@ -56,17 +56,62 @@
 }
 
 .cvvHint {
-    display: flex;
+  display: flex;
+  align-items: flex-end; // alinea la flecha con la base del texto
+  justify-content: flex-end;
+  gap: 0.2rem;
+}
+
+.cvvArrow {
+  flex-shrink: 0;
+  margin-bottom: -4px; // baja levemente para que la base coincida con el texto
+}
+.cvvTooltipWrapper {
+    position: relative;
+    display: inline-flex;
     align-items: center;
-    justify-content: flex-end;
-    gap: 0.35rem;
+
+    &:hover .tooltip {
+        opacity: 1;
+        pointer-events: auto;
+        transform: translateY(0);
+    }
 }
 
 .cvvLink {
     font-size: 0.85rem;
     color: #6dbf6c;
     font-weight: 600;
-    cursor: pointer;
+    cursor: help;
+}
+
+
+.tooltip {
+    position: absolute;
+    bottom: calc(100% + 10px);
+    right: 0;
+    width: 220px;
+    background: #1b2a6b;
+    color: #fff;
+    font-size: 0.78rem;
+    line-height: 1.5;
+    padding: 0.75rem 1rem;
+    border-radius: 0.65rem;
+    opacity: 0;
+    pointer-events: none;
+    transform: translateY(4px);
+    transition: opacity 0.18s ease, transform 0.18s ease;
+    z-index: 10;
+
+    // pequeña flecha apuntando hacia abajo
+    &::after {
+        content: "";
+        position: absolute;
+        top: 100%;
+        right: 1rem;
+        border: 6px solid transparent;
+        border-top-color: #1b2a6b;
+    }
 }
 
 .payButton {

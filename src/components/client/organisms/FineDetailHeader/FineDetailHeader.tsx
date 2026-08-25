@@ -1,7 +1,5 @@
 "use client";
 
-// import Card from "@/components/atoms/card/Card";
-
 import { useMediaQuery } from "@/hooks/useMediaQuery";
 import { FineCategory } from "@/types/fines";
 import styles from "./FineDetailHeader.module.scss";
@@ -19,6 +17,7 @@ interface FineDetailHeaderProps {
     article: string;
     numeral: string;
     onVerImagen: () => void;
+    onPayThis: () => void;
 }
 
 export default function FineDetailHeader({
@@ -32,6 +31,7 @@ export default function FineDetailHeader({
     article,
     numeral,
     onVerImagen,
+    onPayThis,
 }: FineDetailHeaderProps) {
     const isMobile = useMediaQuery("(max-width: 520px)");
 
@@ -58,6 +58,9 @@ export default function FineDetailHeader({
                 <button type="button" className={styles.verImagenButtonMobile} onClick={onVerImagen}>
                 Ver imagen
                 </button>
+                <button type="button" className={styles.payButtonMobile} onClick={onPayThis}>
+                Pagar esta multa
+                </button>
             </div>
             </>
         ) : (
@@ -81,9 +84,14 @@ export default function FineDetailHeader({
 
             <div className={styles.rightCol}>
                 <span className={styles.totalLabel}>Total: Q{totalAmount}</span>
+                <div className={styles.buttonCol}>
                 <button type="button" className={styles.verImagenButton} onClick={onVerImagen}>
-                Ver imagen
+                    Ver imagen
                 </button>
+                <button type="button" className={styles.payButton} onClick={onPayThis}>
+                    Pagar esta multa
+                </button>
+                </div>
             </div>
             </div>
         )}

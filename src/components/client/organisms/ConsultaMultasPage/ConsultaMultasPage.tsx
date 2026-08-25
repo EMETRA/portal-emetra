@@ -12,6 +12,7 @@ import { useMediaQuery } from "@/hooks/useMediaQuery";
 import FineListSummaryBar from "../../molecules/FineListSummaryBar/FineListSummaryBar";
 import { useRouter } from "next/navigation";
 import { useSearchParams } from "next/navigation";
+import FineSelectionBar from "../../molecules/FineSelectionBar/FineSelectionBar";
 
 // TODO: replace with the real query, e.g. useConsultarMultasPorPlaca
 const vehicle = { plate: "P111BBB", model: "Toyota corolla", color: "Gris", year: 2020 };
@@ -64,7 +65,7 @@ export default function ConsultaMultasPage() {
 return (
     <div className={styles.wrapper}>
         <SectionTitle>Consulta de Multas</SectionTitle>
-
+        <FineSelectionBar />
         <div className={styles.topGrid}>
             <PlateSearchCard
                 options={[{ value: vehicle.plate, label: vehicle.plate }]}
@@ -84,6 +85,7 @@ return (
         </div>
 
         <div className={styles.listCard}>
+            
             <div className={styles.tabsRow}>
                 <FineFilterTabs value={filter} onChange={setFilter} />
             </div>
@@ -92,6 +94,13 @@ return (
                 <FineListSummaryBar count={filteredFines.length} total={filteredTotal} />
             )}
 
+            <div className={styles.selectionHint}>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                <path d="M9 11l3 3L22 4" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
+                <path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+            </svg>
+            Selecciona las multas que deseas pagar
+            </div>
             <div className={styles.carouselSection}>
                 <FineCardCarousel fines={filteredFines} onViewDetail={handleViewDetail} />
             </div>

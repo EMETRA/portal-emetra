@@ -1,0 +1,77 @@
+// FineSelectionBar.module.scss
+.bar {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 50;
+    background: #1b2a6b;
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1rem 2rem;
+    box-shadow: 0 -4px 16px rgba(27, 42, 107, 0.25);
+    gap: 1rem;
+}
+
+.info {
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+}
+
+.count {
+    font-size: 0.9rem;
+    opacity: 0.85;
+}
+
+.total {
+    font-size: 1.1rem;
+    font-weight: 700;
+}
+
+.actions {
+    display: flex;
+    gap: 0.75rem;
+    align-items: center;
+}
+
+.clearBtn {
+    background: transparent;
+    border: 1px solid rgba(255, 255, 255, 0.4);
+    color: #fff;
+    border-radius: 999px;
+    padding: 0.6rem 1.25rem;
+    font-size: 0.85rem;
+    cursor: pointer;
+
+    &:hover {
+        border-color: #fff;
+    }
+    }
+
+.payBtn {
+    background: #6dbf6c;
+    border: none;
+    color: #fff;
+    border-radius: 999px;
+    padding: 0.6rem 1.75rem;
+    font-size: 0.9rem;
+    font-weight: 700;
+    cursor: pointer;
+
+    &:hover {
+        opacity: 0.9;
+    }
+}
+
+@media (max-width: 768px) {
+    .bar {
+        padding: 0.85rem 1.25rem;
+    }
+
+    .total {
+        font-size: 1rem;
+    }
+}

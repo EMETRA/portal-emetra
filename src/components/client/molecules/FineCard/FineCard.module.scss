@@ -1,12 +1,65 @@
 .card {
     background: #fff;
     border-radius: 0.75rem;
-    padding: 1.25rem;
+    padding: 1rem;
+    display: flex;
+    flex-direction: row; // checkbox left, content right
+    gap: 0.75rem;
+    min-height: 12rem;
+    box-shadow: 0 0 12px rgba(27, 42, 107, 0.12);
+    border: 2px solid transparent;
+    transition: border-color 0.15s;
+}
+
+.cardSelected {
+    border-color: #6dbf6c;
+}
+
+.checkboxCol {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  padding-right: 0.75rem;
+  border-right: 1px solid #ececec;
+  cursor: pointer;
+}
+
+// oculta el input nativo
+.checkbox {
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+  pointer-events: none;
+}
+
+// checkbox visual custom
+.checkboxCustom {
+  width: 24px;
+  height: 24px;
+  border: 2.5px solid #1b2a6b;
+  border-radius: 5px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: background 0.15s, border-color 0.15s;
+  background: #fff;
+}
+
+.checkboxCustomChecked {
+  background: #6dbf6c;
+  border-color: #6dbf6c;
+}
+
+// Content column
+.content {
+    flex: 1;
     display: flex;
     flex-direction: column;
     gap: 0.5rem;
-    min-height: 12rem;
-    box-shadow: 0 0 12px rgba(27, 42, 107, 0.12);
+    min-width: 0;
 }
 
 .header {
@@ -16,10 +69,28 @@
     color: #1b2a6b;
 }
 
+.code {
+    font-weight: 700;
+    color: #1b2a6b;
+}
+
+.amount {
+    font-weight: 700;
+    color: #1b2a6b;
+}
+
+.description {
+    color: #1b2a6b;
+    font-size: 0.9rem;
+    margin: 0;
+}
+
 .meta {
     margin-top: auto;
     color: #6b6b6b;
     font-size: 0.85rem;
+
+    p { margin: 0; }
 }
 
 .detailLink {

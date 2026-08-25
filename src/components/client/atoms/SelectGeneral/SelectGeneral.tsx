@@ -1,4 +1,4 @@
-import React, { useEffect, useId, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import classNames from "classnames";
 import styles from "./SelectGeneral.module.scss";
 import { SelectProps } from "./types";
@@ -18,7 +18,7 @@ const SelectGeneral: React.FC<SelectProps> = ({
     const [highlightedIndex, setHighlightedIndex] = useState(-1);
     const containerRef = useRef<HTMLDivElement>(null);
     const listRef = useRef<HTMLUListElement>(null);
-    const selectId = id ?? useId();
+    const selectId = id;
     const listboxId = `${selectId}-listbox`;
 
     const selectedOption = options.find((opt) => opt.value === value);
@@ -72,12 +72,20 @@ const SelectGeneral: React.FC<SelectProps> = ({
         case "ArrowDown":
         case "ArrowUp":
             e.preventDefault();
-            open ? moveHighlight(e.key === "ArrowDown" ? 1 : -1) : setOpen(true);
+            if (open) {
+            moveHighlight(e.key === "ArrowDown" ? 1 : -1);
+            } else {
+            setOpen(true);
+            }
             break;
         case "Enter":
         case " ":
             e.preventDefault();
-            open ? commitSelection(highlightedIndex) : setOpen(true);
+            if (open) {
+            commitSelection(highlightedIndex);
+            } else {
+            setOpen(true);
+            }
             break;
         case "Escape":
             if (open) {

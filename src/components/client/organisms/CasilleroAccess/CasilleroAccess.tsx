@@ -2,14 +2,22 @@
 
 import { FormEvent, useState } from "react";
 import { useRouter } from "next/navigation";
-import { Button, Input } from "@/components/server/atoms";
+import { Button, Icon, Input, type IconType } from "@/components/server/atoms";
+import { Text } from "@/components/atoms";
 import CasilleroTabs from "@/components/client/molecules/CasilleroTabs/CasilleroTabs";
 import CasilleroPersonTypeSelector from "@/components/client/molecules/CasilleroPersonTypeSelector/CasilleroPersonTypeSelector";
 import CasilleroDriveLinkField from "@/components/client/molecules/CasilleroDriveLinkField/CasilleroDriveLinkField";
 import styles from "./CasilleroAccess.module.scss";
 
-type View = "login" | "register" | "recover-email" | "recover-code" | "recover-password";
+type View = "login" | "login-2fa" | "register" | "recover-email" | "recover-code" | "recover-password";
 type PersonType = "individual" | "legal";
+type TwoFactorMethod = "google" | "microsoft" | "email";
+
+const twoFactorMethods: { id: TwoFactorMethod; icon: IconType; label: string }[] = [
+  { id: "google", icon: "GoogleAuthenticator", label: "Google Authenticator" },
+  { id: "microsoft", icon: "MicrosoftAuthenticator", label: "Microsoft Authenticator" },
+  { id: "email", icon: "Mail", label: "Correo electrónico" },
+];
 
 const fields = {
   login: [
@@ -29,11 +37,13 @@ export default function CasilleroAccess() {
   const router = useRouter();
   const [view, setView] = useState<View>("login");
   const [personType, setPersonType] = useState<PersonType>("individual");
+  const [twoFactorMethod, setTwoFactorMethod] = useState<TwoFactorMethod | null>(null);
   const [message, setMessage] = useState("");
 
   const changeView = (nextView: View) => {
     setView(nextView);
     setMessage("");
+    setTwoFactorMethod(null);
   };
 
   const changePersonType = (nextType: PersonType) => {
@@ -104,6 +114,18 @@ export default function CasilleroAccess() {
     }
 
     if (view === "login") {
+      setTwoFactorMethod(null);
+      setView("login-2fa");
+      setMessage("");
+      return;
+    }
+
+    if (view === "login-2fa") {
+      if (!twoFactorMethod) {
+        setMessage("Selecciona un método de autenticación.");
+        return;
+      }
+
       router.push("/casillero/dashboard");
       return;
     }
@@ -112,6 +134,7 @@ export default function CasilleroAccess() {
   };
 
   const isLogin = view === "login";
+  const isTwoFactor = view === "login-2fa";
   const isRegister = view === "register";
   const isRecovery = view.startsWith("recover-");
 
@@ -199,6 +222,64 @@ export default function CasilleroAccess() {
     );
   };
 
+  const renderTwoFactorFields = () => {
+    return (
+      <>
+        <div className={styles.twoFactorIntro}>
+          <Text>
+            La autenticación en dos pasos es una capa adicional de protección para tu cuenta.
+          </Text>
+          <Text variant="Small">
+            <strong>Nota:</strong> Recuerda revisar la carpeta de Spam
+          </Text>
+        </div>
+
+        <div className={styles.methodsRow} role="radiogroup" aria-label="Método de autenticación">
+          {twoFactorMethods.map((method) => {
+            const isSelected = twoFactorMethod === method.id;
+
+            return (
+              <button
+                key={method.id}
+                type="button"
+                role="radio"
+                aria-checked={isSelected}
+                aria-pressed={isSelected}
+                aria-label={method.label}
+                className={isSelected ? `${styles.methodButton} ${styles.selected}` : styles.methodButton}
+                onClick={() => {
+                  setTwoFactorMethod(method.id);
+                  setMessage("");
+                }}
+              >
+                <Icon name={method.icon} className={styles.methodIcon} />
+              </button>
+            );
+          })}
+        </div>
+
+        <label className={styles.field} htmlFor="two-factor-code">
+          <span>Código</span>
+          <Input
+            id="two-factor-code"
+            name="two-factor-code"
+            type="text"
+            placeholder="*****"
+            autoComplete="one-time-code"
+            required
+            className={styles.input}
+          />
+        </label>
+
+        <div className={styles.loginActions}>
+          <Button type="submit" variant="success" className={styles.submitButton}>
+            Iniciar Sesión
+          </Button>
+        </div>
+      </>
+    );
+  };
+
   return (
     <main className={styles.page}>
       <section className={styles.content}>
@@ -209,15 +290,19 @@ export default function CasilleroAccess() {
         </div>
 
         <div className={styles.card}>
-          <CasilleroTabs
-            loginActive={isLogin || isRecovery}
-            registerActive={isRegister}
-            onLogin={() => changeView("login")}
-            onRegister={() => changeView("register")}
-          />
+          {!isTwoFactor && (
+            <CasilleroTabs
+              loginActive={isLogin || isRecovery}
+              registerActive={isRegister}
+              onLogin={() => changeView("login")}
+              onRegister={() => changeView("register")}
+            />
+          )}
 
           <h2>
-            {isRecovery ? (
+            {isTwoFactor ? (
+              <>Autenticación en dos pasos</>
+            ) : isRecovery ? (
               <>Recuperar Contraseña</>
             ) : isLogin ? (
               <>Inicio de Sesión</>
@@ -269,7 +354,7 @@ export default function CasilleroAccess() {
               </>
             )}
 
-            {!isRecovery && fields[isRegister ? "register" : "login"].map((field) => (
+            {!isRecovery && !isTwoFactor && fields[isRegister ? "register" : "login"].map((field) => (
               <label className={styles.field} key={field.id} htmlFor={field.id}>
                 <span>{field.label}</span>
                 <Input
@@ -292,7 +377,9 @@ export default function CasilleroAccess() {
               </label>
             ))}
 
-            {isRecovery ? (
+            {isTwoFactor ? (
+              renderTwoFactorFields()
+            ) : isRecovery ? (
               <div className={styles.recoveryActions}>
                 <Button type="submit" variant="success" className={styles.submitButton}>
                   {view === "recover-email"

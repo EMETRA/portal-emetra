@@ -1,4 +1,4 @@
-import Card from "@/components/atoms/card/Card";
+// import Card from "@/components/atoms/card/Card";
 import { FINE_CATEGORIES, FineCategory } from "@/types/fines";
 import styles from "./VehicleSummaryCard.module.scss";
 import CardGeneral from "../../atoms/CardGeneral/CardGeneral";

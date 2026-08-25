@@ -1,0 +1,43 @@
+// PagoMultasPage.module.scss
+.wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    margin-top: 1.5rem;
+}
+
+.titleRow {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.titleDivider {
+    flex: 1;
+    height: 2px;
+    background: #abd648;
+    border-radius: 1px;
+}
+
+.title {
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: #1b2a6b;
+    white-space: nowrap;
+    margin: 0;
+}
+
+.content {
+    display: grid;
+    grid-template-columns: 1fr 1.3fr;
+    gap: 1.5rem;
+    align-items: start;
+}
+
+// tablet y mobile: una sola columna
+@media (max-width: 1400px) {
+    .content {
+        grid-template-columns: 1fr;
+        gap: 1.25rem;
+    }
+}

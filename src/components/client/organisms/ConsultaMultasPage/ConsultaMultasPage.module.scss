@@ -28,3 +28,23 @@
     // overflow: hidden;
     // margin-bottom: 0.5rem; 
 }
+
+.selectionHint {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.4rem;
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #1b2a6b;
+    margin: 0 0 0.75rem;
+
+    svg {
+        color: #6dbf6c;
+        flex-shrink: 0;
+    }
+
+    @media (max-width: 768px) {
+        justify-content: flex-start;
+    }
+}

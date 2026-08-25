@@ -1,15 +1,16 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { SectionTitle } from "@/components/server/molecules/SectionTitle";
 import FineDetailHeader from "@/components/client/organisms/FineDetailHeader/FineDetailHeader";
 import InfoCard from "@/components/client/molecules/InfoCard/InfoCard";
 import EvidenceModal from "@/components/client/organisms/EvidenceModal/EvidenceModal";
+import InfoField from "../../atoms/InfoField/InfoField";
 import styles from "./FineDetailPage.module.scss";
 import { FineDetail } from "@/types/fynesDetail";
-import InfoField from "../../atoms/InfoField/InfoField";
+import { useSelectedFinesStore } from "@/store/useSelectedFineStore";
 
-// TODO: replace with the real query, e.g. useObtenerDetalleMulta(id)
 const fine: FineDetail = {
     series: "N",
     number: "456123",
@@ -35,9 +36,24 @@ const fine: FineDetail = {
         "El vehículo fue detectado excediendo el límite permitido de velocidad sobre la Calzada Roosevelt en dirección norte, a la altura de la 14 avenida, según registro realizado por agente municipal de tránsito.",
 };
 
-export default function FineDetailPage(id: { fineId: string }) {
-    console.log("Fine ID:", id.fineId); // TODO: remove after wiring to real data
+export default function FineDetailPage({ fineId }: { fineId: string }) {
+    console.log("Fine ID:", fineId);
+    const router = useRouter();
+    const { addOne } = useSelectedFinesStore();
     const [isModalOpen, setIsModalOpen] = useState(false);
+
+    const handlePayThis = () => {
+        addOne({
+        id: fineId,
+        code: `${fine.series}${fine.number}`,
+        category: fine.category,
+        amount: fine.totalAmount,
+        description: fine.description,
+        location: fine.location,
+        date: fine.date,
+        });
+        router.push("/casillero/dashboard/multas/pagar");
+    };
 
     return (
         <>
@@ -54,6 +70,7 @@ export default function FineDetailPage(id: { fineId: string }) {
             article={fine.article}
             numeral={fine.numeral}
             onVerImagen={() => setIsModalOpen(true)}
+            onPayThis={handlePayThis}
         />
 
         <div className={styles.infoGrid}>
@@ -78,9 +95,9 @@ export default function FineDetailPage(id: { fineId: string }) {
             isOpen={isModalOpen}
             onClose={() => setIsModalOpen(false)}
             imageUrl={fine.evidenceImageUrl}
-            onDownloadImage={() => {/* TODO: wire to real download endpoint */}}
-            onDownloadNotificacion={() => {/* TODO */}}
-            onDownloadRemisionPdf={() => {/* TODO */}}
+            onDownloadImage={() => {}}
+            onDownloadNotificacion={() => {}}
+            onDownloadRemisionPdf={() => {}}
         />
         </>
     );

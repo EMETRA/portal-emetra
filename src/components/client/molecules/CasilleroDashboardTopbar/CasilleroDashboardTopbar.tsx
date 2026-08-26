@@ -17,6 +17,11 @@ export default function CasilleroDashboardTopbar({ userName, onMenuClickAction }
   const router = useRouter();
   const { mode, setMode } = useModeStore();
 
+  const handleModeChange = (newMode: "personal" | "empresa") => {
+    setMode(newMode);
+    router.push("/casillero/dashboard");
+  };
+
   return (
     <div className={styles.topbar}>
       <button className={styles.menuButton} type="button" onClick={onMenuClickAction}>
@@ -32,14 +37,15 @@ export default function CasilleroDashboardTopbar({ userName, onMenuClickAction }
         <button
           type="button"
           className={classNames(styles.modeBtn, { [styles.modeBtnActive]: mode === "personal" })}
-          onClick={() => setMode("personal")}
+          onClick={() => handleModeChange("personal")}
+
         >
           Personal
         </button>
         <button
           type="button"
           className={classNames(styles.modeBtn, { [styles.modeBtnActive]: mode === "empresa" })}
-          onClick={() => setMode("empresa")}
+          onClick={() => handleModeChange("empresa")}
         >
           Empresa
         </button>
@@ -69,7 +75,7 @@ export default function CasilleroDashboardTopbar({ userName, onMenuClickAction }
         <button
           type="button"
           className={classNames(styles.mobileModeBtn, { [styles.mobileModeBtnActive]: mode === "personal" })}
-          onClick={() => setMode("personal")}
+          onClick={() => handleModeChange("personal")}
           aria-label="Modo personal"
         >
           P
@@ -77,7 +83,7 @@ export default function CasilleroDashboardTopbar({ userName, onMenuClickAction }
         <button
           type="button"
           className={classNames(styles.mobileModeBtn, { [styles.mobileModeBtnActive]: mode === "empresa" })}
-          onClick={() => setMode("empresa")}
+          onClick={() => handleModeChange("empresa")}
           aria-label="Modo empresa"
         >
           E

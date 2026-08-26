@@ -57,7 +57,9 @@ export default function EvidenceModal({
             Evidencia y documentos
             </h2>
 
-            <Image src={imageUrl} alt="Evidencia de la infracción" className={styles.image} />
+            <div className={styles.imageContainer}>
+                <Image src={imageUrl} alt="Evidencia de la infracción" width={0} height={0} sizes="100vw" style={{ width: "100%", height: "auto" }} />
+            </div>
 
             <button type="button" className={styles.downloadImageLink} onClick={onDownloadImage}>
             descargar imagen ↓

@@ -136,6 +136,8 @@ export default function CasilleroUserProfile() {
             <Image
               className={styles.avatar}
               src={mockUser.profileImage}
+              width={110}
+              height={110}
               alt="Foto de perfil"
             />
           </div>

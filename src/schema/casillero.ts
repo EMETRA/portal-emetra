@@ -29,7 +29,7 @@ export const dpiSchema = yup.string().required("El DPI es requerido").matches(/^
  */
 export const emailSchema = yup.string().required("El correo electrónico es requerido").email("El correo electrónico no es válido");
 
- /**
+/**
   * **Esquema de validación para la contraseña**
   * @description La contraseña debe tener entre 8 y 16 caracteres. debe tener al menos una letra mayúscula, una letra minúscula, un número y un carácter especial
   * @example "Abc123!@"

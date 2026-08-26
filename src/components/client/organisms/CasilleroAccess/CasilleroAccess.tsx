@@ -8,6 +8,9 @@ import CasilleroTabs from "@/components/client/molecules/CasilleroTabs/Casillero
 import CasilleroPersonTypeSelector from "@/components/client/molecules/CasilleroPersonTypeSelector/CasilleroPersonTypeSelector";
 import CasilleroDriveLinkField from "@/components/client/molecules/CasilleroDriveLinkField/CasilleroDriveLinkField";
 import styles from "./CasilleroAccess.module.scss";
+import { registroIndividualSchema } from "@/schema/casillero-registro";
+import * as yup from "yup";
+import CountrySelect from "../../atoms/CountrySelect/CountrySelect";
 
 type View = "login" | "login-2fa" | "register" | "recover-email" | "recover-code" | "recover-password";
 type PersonType = "individual" | "legal";
@@ -51,7 +54,7 @@ export default function CasilleroAccess() {
     setMessage("");
   };
 
-  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
     if (view === "recover-email") {
@@ -83,24 +86,64 @@ export default function CasilleroAccess() {
 
     if (view === "register") {
       const formData = new FormData(event.currentTarget);
-      const email = String(formData.get("email") ?? "");
-      const confirmEmail = String(formData.get("confirm-email") ?? "");
-      const password = String(formData.get("password") ?? "");
-      const confirmPassword = String(formData.get("confirm-password") ?? "");
-      const rtuLink = String(formData.get("rtu-link") ?? "").trim();
-      const mandateLink = String(formData.get("legal-mandate-link") ?? "").trim();
 
-      if (email !== confirmEmail) {
-        setMessage("Los correos electrónicos no coinciden.");
-        return;
-      }
+      if (personType === "individual") {
+        const data = {
+          firstName:         String(formData.get("firstName") ?? ""),
+          secondName:        String(formData.get("secondName") ?? ""),
+          firstLastName:     String(formData.get("firstLastName") ?? ""),
+          secondLastName:    String(formData.get("secondLastName") ?? ""),
+          email:             String(formData.get("email") ?? ""),
+          confirmEmail:      String(formData.get("confirm-email") ?? ""),
+          password:          String(formData.get("password") ?? ""),
+          confirmPassword:   String(formData.get("confirm-password") ?? ""),
+          dateOfBirth:       String(formData.get("dateOfBirth") ?? ""),
+          nationality:       String(formData.get("nationality") ?? ""),
+          residenceCountry:  String(formData.get("residenceCountry") ?? ""),
+          documentNumber:    String(formData.get("dpi") ?? ""),
+          documentCountry:   String(formData.get("documentCountry") ?? ""),
+          documentIssuedOn:  String(formData.get("documentIssuedOn") ?? ""),
+          documentExpiresOn: String(formData.get("documentExpiresOn") ?? ""),
+        };
 
-      if (password !== confirmPassword) {
-        setMessage("Las contraseñas no coinciden.");
+        try {
+          await registroIndividualSchema.validate(data, { abortEarly: true });
+        } catch (err) {
+          if (err instanceof yup.ValidationError) {
+            setMessage(err.message);
+            return;
+          }
+        }
+
+        const documentFile = formData.get("documentFile") as File | null;
+        if (!documentFile || documentFile.size === 0) {
+          setMessage("Debes adjuntar el archivo de tu DPI.");
+          return;
+        }
+
+        // TODO: POST /v1/registrations
+        setMessage("El registro se conectará al servicio de Casillero.");
         return;
       }
 
       if (personType === "legal") {
+        const email = String(formData.get("email") ?? "");
+        const confirmEmail = String(formData.get("confirm-email") ?? "");
+        const password = String(formData.get("password") ?? "");
+        const confirmPassword = String(formData.get("confirm-password") ?? "");
+        const rtuLink = String(formData.get("rtu-link") ?? "").trim();
+        const mandateLink = String(formData.get("legal-mandate-link") ?? "").trim();
+
+        if (email !== confirmEmail) {
+          setMessage("Los correos electrónicos no coinciden.");
+          return;
+        }
+
+        if (password !== confirmPassword) {
+          setMessage("Las contraseñas no coinciden.");
+          return;
+        }
+
         if (!isGoogleDriveUrl(rtuLink) || !isGoogleDriveUrl(mandateLink)) {
           setMessage("Los enlaces de RTU y Mandato deben ser enlaces válidos de Google Drive.");
           return;
@@ -110,6 +153,10 @@ export default function CasilleroAccess() {
           setMessage("El enlace de RTU y el Mandato Representante Legal no pueden ser el mismo.");
           return;
         }
+
+        // TODO: POST jurídica
+        setMessage("El registro se conectará al servicio de Casillero.");
+        return;
       }
     }
 
@@ -326,7 +373,28 @@ export default function CasilleroAccess() {
               />
             )}
 
-            {isRegister && (
+            {isRegister && personType === "individual" && (
+              <>
+                <label className={styles.field} htmlFor="firstName">
+                  <span>Nombre</span>
+                  <Input id="firstName" name="firstName" type="text" placeholder="Ana" required className={styles.input} />
+                </label>
+                <label className={styles.field} htmlFor="secondName">
+                  <span>Segundo nombre</span>
+                  <Input id="secondName" name="secondName" type="text" placeholder="María" className={styles.input} />
+                </label>
+                <label className={styles.field} htmlFor="firstLastName">
+                  <span>Primer apellido</span>
+                  <Input id="firstLastName" name="firstLastName" type="text" placeholder="López" required className={styles.input} />
+                </label>
+                <label className={styles.field} htmlFor="secondLastName">
+                  <span>Segundo apellido</span>
+                  <Input id="secondLastName" name="secondLastName" type="text" placeholder="García" className={styles.input} />
+                </label>
+              </>
+            )}
+
+            {isRegister && personType === "legal" && (
               <>
                 <label className={styles.field} htmlFor="dpi">
                   <span>DPI</span>
@@ -336,11 +404,6 @@ export default function CasilleroAccess() {
                   <span>NIT</span>
                   <Input id="nit" name="nit" type="text" placeholder="12345678" required className={styles.input} />
                 </label>
-              </>
-            )}
-
-            {isRegister && personType === "legal" && (
-              <>
                 <CasilleroDriveLinkField
                   id="rtu-link"
                   label="RTU"
@@ -354,28 +417,89 @@ export default function CasilleroAccess() {
               </>
             )}
 
-            {!isRecovery && !isTwoFactor && fields[isRegister ? "register" : "login"].map((field) => (
-              <label className={styles.field} key={field.id} htmlFor={field.id}>
-                <span>{field.label}</span>
-                <Input
-                  id={field.id}
-                  name={field.id}
-                  type={field.type}
-                  placeholder={field.placeholder}
-                  required
-                  autoComplete={
-                    field.id.includes("password")
-                      ? isLogin
-                        ? "current-password"
-                        : "new-password"
-                      : field.type === "email"
-                        ? "email"
-                        : "off"
-                  }
-                  className={styles.input}
-                />
-              </label>
-            ))}
+            {!isRecovery && !isTwoFactor && fields[isRegister ? "register" : "login"]
+              .filter((field) => {
+                if (isRegister && personType === "individual" && field.id === "phone") return false;
+                return true;
+              })
+              .map((field) => (
+                <label className={styles.field} key={field.id} htmlFor={field.id}>
+                  <span>{field.label}</span>
+                  <Input
+                    id={field.id}
+                    name={field.id}
+                    type={field.type}
+                    placeholder={field.placeholder}
+                    required
+                    autoComplete={
+                      field.id.includes("password")
+                        ? isLogin
+                          ? "current-password"
+                          : "new-password"
+                        : field.type === "email"
+                          ? "email"
+                          : "off"
+                    }
+                    className={styles.input}
+                  />
+                </label>
+              ))
+            }
+
+            {isRegister && personType === "individual" && (
+              <>
+                <label className={styles.field} htmlFor="dateOfBirth">
+                  <span>Fecha de nacimiento</span>
+                  <Input id="dateOfBirth" name="dateOfBirth" type="date" required className={styles.input} />
+                </label>
+                <label className={styles.field} htmlFor="nationality">
+                  <span>Nacionalidad</span>
+                  <CountrySelect id="nationality" name="nationality" required className={styles.input} />
+                </label>
+                <label className={styles.field} htmlFor="residenceCountry">
+                  <span>País de residencia</span>
+                  <CountrySelect id="residenceCountry" name="residenceCountry" required className={styles.input} />
+                </label>
+                <div className={`${styles.sectionDivider} ${styles.fullCol}`}>
+                  <span>Documento de identidad (DPI)</span>
+                </div>
+
+                <label className={styles.field} htmlFor="dpi">
+                  <span>Número de DPI</span>
+                  <Input id="dpi" name="dpi" type="text" placeholder="2546987850101" required className={styles.input} />
+                </label>
+                <label className={styles.field} htmlFor="documentCountry">
+                  <span>País del documento</span>
+                  <CountrySelect id="documentCountry" name="documentCountry" required className={styles.input} />
+                </label>
+                <label className={styles.field} htmlFor="documentIssuedOn">
+                  <span>Fecha de emisión</span>
+                  <Input id="documentIssuedOn" name="documentIssuedOn" type="date" required className={styles.input} />
+                </label>
+                <label className={styles.field} htmlFor="documentExpiresOn">
+                  <span>Fecha de vencimiento</span>
+                  <Input id="documentExpiresOn" name="documentExpiresOn" type="date" required className={styles.input} />
+                </label>
+                <label className={`${styles.field} ${styles.fullCol}`} htmlFor="documentFile">
+                  <span>Archivo del DPI <span className={styles.hint}>(PDF, JPG, PNG · máx. 10 MB)</span></span>
+                  <input
+                    id="documentFile"
+                    name="documentFile"
+                    type="file"
+                    accept=".pdf,image/jpeg,image/png"
+                    required
+                    className={styles.fileInput}
+                    onChange={(e) => {
+                      const file = e.target.files?.[0];
+                      if (file && file.size > 10 * 1024 * 1024) {
+                        setMessage("El archivo no puede superar 10 MB.");
+                        e.target.value = "";
+                      }
+                    }}
+                  />
+                </label>
+              </>
+            )}
 
             {isTwoFactor ? (
               renderTwoFactorFields()

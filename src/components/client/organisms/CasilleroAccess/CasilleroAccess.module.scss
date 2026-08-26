@@ -405,3 +405,57 @@
     padding-top: 8px;
   }
 }
+
+
+.optional {
+  font-weight: 400;
+  color: #999;
+  font-size: 0.8em;
+}
+
+.hint {
+  font-weight: 400;
+  color: #999;
+  font-size: 0.8em;
+}
+
+.sectionDivider {
+  grid-column: 1 / -1;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin: 0.5rem 0;
+
+  span {
+    font-size: 0.82rem;
+    font-weight: 700;
+    color: #666;
+    white-space: nowrap;
+  }
+
+  &::before,
+  &::after {
+    content: "";
+    flex: 1;
+    height: 1px;
+    background: #e0e0e0;
+  }
+}
+
+.fullCol {
+  grid-column: 1 / -1;
+}
+
+.fileInput {
+  padding: 10px 12px;
+  border: 1px dashed #c0c0c0;
+  border-radius: 7px;
+  background: #fafafa;
+  font-size: 0.82rem;
+  cursor: pointer;
+
+  &:hover {
+    border-color: #1b2a6b;
+    background: #f0f4ff;
+  }
+}

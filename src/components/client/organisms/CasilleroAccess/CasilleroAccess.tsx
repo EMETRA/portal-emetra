@@ -23,6 +23,12 @@ export default function CasilleroAccess() {
   const router = useRouter();
   const [view, setView] = useState<AccessView>("login");
   const [notice, setNotice] = useState("");
+  const [verificationId, setVerificationId] = useState("");
+
+  const handleRegisterSuccess = (verificationId: string) => {
+    setVerificationId(verificationId);
+    changeView("verify-email");
+  };
 
   const changeView = (nextView: AccessView) => {
     setView(nextView);
@@ -82,13 +88,13 @@ export default function CasilleroAccess() {
             <TwoFactorView onSuccess={() => router.push("/casillero/dashboard")} />
           )}
           {view === "register" && (
-            <RegisterView onLogin={() => changeView("login")} onSuccess={() => changeView("verify-email")} />
+            <RegisterView onLogin={() => changeView("login")} onSuccess={handleRegisterSuccess} />
           )}
           {view === "recover" && (
             <RecoverView onLogin={goToLogin} />
           )}
           {view === "verify-email" && (
-            <VerifyEmailView onSuccess={() => changeView("login")} />
+            <VerifyEmailView verificationId={verificationId} onSuccess={() => changeView("login")} />
           )}
         </div>
       </section>

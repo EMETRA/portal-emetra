@@ -12,7 +12,7 @@ import styles from "../CasilleroAccess.module.scss";
 
 type Props = {
   onLogin: () => void;
-  onSuccess: () => void;
+  onSuccess: (verificationId: string) => void;
 };
 
 function formValue(formData: FormData, key: string) {
@@ -68,7 +68,7 @@ export default function RegisterView({ onLogin, onSuccess }: Props) {
 
       // TODO: POST /v1/registrations
       // setMessage("El registro se conectará al servicio de Casillero.");
-      onSuccess();
+      onSuccess("123456");
       return;
     }
 

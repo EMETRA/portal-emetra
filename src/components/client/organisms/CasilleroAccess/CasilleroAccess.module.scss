@@ -173,6 +173,8 @@
 .registerForm > .submitButton {
   grid-column: 1 / -1;
   margin-top: 8px;
+  max-width: 100%;
+  width: 100%;
 }
 
 .forgotPassword {
@@ -437,6 +439,8 @@
 }
 
 .fileInput {
+  max-width: 100%;
+  width: 100%;
   padding: 10px 12px;
   border: 1px dashed #c0c0c0;
   border-radius: 7px;

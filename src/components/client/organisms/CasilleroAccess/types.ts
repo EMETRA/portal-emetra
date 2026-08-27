@@ -1,4 +1,4 @@
-export type AccessView = "login" | "login-2fa" | "register" | "recover";
+export type AccessView = "login" | "login-2fa" | "register" | "recover" | "verify-email";
 
 export type PersonType = "individual" | "legal";
 

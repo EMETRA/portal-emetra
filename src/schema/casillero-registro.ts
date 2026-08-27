@@ -76,3 +76,5 @@ export const registroLegalSchema = yup.object({
 );
 
 export type RegistroLegalData = yup.InferType<typeof registroLegalSchema>;
+
+export const VerifyEmailCode = yup.string().required("El código de verificación es requerido");

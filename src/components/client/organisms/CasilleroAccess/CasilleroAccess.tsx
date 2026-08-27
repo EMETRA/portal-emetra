@@ -7,6 +7,7 @@ import LoginView from "./views/LoginView";
 import TwoFactorView from "./views/TwoFactorView";
 import RegisterView from "./views/RegisterView";
 import RecoverView from "./views/RecoverView";
+import VerifyEmailView from "./views/VerifyEmailView";
 import type { AccessView } from "./types";
 import styles from "./CasilleroAccess.module.scss";
 
@@ -15,6 +16,7 @@ const pageTitle: Record<AccessView, string> = {
   "login-2fa": "Log In",
   register: "Registro",
   recover: "Recuperar Contraseña",
+  "verify-email": "Verificar Email",
 };
 
 export default function CasilleroAccess() {
@@ -42,7 +44,7 @@ export default function CasilleroAccess() {
         </div>
 
         <div className={styles.card}>
-          {view !== "login-2fa" && (
+          {view !== "login-2fa" && view !== "verify-email" && (
             <CasilleroTabs
               loginActive={view === "login" || view === "recover"}
               registerActive={view === "register"}
@@ -58,6 +60,8 @@ export default function CasilleroAccess() {
               <>Recuperar Contraseña</>
             ) : view === "login" ? (
               <>Inicio de Sesión</>
+            ) : view === "verify-email" ? (
+              <>Verificar Email</>
             ) : (
               <>
                 <span className={styles.desktopTitle}>Creación de Cuenta</span>
@@ -78,10 +82,13 @@ export default function CasilleroAccess() {
             <TwoFactorView onSuccess={() => router.push("/casillero/dashboard")} />
           )}
           {view === "register" && (
-            <RegisterView onLogin={() => changeView("login")} />
+            <RegisterView onLogin={() => changeView("login")} onSuccess={() => changeView("verify-email")} />
           )}
           {view === "recover" && (
             <RecoverView onLogin={goToLogin} />
+          )}
+          {view === "verify-email" && (
+            <VerifyEmailView onSuccess={() => changeView("login")} />
           )}
         </div>
       </section>

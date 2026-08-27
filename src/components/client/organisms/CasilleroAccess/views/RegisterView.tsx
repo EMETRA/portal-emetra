@@ -12,13 +12,14 @@ import styles from "../CasilleroAccess.module.scss";
 
 type Props = {
   onLogin: () => void;
+  onSuccess: () => void;
 };
 
 function formValue(formData: FormData, key: string) {
   return String(formData.get(key) ?? "");
 }
 
-export default function RegisterView({ onLogin }: Props) {
+export default function RegisterView({ onLogin, onSuccess }: Props) {
   const [personType, setPersonType] = useState<PersonType>("individual");
   const [message, setMessage] = useState("");
 
@@ -66,7 +67,8 @@ export default function RegisterView({ onLogin }: Props) {
       }
 
       // TODO: POST /v1/registrations
-      setMessage("El registro se conectará al servicio de Casillero.");
+      // setMessage("El registro se conectará al servicio de Casillero.");
+      onSuccess();
       return;
     }
 

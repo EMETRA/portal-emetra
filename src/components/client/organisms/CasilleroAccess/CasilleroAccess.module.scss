@@ -252,7 +252,7 @@
 
   .card {
     width: 100%;
-    min-height: 515px;
+    min-height: minmax(515px, fit-content);
     padding: 24px 24px 34px;
     display: flex;
     flex-direction: column;

@@ -58,3 +58,26 @@ export const passwordSchema = yup
  */
 export const cellPhoneSchema = yup.string().required("El teléfono es requerido").matches(/^\d{8}$/, "El teléfono debe tener 8 dígitos. Sin espacios");
 
+/**
+ * **Esquema de validación para un enlace de Google Drive**
+ * @description Debe ser una URL válida cuyo host sea drive.google.com
+ * @example "https://drive.google.com/file/d/abc123/view"
+ */
+export const googleDriveUrlSchema = yup
+  .string()
+  .required("El enlace es requerido")
+  .url("Debe ser un enlace válido")
+  .test(
+    "google-drive",
+    "Los enlaces de RTU y Mandato deben ser enlaces válidos de Google Drive.",
+    (value) => {
+      if (!value) return false;
+      try {
+        const url = new URL(value);
+        return url.hostname === "drive.google.com" || url.hostname.endsWith(".drive.google.com");
+      } catch {
+        return false;
+      }
+    },
+  );
+

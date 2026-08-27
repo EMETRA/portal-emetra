@@ -61,18 +61,7 @@
   margin: 0 auto;
   display: flex;
   flex-direction: column;
-
-  > .field {
-    order: 1;
-  }
-
-  > .recoveryActions {
-    order: 2;
-  }
-
-  > .formMessage {
-    order: 3;
-  }
+  gap: 16px;
 }
 
 .registerForm {
@@ -87,6 +76,7 @@
   gap: 7px;
   font-size: 0.9rem;
   font-weight: 700;
+  max-width: 100%;
 }
 
 .input {
@@ -261,7 +251,7 @@
   .card {
     width: 100%;
     min-height: 515px;
-    padding: 24px 48px 34px;
+    padding: 24px 24px 34px;
     display: flex;
     flex-direction: column;
     justify-content: flex-start;

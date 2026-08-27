@@ -1,6 +1,5 @@
+import type { PersonType } from "@/components/client/organisms/CasilleroAccess/types";
 import styles from "./CasilleroPersonTypeSelector.module.scss";
-
-type PersonType = "individual" | "legal";
 
 type Props = {
   value: PersonType;

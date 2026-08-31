@@ -4,6 +4,7 @@ import { FormEvent, useState } from "react";
 import { Button, Input } from "@/components/server/atoms";
 import { Text } from "@/components/atoms";
 import { VerifyEmailCode } from "@/schema/casillero-registro";
+import { confirmContactVerification } from "@/lib/casillero/api";
 import * as yup from "yup";
 import styles from "../CasilleroAccess.module.scss";
 
@@ -14,12 +15,14 @@ type Props = {
 
 export default function VerifyEmailView({ verificationId, onSuccess }: Props) {
   const [message, setMessage] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+    if (isSubmitting) return;
 
     const formData = new FormData(event.currentTarget);
-    const code = formData.get("verify-email-code");
+    const code = String(formData.get("verify-email-code") ?? "").trim();
 
     try {
       await VerifyEmailCode.validate(code);
@@ -30,13 +33,19 @@ export default function VerifyEmailView({ verificationId, onSuccess }: Props) {
       }
     }
 
+    setIsSubmitting(true);
+    setMessage("");
     try {
-        //   await verifyEmail(verificationId, code);
-        await new Promise((resolve) => setTimeout(() => Math.random() > 0.5 ? resolve(true) : resolve(false), 1000));
-
-        onSuccess();
+      await confirmContactVerification(verificationId, code);
+      onSuccess();
     } catch (error) {
-      setMessage("El código de verificación es incorrecto.");
+      setMessage(
+        error instanceof Error
+          ? error.message
+          : "El código de verificación es incorrecto."
+      );
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -65,8 +74,13 @@ export default function VerifyEmailView({ verificationId, onSuccess }: Props) {
       </label>
 
       <div className={styles.loginActions}>
-        <Button type="submit" variant="success" className={styles.submitButton}>
-          Verificar
+        <Button
+          type="submit"
+          variant="success"
+          className={styles.submitButton}
+          disabled={isSubmitting}
+        >
+          {isSubmitting ? "Verificando..." : "Verificar"}
         </Button>
       </div>
       {message && <p className={styles.formMessage}>{message}</p>}

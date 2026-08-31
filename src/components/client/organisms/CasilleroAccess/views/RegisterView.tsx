@@ -5,6 +5,7 @@ import * as yup from "yup";
 import { Button } from "@/components/server/atoms";
 import CasilleroPersonTypeSelector from "@/components/client/molecules/CasilleroPersonTypeSelector/CasilleroPersonTypeSelector";
 import { registroIndividualSchema, registroLegalSchema } from "@/schema/casillero-registro";
+import { requestContactVerification } from "@/lib/casillero/api";
 import IndividualRegisterFields from "../fields/IndividualRegisterFields";
 import LegalRegisterFields from "../fields/LegalRegisterFields";
 import type { PersonType } from "../types";
@@ -22,14 +23,33 @@ function formValue(formData: FormData, key: string) {
 export default function RegisterView({ onLogin, onSuccess }: Props) {
   const [personType, setPersonType] = useState<PersonType>("individual");
   const [message, setMessage] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const changePersonType = (nextType: PersonType) => {
     setPersonType(nextType);
     setMessage("");
   };
 
+  const requestVerification = async (email: string) => {
+    setIsSubmitting(true);
+    setMessage("");
+    try {
+      const result = await requestContactVerification(email);
+      onSuccess(result.verificationId);
+    } catch (err) {
+      setMessage(
+        err instanceof Error
+          ? err.message
+          : "No se pudo enviar el código de verificación."
+      );
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+    if (isSubmitting) return;
     const formData = new FormData(event.currentTarget);
 
     if (personType === "individual") {
@@ -66,9 +86,7 @@ export default function RegisterView({ onLogin, onSuccess }: Props) {
         return;
       }
 
-      // TODO: POST /v1/registrations
-      // setMessage("El registro se conectará al servicio de Casillero.");
-      onSuccess("123456");
+      await requestVerification(data.email);
       return;
     }
 
@@ -92,8 +110,7 @@ export default function RegisterView({ onLogin, onSuccess }: Props) {
       }
     }
 
-    // TODO: POST jurídica
-    setMessage("El registro se conectará al servicio de Casillero.");
+    await requestVerification(legalData.email);
   };
 
   return (
@@ -116,8 +133,13 @@ export default function RegisterView({ onLogin, onSuccess }: Props) {
           responsabilidad legal sobre los datos registrados.
         </span>
       </label>
-      <Button type="submit" variant="success" className={styles.submitButton}>
-        Crear Cuenta
+      <Button
+        type="submit"
+        variant="success"
+        className={styles.submitButton}
+        disabled={isSubmitting}
+      >
+        {isSubmitting ? "Enviando código..." : "Crear Cuenta"}
       </Button>
       <button
         type="button"

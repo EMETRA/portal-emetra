@@ -61,18 +61,7 @@
   margin: 0 auto;
   display: flex;
   flex-direction: column;
-
-  > .field {
-    order: 1;
-  }
-
-  > .recoveryActions {
-    order: 2;
-  }
-
-  > .formMessage {
-    order: 3;
-  }
+  gap: 16px;
 }
 
 .registerForm {
@@ -87,6 +76,7 @@
   gap: 7px;
   font-size: 0.9rem;
   font-weight: 700;
+  max-width: 100%;
 }
 
 .input {
@@ -183,6 +173,8 @@
 .registerForm > .submitButton {
   grid-column: 1 / -1;
   margin-top: 8px;
+  max-width: 100%;
+  width: 100%;
 }
 
 .forgotPassword {
@@ -260,8 +252,8 @@
 
   .card {
     width: 100%;
-    min-height: 515px;
-    padding: 24px 48px 34px;
+    min-height: minmax(515px, fit-content);
+    padding: 24px 24px 34px;
     display: flex;
     flex-direction: column;
     justify-content: flex-start;
@@ -447,6 +439,8 @@
 }
 
 .fileInput {
+  max-width: 100%;
+  width: 100%;
   padding: 10px 12px;
   border: 1px dashed #c0c0c0;
   border-radius: 7px;
@@ -458,4 +452,39 @@
     border-color: #1b2a6b;
     background: #f0f4ff;
   }
+}
+
+.resendLink {
+  display: block;
+  width: fit-content;
+  margin: 0.5rem auto 0;
+  background: none;
+  border: none;
+  padding: 0;
+
+  font-size: 0.875rem;
+  color: var(--color-primary, #2f8f4e);
+  text-decoration: underline;
+  text-underline-offset: 0.15rem;
+  cursor: pointer;
+
+  &:hover:not(:disabled) {
+    color: var(--color-primary-dark, #256f3c);
+  }
+
+  &:disabled {
+    color: var(--text-muted, #8a8a8a);
+    text-decoration: none;
+    cursor: default;
+  }
+}
+
+.timer {
+  text-align: center;
+  color: var(--text-muted, #8a8a8a);
+}
+
+.timerExpired {
+  text-align: center;
+  color: var(--color-danger, #c0392b);
 }

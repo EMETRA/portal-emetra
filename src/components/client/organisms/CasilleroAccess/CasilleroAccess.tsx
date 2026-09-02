@@ -1,329 +1,59 @@
 "use client";
 
-import { FormEvent, useState } from "react";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Button, Icon, Input, type IconType } from "@/components/server/atoms";
-import { Text } from "@/components/atoms";
 import CasilleroTabs from "@/components/client/molecules/CasilleroTabs/CasilleroTabs";
-import CasilleroPersonTypeSelector from "@/components/client/molecules/CasilleroPersonTypeSelector/CasilleroPersonTypeSelector";
-import CasilleroDriveLinkField from "@/components/client/molecules/CasilleroDriveLinkField/CasilleroDriveLinkField";
+import LoginView from "./views/LoginView";
+import TwoFactorView from "./views/TwoFactorView";
+import RegisterView from "./views/RegisterView";
+import RecoverView from "./views/RecoverView";
+import VerifyEmailView from "./views/VerifyEmailView";
+import type { AccessView } from "./types";
 import styles from "./CasilleroAccess.module.scss";
-import { registroIndividualSchema } from "@/schema/casillero-registro";
-import * as yup from "yup";
-import CountrySelect from "../../atoms/CountrySelect/CountrySelect";
 
-type View = "login" | "login-2fa" | "register" | "recover-email" | "recover-code" | "recover-password";
-type PersonType = "individual" | "legal";
-type TwoFactorMethod = "google" | "microsoft" | "email";
-
-const twoFactorMethods: { id: TwoFactorMethod; icon: IconType; label: string }[] = [
-  { id: "google", icon: "GoogleAuthenticator", label: "Google Authenticator" },
-  { id: "microsoft", icon: "MicrosoftAuthenticator", label: "Microsoft Authenticator" },
-  { id: "email", icon: "Mail", label: "Correo electrónico" },
-];
-
-const fields = {
-  login: [
-    { id: "login-email", label: "Correo electrónico", type: "email", placeholder: "example@muniguate.com" },
-    { id: "login-password", label: "Contraseña", type: "password", placeholder: "Ingresa tu contraseña" },
-  ],
-  register: [
-    { id: "email", label: "Correo electrónico", type: "email", placeholder: "example@muniguate.com" },
-    { id: "confirm-email", label: "Confirmar correo electrónico", type: "email", placeholder: "example@muniguate.com" },
-    { id: "phone", label: "Teléfono", type: "tel", placeholder: "12345678" },
-    { id: "password", label: "Contraseña", type: "password", placeholder: "Ingresa tu contraseña" },
-    { id: "confirm-password", label: "Confirmar contraseña", type: "password", placeholder: "Confirma tu contraseña" },
-  ],
-} as const;
+const pageTitle: Record<AccessView, string> = {
+  login: "Log In",
+  "login-2fa": "Log In",
+  register: "Registro",
+  recover: "Recuperar Contraseña",
+  "verify-email": "Verificar Email",
+};
 
 export default function CasilleroAccess() {
   const router = useRouter();
-  const [view, setView] = useState<View>("login");
-  const [personType, setPersonType] = useState<PersonType>("individual");
-  const [twoFactorMethod, setTwoFactorMethod] = useState<TwoFactorMethod | null>(null);
-  const [message, setMessage] = useState("");
+  const [view, setView] = useState<AccessView>("login");
+  const [notice, setNotice] = useState("");
+  const [verificationId, setVerificationId] = useState("");
+  const [verificationEmail, setVerificationEmail] = useState("");
+  const [verificationExpiresAt, setVerificationExpiresAt] = useState("");
 
-  const changeView = (nextView: View) => {
+  const handleRegisterSuccess = (
+    newVerificationId: string,
+    email: string,
+    expiresAt: string
+  ) => {
+    setVerificationId(newVerificationId);
+    setVerificationEmail(email);
+    setVerificationExpiresAt(expiresAt);
+    changeView("verify-email");
+  };
+
+  const handleResendVerification = (
+    newVerificationId: string,
+    newExpiresAt: string
+  ) => {
+    setVerificationId(newVerificationId);
+    setVerificationExpiresAt(newExpiresAt);
+  };
+
+  const changeView = (nextView: AccessView) => {
     setView(nextView);
-    setMessage("");
-    setTwoFactorMethod(null);
+    setNotice("");
   };
 
-  const changePersonType = (nextType: PersonType) => {
-    setPersonType(nextType);
-    setMessage("");
-  };
-
-  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-
-    if (view === "recover-email") {
-      setView("recover-code");
-      setMessage("");
-      return;
-    }
-
-    if (view === "recover-code") {
-      setView("recover-password");
-      setMessage("");
-      return;
-    }
-
-    if (view === "recover-password") {
-      const formData = new FormData(event.currentTarget);
-      const password = String(formData.get("recovery-password") ?? "");
-      const confirmPassword = String(formData.get("recovery-confirm-password") ?? "");
-
-      if (password !== confirmPassword) {
-        setMessage("Las contraseñas no coinciden.");
-        return;
-      }
-
-      setView("login");
-      setMessage("La contraseña fue restablecida correctamente.");
-      return;
-    }
-
-    if (view === "register") {
-      const formData = new FormData(event.currentTarget);
-
-      if (personType === "individual") {
-        const data = {
-          firstName:         String(formData.get("firstName") ?? ""),
-          secondName:        String(formData.get("secondName") ?? ""),
-          firstLastName:     String(formData.get("firstLastName") ?? ""),
-          secondLastName:    String(formData.get("secondLastName") ?? ""),
-          email:             String(formData.get("email") ?? ""),
-          confirmEmail:      String(formData.get("confirm-email") ?? ""),
-          password:          String(formData.get("password") ?? ""),
-          confirmPassword:   String(formData.get("confirm-password") ?? ""),
-          dateOfBirth:       String(formData.get("dateOfBirth") ?? ""),
-          nationality:       String(formData.get("nationality") ?? ""),
-          residenceCountry:  String(formData.get("residenceCountry") ?? ""),
-          documentNumber:    String(formData.get("dpi") ?? ""),
-          documentCountry:   String(formData.get("documentCountry") ?? ""),
-          documentIssuedOn:  String(formData.get("documentIssuedOn") ?? ""),
-          documentExpiresOn: String(formData.get("documentExpiresOn") ?? ""),
-        };
-
-        try {
-          await registroIndividualSchema.validate(data, { abortEarly: true });
-        } catch (err) {
-          if (err instanceof yup.ValidationError) {
-            setMessage(err.message);
-            return;
-          }
-        }
-
-        const documentFile = formData.get("documentFile") as File | null;
-        if (!documentFile || documentFile.size === 0) {
-          setMessage("Debes adjuntar el archivo de tu DPI.");
-          return;
-        }
-
-        // TODO: POST /v1/registrations
-        setMessage("El registro se conectará al servicio de Casillero.");
-        return;
-      }
-
-      if (personType === "legal") {
-        const email = String(formData.get("email") ?? "");
-        const confirmEmail = String(formData.get("confirm-email") ?? "");
-        const password = String(formData.get("password") ?? "");
-        const confirmPassword = String(formData.get("confirm-password") ?? "");
-        const rtuLink = String(formData.get("rtu-link") ?? "").trim();
-        const mandateLink = String(formData.get("legal-mandate-link") ?? "").trim();
-
-        if (email !== confirmEmail) {
-          setMessage("Los correos electrónicos no coinciden.");
-          return;
-        }
-
-        if (password !== confirmPassword) {
-          setMessage("Las contraseñas no coinciden.");
-          return;
-        }
-
-        if (!isGoogleDriveUrl(rtuLink) || !isGoogleDriveUrl(mandateLink)) {
-          setMessage("Los enlaces de RTU y Mandato deben ser enlaces válidos de Google Drive.");
-          return;
-        }
-
-        if (normalizeUrl(rtuLink) === normalizeUrl(mandateLink)) {
-          setMessage("El enlace de RTU y el Mandato Representante Legal no pueden ser el mismo.");
-          return;
-        }
-
-        // TODO: POST jurídica
-        setMessage("El registro se conectará al servicio de Casillero.");
-        return;
-      }
-    }
-
-    if (view === "login") {
-      setTwoFactorMethod(null);
-      setView("login-2fa");
-      setMessage("");
-      return;
-    }
-
-    if (view === "login-2fa") {
-      if (!twoFactorMethod) {
-        setMessage("Selecciona un método de autenticación.");
-        return;
-      }
-
-      router.push("/casillero/dashboard");
-      return;
-    }
-
-    setMessage("El registro se conectará al servicio de Casillero.");
-  };
-
-  const isLogin = view === "login";
-  const isTwoFactor = view === "login-2fa";
-  const isRegister = view === "register";
-  const isRecovery = view.startsWith("recover-");
-
-  function isGoogleDriveUrl(value: string) {
-    try {
-      const url = new URL(value);
-      return url.hostname === "drive.google.com" || url.hostname.endsWith(".drive.google.com");
-    } catch {
-      return false;
-    }
-  }
-
-  function normalizeUrl(value: string) {
-    try {
-      const url = new URL(value);
-      url.hash = "";
-      return url.toString().replace(/\/$/, "");
-    } catch {
-      return value.trim().replace(/\/$/, "");
-    }
-  }
-
-  const renderRecoveryFields = () => {
-    if (view === "recover-email") {
-      return (
-        <label className={styles.field} htmlFor="recovery-email">
-          <span>Correo electrónico</span>
-          <Input
-            id="recovery-email"
-            name="recovery-email"
-            type="email"
-            placeholder="example@muniguate.com"
-            autoComplete="email"
-            required
-            className={styles.input}
-          />
-        </label>
-      );
-    }
-
-    if (view === "recover-code") {
-      return (
-        <label className={styles.field} htmlFor="recovery-code">
-          <span>Ingresar código</span>
-          <Input
-            id="recovery-code"
-            name="recovery-code"
-            type="text"
-            placeholder="8QGRH7T6"
-            autoComplete="one-time-code"
-            required
-            className={styles.input}
-          />
-        </label>
-      );
-    }
-
-    return (
-      <>
-        <label className={styles.field} htmlFor="recovery-password">
-          <span>Nueva Contraseña</span>
-          <Input
-            id="recovery-password"
-            name="recovery-password"
-            type="password"
-            placeholder="Ingresa tu nueva contraseña"
-            autoComplete="new-password"
-            required
-            className={styles.input}
-          />
-        </label>
-        <label className={styles.field} htmlFor="recovery-confirm-password">
-          <span>Confirmar Contraseña</span>
-          <Input
-            id="recovery-confirm-password"
-            name="recovery-confirm-password"
-            type="password"
-            placeholder="Confirma tu nueva contraseña"
-            autoComplete="new-password"
-            required
-            className={styles.input}
-          />
-        </label>
-      </>
-    );
-  };
-
-  const renderTwoFactorFields = () => {
-    return (
-      <>
-        <div className={styles.twoFactorIntro}>
-          <Text>
-            La autenticación en dos pasos es una capa adicional de protección para tu cuenta.
-          </Text>
-          <Text variant="Small">
-            <strong>Nota:</strong> Recuerda revisar la carpeta de Spam
-          </Text>
-        </div>
-
-        <div className={styles.methodsRow} role="radiogroup" aria-label="Método de autenticación">
-          {twoFactorMethods.map((method) => {
-            const isSelected = twoFactorMethod === method.id;
-
-            return (
-              <button
-                key={method.id}
-                type="button"
-                role="radio"
-                aria-checked={isSelected}
-                aria-label={method.label}
-                className={isSelected ? `${styles.methodButton} ${styles.selected}` : styles.methodButton}
-                onClick={() => {
-                  setTwoFactorMethod(method.id);
-                  setMessage("");
-                }}
-              >
-                <Icon name={method.icon} className={styles.methodIcon} />
-              </button>
-            );
-          })}
-        </div>
-
-        <label className={styles.field} htmlFor="two-factor-code">
-          <span>Código</span>
-          <Input
-            id="two-factor-code"
-            name="two-factor-code"
-            type="text"
-            placeholder="*****"
-            autoComplete="one-time-code"
-            required
-            className={styles.input}
-          />
-        </label>
-
-        <div className={styles.loginActions}>
-          <Button type="submit" variant="success" className={styles.submitButton}>
-            Iniciar Sesión
-          </Button>
-        </div>
-      </>
-    );
+  const goToLogin = (message?: string) => {
+    setNotice(message ?? "");
+    setView("login");
   };
 
   return (
@@ -331,27 +61,29 @@ export default function CasilleroAccess() {
       <section className={styles.content}>
         <div className={styles.titleRow}>
           <span />
-          <h1>{isRecovery ? "Recuperar Contraseña" : isLogin ? "Log In" : "Registro"}</h1>
+          <h1>{pageTitle[view]}</h1>
           <span />
         </div>
 
         <div className={styles.card}>
-          {!isTwoFactor && (
+          {view !== "login-2fa" && view !== "verify-email" && (
             <CasilleroTabs
-              loginActive={isLogin || isRecovery}
-              registerActive={isRegister}
+              loginActive={view === "login" || view === "recover"}
+              registerActive={view === "register"}
               onLogin={() => changeView("login")}
               onRegister={() => changeView("register")}
             />
           )}
 
           <h2>
-            {isTwoFactor ? (
+            {view === "login-2fa" ? (
               <>Autenticación en dos pasos</>
-            ) : isRecovery ? (
+            ) : view === "recover" ? (
               <>Recuperar Contraseña</>
-            ) : isLogin ? (
+            ) : view === "login" ? (
               <>Inicio de Sesión</>
+            ) : view === "verify-email" ? (
+              <>Verificar Email</>
             ) : (
               <>
                 <span className={styles.desktopTitle}>Creación de Cuenta</span>
@@ -360,211 +92,32 @@ export default function CasilleroAccess() {
             )}
           </h2>
 
-          <form
-            key={view}
-            className={isRegister ? styles.registerForm : isRecovery ? styles.recoveryForm : styles.loginForm}
-            onSubmit={handleSubmit}
-          >
-            {isRegister && (
-              <CasilleroPersonTypeSelector
-                value={personType}
-                onChange={changePersonType}
-              />
-            )}
-
-            {isRegister && personType === "individual" && (
-              <>
-                <label className={styles.field} htmlFor="firstName">
-                  <span>Nombre</span>
-                  <Input id="firstName" name="firstName" type="text" placeholder="Ana" required className={styles.input} />
-                </label>
-                <label className={styles.field} htmlFor="secondName">
-                  <span>Segundo nombre</span>
-                  <Input id="secondName" name="secondName" type="text" placeholder="María" className={styles.input} />
-                </label>
-                <label className={styles.field} htmlFor="firstLastName">
-                  <span>Primer apellido</span>
-                  <Input id="firstLastName" name="firstLastName" type="text" placeholder="López" required className={styles.input} />
-                </label>
-                <label className={styles.field} htmlFor="secondLastName">
-                  <span>Segundo apellido</span>
-                  <Input id="secondLastName" name="secondLastName" type="text" placeholder="García" className={styles.input} />
-                </label>
-              </>
-            )}
-
-            {isRegister && personType === "legal" && (
-              <>
-                <label className={styles.field} htmlFor="dpi">
-                  <span>DPI</span>
-                  <Input id="dpi" name="dpi" type="text" placeholder="123456789123" required className={styles.input} />
-                </label>
-                <label className={styles.field} htmlFor="nit">
-                  <span>NIT</span>
-                  <Input id="nit" name="nit" type="text" placeholder="12345678" required className={styles.input} />
-                </label>
-                <CasilleroDriveLinkField
-                  id="rtu-link"
-                  label="RTU"
-                  placeholder="https://drive.google.com/..."
-                />
-                <CasilleroDriveLinkField
-                  id="legal-mandate-link"
-                  label="Mandato Representante Legal"
-                  placeholder="https://drive.google.com/..."
-                />
-              </>
-            )}
-
-            {!isRecovery && !isTwoFactor && fields[isRegister ? "register" : "login"]
-              .filter((field) => {
-                if (isRegister && personType === "individual" && field.id === "phone") return false;
-                return true;
-              })
-              .map((field) => (
-                <label className={styles.field} key={field.id} htmlFor={field.id}>
-                  <span>{field.label}</span>
-                  <Input
-                    id={field.id}
-                    name={field.id}
-                    type={field.type}
-                    placeholder={field.placeholder}
-                    required
-                    autoComplete={
-                      field.id.includes("password")
-                        ? isLogin
-                          ? "current-password"
-                          : "new-password"
-                        : field.type === "email"
-                          ? "email"
-                          : "off"
-                    }
-                    className={styles.input}
-                  />
-                </label>
-              ))
-            }
-
-            {isRegister && personType === "individual" && (
-              <>
-                <label className={styles.field} htmlFor="dateOfBirth">
-                  <span>Fecha de nacimiento</span>
-                  <Input id="dateOfBirth" name="dateOfBirth" type="date" required className={styles.input} />
-                </label>
-                <label className={styles.field} htmlFor="nationality">
-                  <span>Nacionalidad</span>
-                  <CountrySelect id="nationality" name="nationality" required className={styles.input} />
-                </label>
-                <label className={styles.field} htmlFor="residenceCountry">
-                  <span>País de residencia</span>
-                  <CountrySelect id="residenceCountry" name="residenceCountry" required className={styles.input} />
-                </label>
-                <div className={`${styles.sectionDivider} ${styles.fullCol}`}>
-                  <span>Documento de identidad (DPI)</span>
-                </div>
-
-                <label className={styles.field} htmlFor="dpi">
-                  <span>Número de DPI</span>
-                  <Input id="dpi" name="dpi" type="text" placeholder="2546987850101" required className={styles.input} />
-                </label>
-                <label className={styles.field} htmlFor="documentCountry">
-                  <span>País del documento</span>
-                  <CountrySelect id="documentCountry" name="documentCountry" required className={styles.input} />
-                </label>
-                <label className={styles.field} htmlFor="documentIssuedOn">
-                  <span>Fecha de emisión</span>
-                  <Input id="documentIssuedOn" name="documentIssuedOn" type="date" required className={styles.input} />
-                </label>
-                <label className={styles.field} htmlFor="documentExpiresOn">
-                  <span>Fecha de vencimiento</span>
-                  <Input id="documentExpiresOn" name="documentExpiresOn" type="date" required className={styles.input} />
-                </label>
-                <label className={`${styles.field} ${styles.fullCol}`} htmlFor="documentFile">
-                  <span>Archivo del DPI <span className={styles.hint}>(PDF, JPG, PNG · máx. 10 MB)</span></span>
-                  <input
-                    id="documentFile"
-                    name="documentFile"
-                    type="file"
-                    accept=".pdf,image/jpeg,image/png"
-                    required
-                    className={styles.fileInput}
-                    onChange={(e) => {
-                      const file = e.target.files?.[0];
-                      if (file && file.size > 10 * 1024 * 1024) {
-                        setMessage("El archivo no puede superar 10 MB.");
-                        e.target.value = "";
-                      }
-                    }}
-                  />
-                </label>
-              </>
-            )}
-
-            {isTwoFactor ? (
-              renderTwoFactorFields()
-            ) : isRecovery ? (
-              <div className={styles.recoveryActions}>
-                <Button type="submit" variant="success" className={styles.submitButton}>
-                  {view === "recover-email"
-                    ? "Enviar código"
-                    : view === "recover-code"
-                      ? "Validar"
-                      : "Reestablecer"}
-                </Button>
-                <button
-                  type="button"
-                  className={styles.forgotPassword}
-                  onClick={() => changeView("login")}
-                >
-                  Iniciar Sesión
-                </button>
-              </div>
-            ) : isLogin ? (
-              <div className={styles.loginActions}>
-                {/* Aquí va el captcha real. */}
-                <Button type="submit" variant="success" className={styles.submitButton}>
-                  Iniciar Sesión
-                </Button>
-                <button
-                  type="button"
-                  className={styles.mobileCreateAccount}
-                  onClick={() => changeView("register")}
-                >
-                  Crear Cuenta
-                </button>
-                <button
-                  type="button"
-                  className={styles.forgotPassword}
-                  onClick={() => changeView("recover-email")}
-                >
-                  ¿Olvidó su contraseña?
-                </button>
-              </div>
-            ) : (
-              <>
-                <label className={styles.terms}>
-                  <input type="checkbox" required />
-                  <span>
-                    Declaro que la información proporcionada es verídica y acepto la
-                    responsabilidad legal sobre los datos registrados.
-                  </span>
-                </label>
-                <Button type="submit" variant="success" className={styles.submitButton}>
-                  Crear Cuenta
-                </Button>
-                <button
-                  type="button"
-                  className={styles.mobileLoginLink}
-                  onClick={() => changeView("login")}
-                >
-                  ¿Ya tiene cuenta? Inicie Sesión
-                </button>
-              </>
-            )}
-
-            {isRecovery && renderRecoveryFields()}
-            {message && <p className={styles.formMessage}>{message}</p>}
-          </form>
+          {view === "login" && (
+            <LoginView
+              notice={notice}
+              onSuccess={() => changeView("login-2fa")}
+              onRegister={() => changeView("register")}
+              onRecover={() => changeView("recover")}
+            />
+          )}
+          {view === "login-2fa" && (
+            <TwoFactorView onSuccess={() => router.push("/casillero/dashboard")} />
+          )}
+          {view === "register" && (
+            <RegisterView onLogin={() => changeView("login")} onSuccess={handleRegisterSuccess} />
+          )}
+          {view === "recover" && (
+            <RecoverView onLogin={goToLogin} />
+          )}
+        {view === "verify-email" && (
+          <VerifyEmailView
+            email={verificationEmail}
+            verificationId={verificationId}
+            expiresAt={verificationExpiresAt}
+            onSuccess={() => changeView("login")}
+            onResend={handleResendVerification}
+          />
+        )}
         </div>
       </section>
     </main>

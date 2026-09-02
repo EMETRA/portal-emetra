@@ -1,5 +1,12 @@
 import * as yup from "yup";
-import { emailSchema, passwordSchema } from "./casillero";
+import { normalizeUrl } from "../lib/casillero/google-drive";
+import {
+  dpiSchema,
+  emailSchema,
+  googleDriveUrlSchema,
+  nitSchema,
+  passwordSchema,
+} from "./casillero";
 
 export const registroIndividualSchema = yup.object({
   // Datos personales
@@ -12,10 +19,7 @@ export const registroIndividualSchema = yup.object({
   email: emailSchema,
   confirmEmail: emailSchema
     .oneOf([yup.ref("email")], "Los correos electrónicos no coinciden"),
-  password: passwordSchema,
-  confirmPassword: yup.string()
-    .required("Confirma tu contraseña")
-    .oneOf([yup.ref("password")], "Las contraseñas no coinciden"),
+  nit: nitSchema,
 
   // Datos adicionales
   dateOfBirth: yup.string().required("La fecha de nacimiento es requerida"),
@@ -46,3 +50,36 @@ export const registroIndividualSchema = yup.object({
 });
 
 export type RegistroIndividualData = yup.InferType<typeof registroIndividualSchema>;
+
+export const registroLegalSchema = yup.object({
+  dpi: dpiSchema,
+  nit: nitSchema,
+  email: emailSchema,
+  confirmEmail: emailSchema
+    .oneOf([yup.ref("email")], "Los correos electrónicos no coinciden"),
+  password: passwordSchema,
+  confirmPassword: yup.string()
+    .required("Confirma tu contraseña")
+    .oneOf([yup.ref("password")], "Las contraseñas no coinciden"),
+  rtuLink: googleDriveUrlSchema,
+  mandateLink: googleDriveUrlSchema,
+}).test(
+  "distinct-drive-links",
+  "El enlace de RTU y el Mandato Representante Legal no pueden ser el mismo.",
+  (value) => {
+    if (!value?.rtuLink || !value?.mandateLink) return true;
+    return normalizeUrl(value.rtuLink) !== normalizeUrl(value.mandateLink);
+  },
+);
+
+export type RegistroLegalData = yup.InferType<typeof registroLegalSchema>;
+
+// export const VerifyEmailCode = yup.string().required("El código de verificación es requerido");
+
+export const verifyEmailSchema = yup.object({
+  code: yup.string().required("El código de verificación es requerido"),
+  password: passwordSchema,
+  confirmPassword: yup.string()
+    .required("Confirma tu contraseña")
+    .oneOf([yup.ref("password")], "Las contraseñas no coinciden"),
+});

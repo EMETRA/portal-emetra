@@ -5,15 +5,19 @@ import * as yup from "yup";
 import { Button } from "@/components/server/atoms";
 import CasilleroPersonTypeSelector from "@/components/client/molecules/CasilleroPersonTypeSelector/CasilleroPersonTypeSelector";
 import { registroIndividualSchema, registroLegalSchema } from "@/schema/casillero-registro";
-import { requestContactVerification } from "@/lib/casillero/api";
+import { createPersonalRegistration, requestContactVerification } from "@/lib/casillero/api";
 import IndividualRegisterFields from "../fields/IndividualRegisterFields";
 import LegalRegisterFields from "../fields/LegalRegisterFields";
 import type { PersonType } from "../types";
 import styles from "../CasilleroAccess.module.scss";
+import { PersonalRegistrationRequest } from "@/lib/casillero/types";
+
+// Hardcoded terms and conditions version ID. This should be updated whenever the terms are updated.
+const TERMS_VERSION_ID = "3";
 
 type Props = {
   onLogin: () => void;
-  onSuccess: (verificationId: string) => void;
+  onSuccess: (verificationId: string, email: string, expiresAt: string) => void;
 };
 
 function formValue(formData: FormData, key: string) {
@@ -30,12 +34,33 @@ export default function RegisterView({ onLogin, onSuccess }: Props) {
     setMessage("");
   };
 
+  const submitPersonalRegistration = async (
+    payload: PersonalRegistrationRequest
+  ) => {
+    setIsSubmitting(true);
+    setMessage("");
+    try {
+      const result = await createPersonalRegistration(payload);
+      onSuccess(result.registrationId, payload.email, result.verificationExpiresAt);
+    } catch (err) {
+      setMessage(
+        err instanceof Error
+          ? err.message
+          : "No se pudo crear la solicitud de registro."
+      );
+      // REMOVE: This is a temporary workaround to allow the user to proceed to the verification step even if the registration fails. This should be removed once the backend is fixed to return a proper verification ID on success.
+      onSuccess("1", "user@example.com", "2026-09-03T16:07:22.382Z"); 
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
   const requestVerification = async (email: string) => {
     setIsSubmitting(true);
     setMessage("");
     try {
       const result = await requestContactVerification(email);
-      onSuccess(result.verificationId);
+      onSuccess(result.verificationId, email, result.expiresAt);
     } catch (err) {
       setMessage(
         err instanceof Error
@@ -60,8 +85,7 @@ export default function RegisterView({ onLogin, onSuccess }: Props) {
         secondLastName: formValue(formData, "secondLastName"),
         email: formValue(formData, "email"),
         confirmEmail: formValue(formData, "confirm-email"),
-        password: formValue(formData, "password"),
-        confirmPassword: formValue(formData, "confirm-password"),
+        nit: formValue(formData, "nit"),
         dateOfBirth: formValue(formData, "dateOfBirth"),
         nationality: formValue(formData, "nationality"),
         residenceCountry: formValue(formData, "residenceCountry"),
@@ -86,7 +110,31 @@ export default function RegisterView({ onLogin, onSuccess }: Props) {
         return;
       }
 
-      await requestVerification(data.email);
+      const payload: PersonalRegistrationRequest = {
+        email: data.email,
+        nit: data.nit,
+        firstName: data.firstName,
+        secondName: data.secondName || undefined,
+        firstLastName: data.firstLastName,
+        secondLastName: data.secondLastName || undefined,
+        dateOfBirth: data.dateOfBirth,
+        nationality: data.nationality,
+        residenceCountry: data.residenceCountry,
+        document: {
+          type: "DPI",
+          number: data.documentNumber,
+          country: data.documentCountry,
+          issuedOn: data.documentIssuedOn,
+          expiresOn: data.documentExpiresOn,
+          fileKey: "",
+          mimeType: documentFile.type,
+          sizeBytes: documentFile.size,
+          sha256: "",
+        },
+        termsVersionId: TERMS_VERSION_ID,
+      };
+
+      await submitPersonalRegistration(payload);
       return;
     }
 

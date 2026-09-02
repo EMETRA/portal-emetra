@@ -40,22 +40,7 @@ export default function IndividualRegisterFields({ onFileTooLarge }: Props) {
         autoComplete="email"
         required
       />
-      <AccessField
-        id="password"
-        label="Contraseña"
-        type="password"
-        placeholder="Ingresa tu contraseña"
-        autoComplete="new-password"
-        required
-      />
-      <AccessField
-        id="confirm-password"
-        label="Confirmar contraseña"
-        type="password"
-        placeholder="Confirma tu contraseña"
-        autoComplete="new-password"
-        required
-      />
+      <AccessField id="nit" label="NIT" type="text" placeholder="12345678" required /> 
       <AccessField id="dateOfBirth" label="Fecha de nacimiento" type="date" required />
       <AccessField id="nationality" label="Nacionalidad" required>
         <CountrySelect id="nationality" name="nationality" required className={styles.input} />

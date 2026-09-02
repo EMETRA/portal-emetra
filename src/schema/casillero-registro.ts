@@ -19,10 +19,7 @@ export const registroIndividualSchema = yup.object({
   email: emailSchema,
   confirmEmail: emailSchema
     .oneOf([yup.ref("email")], "Los correos electrónicos no coinciden"),
-  password: passwordSchema,
-  confirmPassword: yup.string()
-    .required("Confirma tu contraseña")
-    .oneOf([yup.ref("password")], "Las contraseñas no coinciden"),
+  nit: nitSchema,
 
   // Datos adicionales
   dateOfBirth: yup.string().required("La fecha de nacimiento es requerida"),
@@ -77,4 +74,12 @@ export const registroLegalSchema = yup.object({
 
 export type RegistroLegalData = yup.InferType<typeof registroLegalSchema>;
 
-export const VerifyEmailCode = yup.string().required("El código de verificación es requerido");
+// export const VerifyEmailCode = yup.string().required("El código de verificación es requerido");
+
+export const verifyEmailSchema = yup.object({
+  code: yup.string().required("El código de verificación es requerido"),
+  password: passwordSchema,
+  confirmPassword: yup.string()
+    .required("Confirma tu contraseña")
+    .oneOf([yup.ref("password")], "Las contraseñas no coinciden"),
+});

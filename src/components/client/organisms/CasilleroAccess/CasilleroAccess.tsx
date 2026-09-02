@@ -24,10 +24,26 @@ export default function CasilleroAccess() {
   const [view, setView] = useState<AccessView>("login");
   const [notice, setNotice] = useState("");
   const [verificationId, setVerificationId] = useState("");
+  const [verificationEmail, setVerificationEmail] = useState("");
+  const [verificationExpiresAt, setVerificationExpiresAt] = useState("");
 
-  const handleRegisterSuccess = (verificationId: string) => {
-    setVerificationId(verificationId);
+  const handleRegisterSuccess = (
+    newVerificationId: string,
+    email: string,
+    expiresAt: string
+  ) => {
+    setVerificationId(newVerificationId);
+    setVerificationEmail(email);
+    setVerificationExpiresAt(expiresAt);
     changeView("verify-email");
+  };
+
+  const handleResendVerification = (
+    newVerificationId: string,
+    newExpiresAt: string
+  ) => {
+    setVerificationId(newVerificationId);
+    setVerificationExpiresAt(newExpiresAt);
   };
 
   const changeView = (nextView: AccessView) => {
@@ -93,9 +109,15 @@ export default function CasilleroAccess() {
           {view === "recover" && (
             <RecoverView onLogin={goToLogin} />
           )}
-          {view === "verify-email" && (
-            <VerifyEmailView verificationId={verificationId} onSuccess={() => changeView("login")} />
-          )}
+        {view === "verify-email" && (
+          <VerifyEmailView
+            email={verificationEmail}
+            verificationId={verificationId}
+            expiresAt={verificationExpiresAt}
+            onSuccess={() => changeView("login")}
+            onResend={handleResendVerification}
+          />
+        )}
         </div>
       </section>
     </main>

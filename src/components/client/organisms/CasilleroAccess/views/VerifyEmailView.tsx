@@ -9,7 +9,7 @@ import * as yup from "yup";
 import styles from "../CasilleroAccess.module.scss";
 import AccessField from "../fields/AccessField";
 
-const RESEND_COOLDOWN_SECONDS = 2;
+const RESEND_COOLDOWN_SECONDS = 60;
 
 type Props = {
   email: string;
@@ -107,9 +107,9 @@ export default function VerifyEmailView({ email, verificationId, expiresAt, onSu
           : "No se pudo reenviar el código."
       );
       /// VERY IMPORTANT TO REMOVE: This is a temporary workaround to allow the user to proceed to the verification step even if the resend fails. This should be removed once the backend is fixed to return a proper verification ID on success.
-      onResend("1", "2026-09-02T19:07:22.382Z");
-      setMessage("Enviamos un nuevo código a tu correo.");
-      setResendCooldown(RESEND_COOLDOWN_SECONDS);
+      // onResend("1", "2026-09-02T19:07:22.382Z");
+      // setMessage("Enviamos un nuevo código a tu correo.");
+      // setResendCooldown(RESEND_COOLDOWN_SECONDS);
     } finally {
       setIsResending(false);
     }

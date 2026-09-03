@@ -1,0 +1,14 @@
+.next
+.git
+.gitignore
+*.md
+.husky
+.vscode
+.idea
+coverage
+storybook-static
+test-results
+playwright-report
+**/*.log
+npm-debug.log*
+pnpm-debug.log*

@@ -1,0 +1,131 @@
+.card {
+    background: #fff;
+    border-radius: 1rem;
+    padding: 1.5rem;
+    box-shadow: 0 0 12px rgba(27, 42, 107, 0.08);
+    display: flex;
+    flex-direction: column;
+    gap: 1.1rem;
+}
+
+.title {
+    font-size: 1rem;
+    font-weight: 700;
+    color: #1b2a6b;
+    text-align: center;
+    letter-spacing: 0.06em;
+    margin: 0;
+}
+
+.field {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+}
+
+.label {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #1b2a6b;
+}
+
+.input {
+    border: 1px solid #d0d0d0;
+    border-radius: 0.5rem;
+    padding: 0.7rem 1rem;
+    font-size: 0.9rem;
+    color: #1b2a6b;
+    width: 100%;
+
+    &:focus {
+        outline: none;
+        border-color: #1b2a6b;
+        box-shadow: 0 0 0 2px rgba(27, 42, 107, 0.1);
+    }
+
+    &::placeholder {
+        color: #b0b0b0;
+        font-style: italic;
+    }
+}
+
+.row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.75rem;
+}
+
+.cvvHint {
+  display: flex;
+  align-items: flex-end; // alinea la flecha con la base del texto
+  justify-content: flex-end;
+  gap: 0.2rem;
+}
+
+.cvvArrow {
+  flex-shrink: 0;
+  margin-bottom: -4px; // baja levemente para que la base coincida con el texto
+}
+.cvvTooltipWrapper {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+
+    &:hover .tooltip {
+        opacity: 1;
+        pointer-events: auto;
+        transform: translateY(0);
+    }
+}
+
+.cvvLink {
+    font-size: 0.85rem;
+    color: #6dbf6c;
+    font-weight: 600;
+    cursor: help;
+}
+
+
+.tooltip {
+    position: absolute;
+    bottom: calc(100% + 10px);
+    right: 0;
+    width: 220px;
+    background: #1b2a6b;
+    color: #fff;
+    font-size: 0.78rem;
+    line-height: 1.5;
+    padding: 0.75rem 1rem;
+    border-radius: 0.65rem;
+    opacity: 0;
+    pointer-events: none;
+    transform: translateY(4px);
+    transition: opacity 0.18s ease, transform 0.18s ease;
+    z-index: 10;
+
+    // pequeña flecha apuntando hacia abajo
+    &::after {
+        content: "";
+        position: absolute;
+        top: 100%;
+        right: 1rem;
+        border: 6px solid transparent;
+        border-top-color: #1b2a6b;
+    }
+}
+
+.payButton {
+    background: #6dbf6c;
+    color: #fff;
+    border: none;
+    border-radius: 0.5rem;
+    padding: 1rem;
+    font-size: 1rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    cursor: pointer;
+    width: 100%;
+
+    &:hover { opacity: 0.9; }
+    &:disabled { opacity: 0.5; cursor: not-allowed; }
+}

@@ -1,8 +1,11 @@
 import axios from "axios";
-import { API_BASE_URL } from "@/config/api";
 
+/**
+ * Cliente HTTP solo para rutas internas del portal (BFF).
+ * No debe apuntar al backend externo.
+ */
 export const api = axios.create({
-  baseURL: API_BASE_URL,
+  baseURL: "",
   headers: {
     "Content-Type": "application/json",
   },

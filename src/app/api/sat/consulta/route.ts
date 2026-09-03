@@ -1,63 +1,21 @@
-import { NextRequest, NextResponse } from "next/server";
-const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL;
+import { NextRequest } from "next/server";
+import { proxyBackendRequest } from "@/lib/backend/proxy";
 
-export async function POST(req: NextRequest) {
-  try {
-    const { plate } = await req.json();
+export async function GET(req: NextRequest) {
+  const tplaca = req.nextUrl.searchParams.get("tplaca");
+  const nplaca = req.nextUrl.searchParams.get("nplaca");
 
-    if (!plate || typeof plate !== "string") {
-      return NextResponse.json(
-        { error: true, message: "La placa es requerida" },
-        { status: 400 }
-      );
-    }
-
-    const [tplacaRaw, nplacaRaw] = plate.split("-");
-    const tplaca = tplacaRaw?.trim().toUpperCase();
-    const nplaca = nplacaRaw?.trim().toUpperCase();
-
-    if (!tplaca || !nplaca) {
-      return NextResponse.json(
-        { error: true, message: "Formato de placa inválido" },
-        { status: 400 }
-      );
-    }
-
-    
-    if (!baseUrl) {
-      throw new Error("NEXT_PUBLIC_API_BASE_URL no está configurada");
-    }
-
-    const externalUrl = `${baseUrl}/notificado/consulta/${encodeURIComponent(tplaca)}/${encodeURIComponent(nplaca)}`;
-
-    const externalRes = await fetch(externalUrl, {
+  if (!tplaca || !nplaca) {
+    return proxyBackendRequest(req, {
       method: "GET",
-      cache: "no-store",
+      path: "/notificado/consulta",
+      forwardBody: false,
     });
-
-    if (!externalRes.ok) {
-      const text = await externalRes.text();
-      console.error("Error al consultar backend:", externalRes.status, text);
-
-      return NextResponse.json(
-        {
-          error: true,
-          message: "No se pudo consultar remisiones en el servidor externo",
-        },
-        { status: 502 }
-      );
-    }
-
-    const data = await externalRes.json();
-
-    console.log("datos de consulta: ", data)
-
-    return NextResponse.json(data, { status: 200 });
-  } catch (err) {
-    console.error("Error en api interna:", err);
-    return NextResponse.json(
-      { error: true, message: "Error interno en la consulta de solvencia" },
-      { status: 500 }
-    );
   }
+
+  return proxyBackendRequest(req, {
+    method: "GET",
+    path: `/notificado/consulta/${encodeURIComponent(tplaca)}/${encodeURIComponent(nplaca)}`,
+    forwardBody: false,
+  });
 }

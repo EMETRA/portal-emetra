@@ -1,0 +1,18 @@
+.badge {
+    display: inline-flex;
+    align-self: flex-start; // prevents stretching inside flex column parents
+    padding: 0.2rem 0.65rem;
+    border-radius: 999px;
+    font-size: 0.7rem;
+    font-weight: 700;
+}
+
+.recibo {
+    background: #abd648;
+    color: #1b2376;
+}
+
+.solvencia {
+    background: #1b2376;
+    color: #fff;
+}

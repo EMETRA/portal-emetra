@@ -1,0 +1,70 @@
+@use "../../../../theme/colors.scss" as *;
+
+.shell {
+  min-height: 100vh;
+  background: #f6f6f6;
+  color: $quintary-text;
+}
+
+.brandHeader {
+  height: 90px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #fff;
+
+  img {
+    width: 150px;
+    height: auto;
+  }
+}
+
+.body {
+  display: flex;
+  min-height: calc(100vh - 130px);
+}
+
+.content {
+  flex: 1;
+  padding: 0px 54px;
+  overflow: hidden;
+}
+
+@media (max-width: 1400px) {
+  .brandHeader {
+    height: 56px;
+
+    img {
+      width: 92px;
+    }
+  }
+
+  .body {
+    min-height: calc(100vh - 96px);
+  }
+
+  .content {
+    padding: 26px 20px;
+  }
+}
+
+@media (max-width: 768px) {
+  .brandHeader {
+    height: 42px;
+    justify-content: flex-start;
+    padding-inline: 12px;
+
+    img {
+      width: 68px;
+    }
+  }
+
+  .body {
+    display: block;
+    min-height: auto;
+  }
+
+  .content {
+    padding: 22px 14px 32px;
+  }
+}

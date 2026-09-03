@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { fetchBackend } from '@/lib/backend/client';
+import { apiErrorResponse } from '@/lib/api/errors';
 
-export const runtime = 'nodejs';
-
-const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL; 
+export const runtime = 'nodejs'; 
 
 function normalizaNumero(str: string): string {
     if (str == null) return '0';
@@ -32,10 +32,7 @@ export async function POST(req: NextRequest) {
         const serie = body.serie ?? 'E/E';
 
         if (!rawdocumento) {
-            return NextResponse.json(
-                { success: false, message: 'documento es requerido' },
-                { status: 400 },
-            );
+            return apiErrorResponse('documento es requerido', 400, 'VALIDATION_ERROR');
         }
         const documento = String(rawdocumento).trim();
 
@@ -44,7 +41,7 @@ export async function POST(req: NextRequest) {
         // 1) Traer TODO del backend Nest, PERO SECUENCIAL
 
         // Encabezado
-        const encRes = await fetch(`${BASE_URL}/recibo/encabezado`, {
+        const encRes = await fetchBackend('/recibo/encabezado', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(dtoRecibo),
@@ -53,13 +50,17 @@ export async function POST(req: NextRequest) {
         if (!encRes.ok) {
             console.error('Error en api', encRes.status, encRes.statusText);
             return NextResponse.json(
-                { success: false, message: 'Error consultando encabezado del recibo.' },
+                {
+                    success: false,
+                    error: 'Error consultando encabezado del recibo.',
+                    message: 'Error consultando encabezado del recibo.',
+                },
                 { status: 500 },
             );
         }
 
         // Detalle remisiones
-        const remRes = await fetch(`${BASE_URL}/recibo/detalle-remisiones`, {
+        const remRes = await fetchBackend('/recibo/detalle-remisiones', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(dtoRecibo),
@@ -68,13 +69,17 @@ export async function POST(req: NextRequest) {
         if (!remRes.ok) {
             console.error('Error en api 1', remRes.status, remRes.statusText);
             return NextResponse.json(
-                { success: false, message: 'Error consultando remisiones del recibo.' },
+                {
+                    success: false,
+                    error: 'Error consultando remisiones del recibo.',
+                    message: 'Error consultando remisiones del recibo.',
+                },
                 { status: 500 },
             );
         }
 
         // Detalle cuentas
-        const ctasRes = await fetch(`${BASE_URL}/recibo/detalle-cuentas`, {
+        const ctasRes = await fetchBackend('/recibo/detalle-cuentas', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(dtoRecibo),
@@ -83,13 +88,17 @@ export async function POST(req: NextRequest) {
         if (!ctasRes.ok) {
             console.error('Error en api 2', ctasRes.status, ctasRes.statusText);
             return NextResponse.json(
-                { success: false, message: 'Error consultando cuentas del recibo.' },
+                {
+                    success: false,
+                    error: 'Error consultando cuentas del recibo.',
+                    message: 'Error consultando cuentas del recibo.',
+                },
                 { status: 500 },
             );
         }
 
         // Detalle intereses
-        const intRes = await fetch(`${BASE_URL}/recibo/detalle-intereses`, {
+        const intRes = await fetchBackend('/recibo/detalle-intereses', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(dtoRecibo),
@@ -98,13 +107,17 @@ export async function POST(req: NextRequest) {
         if (!intRes.ok) {
             console.error('Error en api 3', intRes.status, intRes.statusText);
             return NextResponse.json(
-                { success: false, message: 'Error consultando intereses del recibo.' },
+                {
+                    success: false,
+                    error: 'Error consultando intereses del recibo.',
+                    message: 'Error consultando intereses del recibo.',
+                },
                 { status: 500 },
             );
         }
 
         // Detalle descuentos
-        const descRes = await fetch(`${BASE_URL}/recibo/detalle-descuentos`, {
+        const descRes = await fetchBackend('/recibo/detalle-descuentos', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(dtoRecibo),
@@ -113,7 +126,11 @@ export async function POST(req: NextRequest) {
         if (!descRes.ok) {
             console.error('Error en api 4', descRes.status, descRes.statusText);
             return NextResponse.json(
-                { success: false, message: 'Error consultando descuentos del recibo.' },
+                {
+                    success: false,
+                    error: 'Error consultando descuentos del recibo.',
+                    message: 'Error consultando descuentos del recibo.',
+                },
                 { status: 500 },
             );
         }
@@ -217,14 +234,18 @@ export async function POST(req: NextRequest) {
                 console.log('[NOTA CREDITO] sr vacío o inválido, se omite llamada');
                 continue;
             }
-            const notaRes = await fetch(
-                `${BASE_URL}/recibo/nota-credito/${encodeURIComponent(sr)}`,
+            const notaRes = await fetchBackend(
+                `/recibo/nota-credito/${encodeURIComponent(sr)}`,
             );
 
             if (!notaRes.ok) {
                 console.error('Error en api 5', sr, notaRes.status, notaRes.statusText);
                 return NextResponse.json(
-                    { success: false, message: 'Error consultando nota de crédito.' },
+                    {
+                        success: false,
+                        error: 'Error consultando nota de credito.',
+                        message: 'Error consultando nota de credito.',
+                    },
                     { status: 500 },
                 );
             }
@@ -236,7 +257,7 @@ export async function POST(req: NextRequest) {
         // 9) Valor en letras
         const valorTotalNum = Number(normalizaNumero(encabezado[4]));
         console.log('Valor total numérico para valor en letras:', valorTotalNum);
-        const velRes = await fetch(`${BASE_URL}/recibo/valor-en-letras`, {
+        const velRes = await fetchBackend('/recibo/valor-en-letras', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ valor_total: valorTotalNum }),
@@ -248,7 +269,11 @@ export async function POST(req: NextRequest) {
         if (!velRes.ok) {
             console.error('Error en api', velRes.status, velRes.statusText);
             return NextResponse.json(
-                { success: false, message: 'No se pudo obtener valor en letras.' },
+                {
+                    success: false,
+                    error: 'No se pudo obtener valor en letras.',
+                    message: 'No se pudo obtener valor en letras.',
+                },
                 { status: 500 },
             );
         }
@@ -282,6 +307,7 @@ export async function POST(req: NextRequest) {
         return NextResponse.json(
             {
                 success: false,
+                error: 'Error interno al obtener datos del recibo.',
                 message: 'Error interno al obtener datos del recibo.',
             },
             { status: 500 },

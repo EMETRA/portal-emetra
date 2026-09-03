@@ -1,0 +1,12 @@
+.counter {
+    font-weight: 700;
+    color: #1b2a6b;
+    font-size: 0.85rem;
+    margin: 0 0 0.75rem;
+}
+
+.grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.85rem;
+}

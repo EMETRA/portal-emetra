@@ -38,10 +38,10 @@ const SolvenciaForm: React.FC = () => {
 
         setLoading(true)
         const payload = {
-            tipoPlaca: tipoPlaca.trim(),
-            placa: placa.trim().toUpperCase(),
-            fechaRecibo: fechaRecibo.trim(),
-            numeroRecibo: numeroRecibo.trim(),
+            tipo_placa: tipoPlaca.trim(),
+            numero_placa: placa.trim().toUpperCase(),
+            fecha_recibo: fechaRecibo.trim(),
+            numero_recibo: numeroRecibo.trim(),
         }
         try {
             const res = await fetch('/api/solvencia/validar', {
@@ -51,7 +51,13 @@ const SolvenciaForm: React.FC = () => {
             })
 
             const data = await res.json()
-            
+
+            if (!res.ok) {
+                setMessage(data.error || data.message || 'Error al validar solvencia')
+                setMessageType('error')
+                return
+            }
+
             setMessage(data.mensaje)
             setMessageType(data.valido ? 'success' : 'error')
             if (data.valido) {

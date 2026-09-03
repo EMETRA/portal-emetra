@@ -1,0 +1,49 @@
+// SolicitudCard.module.scss
+.card {
+    background: #fff;
+    border-radius: 0.85rem;
+    padding: 1rem 1.25rem;
+    box-shadow: 0 0 12px rgba(27, 42, 107, 0.08);
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+}
+
+.topRow {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.date {
+    font-size: 0.85rem;
+    color: #6b6b6b;
+    white-space: nowrap;
+}
+
+.bottomRow {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    gap: 1rem;
+}
+
+.info {
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+}
+
+.title {
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: #1b2a6b;
+    margin: 0;
+}
+
+.plate {
+    font-size: 0.85rem;
+    color: #6b6b6b;
+    margin: 0;
+}

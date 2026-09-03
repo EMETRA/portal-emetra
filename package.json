@@ -8,7 +8,9 @@
     "start": "next start",
     "lint": "next lint",
     "storybook": "storybook dev -p 6006",
-    "build-storybook": "storybook build"
+    "build-storybook": "storybook build",
+    "docker:build": "pnpm install --frozen-lockfile && docker compose build",
+    "docker:up": "pnpm install --frozen-lockfile && docker compose up -d --build"
   },
   "dependencies": {
     "@emotion/react": "^11.14.0",
@@ -33,9 +35,11 @@
     "react-leaflet": "^5.0.0",
     "recharts": "^3.3.0",
     "sass": "^1.89.2",
+    "server-only": "^0.0.1",
     "simplify-js": "^1.2.4",
     "yup": "^1.7.0",
-    "zod": "^4.0.14"
+    "zod": "^4.0.14",
+    "zustand": "^5.0.14"
   },
   "devDependencies": {
     "@chromatic-com/storybook": "^4.0.1",

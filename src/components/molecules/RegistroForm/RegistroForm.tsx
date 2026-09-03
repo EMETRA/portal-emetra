@@ -97,7 +97,9 @@ const RegistroForm: React.FC = () => {
 
             if (!res.ok) {
                 const errorBody = await res.json().catch(() => ({}));
-                throw new Error(errorBody.message || 'Error al obtener remisiones');
+                throw new Error(
+                  errorBody.error || errorBody.message || "Error al obtener remisiones"
+                );
             }
 
             const data: BackendRemision[] = await res.json();
@@ -159,7 +161,10 @@ const RegistroForm: React.FC = () => {
 
             if (!res.ok) {
                 const error = await res.json();
-                alert("Error registrando expediente: " + error.message);
+                alert(
+                  "Error registrando expediente: " +
+                    (error.error || error.message || "Error desconocido")
+                );
                 return;
             }
 

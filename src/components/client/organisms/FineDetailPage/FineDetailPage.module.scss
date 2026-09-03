@@ -1,0 +1,23 @@
+.infoGrid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+    margin-bottom: 1.5rem;
+}
+
+@media (max-width: 900px) {
+    .infoGrid {
+        grid-template-columns: 1fr;
+    }
+}
+
+.descriptionCard {
+    margin-bottom: 1.5rem;
+}
+
+.descriptionText {
+    color: #4a4a4a;
+    font-size: 0.95rem;
+    line-height: 1.6;
+    margin: 0;
+}

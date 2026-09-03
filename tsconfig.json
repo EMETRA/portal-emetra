@@ -1,6 +1,7 @@
 {
   "compilerOptions": {
-    "lib": ["dom", "dom.iterable", "esnext","es2021"],
+    "target": "ES2017",
+    "lib": ["dom", "dom.iterable", "esnext", "es2021"],
     "allowJs": true,
     "skipLibCheck": true,
     "strict": true,
@@ -12,13 +13,12 @@
     "isolatedModules": true,
     "jsx": "preserve",
     "incremental": true,
-    "baseUrl": "./",
+    "baseUrl": ".",
     "plugins": [
       {
         "name": "next"
       }
     ],
-    "baseUrl": ".",
     "paths": {
       "@/*": ["./src/*"],
       "@components": ["./src/components"],
@@ -48,8 +48,7 @@
       "@functions": ["./src/functions/index.ts"],
       "@functions/*": ["./src/functions/*"],
       "@assets/*": ["./src/assets/*"]
-    },
-    "target": "ES2017"
+    }
   },
   "include": [
     "next-env.d.ts",

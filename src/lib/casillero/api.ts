@@ -5,6 +5,9 @@ import type {
   PersonalRegistrationCreated,
   CasilleroUpdateMeRequest,
   CasilleroUser,
+  CasilleroContactList,
+  CasilleroEmailChangeCreated,
+  CasilleroEmailChangeCompleteRequest,
 } from "@/lib/casillero/types";
 
 // GENERAL REQUEST API
@@ -33,6 +36,23 @@ export async function postCasilleroJson<T>(
         : {}),
     },
     body: JSON.stringify(body),
+    cache: "no-store",
+  });
+
+  if (!response.ok) {
+    throw errorFromStatus(response.status);
+  }
+
+  return response.json() as Promise<T>;
+}
+
+export async function getCasilleroJson<T>(
+  path: string,
+  errorFromStatus: (status: number) => Error
+): Promise<T> {
+  const response = await fetch(path, {
+    method: "GET",
+    headers: { Accept: "application/json" },
     cache: "no-store",
   });
 
@@ -164,4 +184,79 @@ export async function updateMyProfile(
   }
 
   return response.json() as Promise<CasilleroUser>;
+}
+
+function errorFromMeReadStatus(status: number): Error {
+  const message =
+    status === 401
+      ? "Sesión ausente o inválida"
+      : status === 404
+        ? "Perfil no encontrado"
+        : `HTTP ${status}`;
+  const error = new Error(message);
+  error.name = "ApiResponseError";
+  return error;
+}
+
+export async function fetchMyProfile(): Promise<CasilleroUser> {
+  return getCasilleroJson<CasilleroUser>(
+    "/api/casillero/me",
+    errorFromMeReadStatus
+  );
+}
+
+export async function fetchMyContacts(): Promise<CasilleroContactList> {
+  return getCasilleroJson<CasilleroContactList>(
+    "/api/casillero/me/contacts",
+    errorFromMeReadStatus
+  );
+}
+
+function errorFromEmailChangeStatus(status: number): Error {
+  const message =
+    status === 400
+      ? "Solicitud inválida"
+      : status === 401
+        ? "Sesión ausente o inválida"
+        : status === 409
+          ? "Correo no disponible"
+          : `HTTP ${status}`;
+  const error = new Error(message);
+  error.name = "ApiResponseError";
+  return error;
+}
+
+export async function requestEmailChange(
+  newEmail: string
+): Promise<CasilleroEmailChangeCreated> {
+  return postCasilleroJson<CasilleroEmailChangeCreated>(
+    "/api/casillero/me/email-change-requests",
+    { newEmail },
+    errorFromEmailChangeStatus
+  );
+}
+
+function errorFromEmailChangeCompleteStatus(status: number): Error {
+  const message =
+    status === 400
+      ? "Solicitud inválida"
+      : status === 401
+        ? "Código inválido o sesión ausente"
+        : status === 409
+          ? "La solicitud no se puede completar"
+          : `HTTP ${status}`;
+  const error = new Error(message);
+  error.name = "ApiResponseError";
+  return error;
+}
+
+export async function completeEmailChange(
+  requestId: string,
+  body: CasilleroEmailChangeCompleteRequest
+): Promise<CasilleroEmailChangeCreated> {
+  return postCasilleroJson<CasilleroEmailChangeCreated>(
+    `/api/casillero/me/email-change-requests/${encodeURIComponent(requestId)}/complete`,
+    body,
+    errorFromEmailChangeCompleteStatus
+  );
 }

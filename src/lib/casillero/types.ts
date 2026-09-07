@@ -58,7 +58,7 @@ export type PersonalRegistrationCreated = {
 
 export type CasilleroUserStatus = "PENDING_ACTIVATION" | "ACTIVE";
 
-export type CasilleroContextType = "PERSONAL" | "EMPRESA";
+export type CasilleroContextType = "PERSONAL" | "COMPANY";
 
 export type CasilleroPerson = {
   firstName: string;
@@ -138,3 +138,48 @@ export type CasilleroContact = {
 export type CasilleroContactList = {
   items: CasilleroContact[];
 };
+
+/**
+ * Solicitud de cambio de correo de acceso
+ */
+
+export type CasilleroEmailChangeStatus =
+  | "PENDING_EMAIL_VERIFICATION"
+  | "PENDING_STEP_UP"
+  | "COMPLETED"
+  | "CANCELLED"
+  | "EXPIRED";
+
+export type CasilleroEmailChangeSessionPolicy =
+  | "KEEP"
+  | "REVOKE_OTHERS"
+  | "REVOKE_ALL";
+
+export type CasilleroEmailChangeNextStep =
+  | "VERIFY_NEW_EMAIL"
+  | "COMPLETE_STEP_UP_2FA";
+
+export type CasilleroEmailChangeRequest = {
+  newEmail: string;
+};
+
+export type CasilleroEmailChangeCreated = {
+  requestId: string;
+  status: CasilleroEmailChangeStatus;
+  verificationId: string;
+  verificationExpiresAt: string;
+  currentEmailMasked: string;
+  newEmailMasked: string;
+  stepUpRequired: boolean;
+  sessionPolicyOnCompletion: CasilleroEmailChangeSessionPolicy;
+  nextSteps: CasilleroEmailChangeNextStep[];
+  setUpChallengeId?: string;
+};
+
+export type CasilleroEmailChangeCompleteRequest = {
+  verificationId: string;
+  newEmailCode: string;
+  setUpChallengeId: string;
+  stepUpCode: string;
+};
+

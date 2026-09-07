@@ -197,6 +197,10 @@
     width: min(100%, 180px) !important;
   }
 
+  .requestChangeEmailBtn {
+    align-self: flex-end !important;
+  }
+
   .infoUserBanner, .personalInfoContainer {
     overflow-x: unset;
   }

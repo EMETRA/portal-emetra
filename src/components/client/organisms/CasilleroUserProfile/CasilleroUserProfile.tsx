@@ -10,6 +10,8 @@ import CountrySelect from "@/components/client/atoms/CountrySelect/CountrySelect
 import Text from "@/components/atoms/Text/Text";
 import { Button, Icon, Input } from "@/components/server/atoms";
 import { editProfileSchema } from "./editProfile.schema";
+import { CasilleroCambioCorreo } from "@/components/client/molecules/CasilleroCambioCorreo/CasilleroCambioCorreo";
+import { CasilleroCambioTelefono } from "@/components/client/molecules/CasilleroCambioTelefono/CasilleroCambioTelefono";
 import styles from "./CasilleroUserProfile.module.scss";
 import {
   CasilleroVersionConflictError,
@@ -111,6 +113,8 @@ export default function CasilleroUserProfile() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [message, setMessage] = useState("");
 
+  const [isChangeEmailOpen, setIsChangeEmailOpen] = useState(false);
+  const [isChangePhoneOpen, setIsChangePhoneOpen] = useState(false);
   const { person } = user;
   const fullName = joinNames(
     person.firstName,
@@ -234,6 +238,9 @@ export default function CasilleroUserProfile() {
                       <Text className={styles.infoUserBannerContentItemInfoValue}>
                         {primaryEmail}
                       </Text>
+                      <Button variant="text" className={styles.requestChangeEmailBtn} onClick={() => setIsChangeEmailOpen(true)}>
+                        Solicitar cambio
+                      </Button>
                     </div>
                   </div>
                   <div className={styles.infoUserBannerContentItem}>
@@ -242,9 +249,20 @@ export default function CasilleroUserProfile() {
                       <Text className={styles.infoUserBannerContentItemInfoTitle}>
                         Teléfono
                       </Text>
-                      <Text className={styles.infoUserBannerContentItemInfoValue}>
-                        {primaryPhone}
-                      </Text>
+                      {primaryPhone ? (	
+                        <Text className={styles.infoUserBannerContentItemInfoValue}>
+                          {primaryPhone}
+                        </Text>
+                      ) : (
+                        <Button variant="text" className={styles.requestAddPhoneBtn} onClick={() => setIsChangePhoneOpen(true)}>
+                          Agregar
+                        </Button>
+                      )}
+                      {primaryPhone && (
+                        <Button variant="text" className={styles.requestChangePhoneBtn} onClick={() => setIsChangePhoneOpen(true)}>
+                          Cambiar
+                        </Button>
+                      )}
                     </div>
                   </div>
                   <div className={styles.infoUserBannerContentItem}>
@@ -427,6 +445,8 @@ export default function CasilleroUserProfile() {
           )}
         </div>
       </CardGeneral>
+      <CasilleroCambioCorreo isOpen={isChangeEmailOpen} onClose={() => setIsChangeEmailOpen(false)} />
+      <CasilleroCambioTelefono isOpen={isChangePhoneOpen} onClose={() => setIsChangePhoneOpen(false)} oldPhone={primaryPhone} />
     </div>
   );
 }

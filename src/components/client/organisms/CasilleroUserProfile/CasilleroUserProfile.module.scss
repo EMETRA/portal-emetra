@@ -34,7 +34,7 @@
 .infoUserContainer {
   display: flex;
   flex-direction: column;
-  align-items: center;
+  align-items: flex-start;
   justify-content: space-between;
   gap: 1rem;
   width: 100%;
@@ -43,7 +43,7 @@
 .infoUserBanner {
   display: flex;
   flex-direction: column;
-  align-items: center;
+  align-items: flex-start;
   justify-content: center;
   gap: 1rem;
   width: 100%;
@@ -104,6 +104,18 @@
 
 .personalInfoItemTitle, .personalInfoItemValue {
   width: min(100%, fit-content);
+}
+
+.personalInfoInput {
+  width: 100%;
+  min-width: 0;
+  flex: 1;
+}
+
+.formMessage {
+  margin: 0;
+  color: $primary-text;
+  text-align: center;
 }
 
 /* ── Acciones ── */

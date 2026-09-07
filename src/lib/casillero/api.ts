@@ -3,6 +3,8 @@ import type {
   ContactVerificationVerified,
   PersonalRegistrationRequest,
   PersonalRegistrationCreated,
+  CasilleroUpdateMeRequest,
+  CasilleroUser,
 } from "@/lib/casillero/types";
 
 // GENERAL REQUEST API
@@ -112,4 +114,54 @@ export async function createPersonalRegistration(
     errorFromRegistrationStatus,
     true
   );
+}
+
+// UPDATE ME API
+
+export class CasilleroVersionConflictError extends Error {
+  constructor(
+    message = "El perfil fue modificado por otra operación. Vuelve a cargar los datos e inténtalo de nuevo."
+  ) {
+    super(message);
+    this.name = "CasilleroVersionConflictError";
+  }
+}
+
+function errorFromUpdateMeStatus(status: number): Error {
+  if (status === 409 || status === 412) {
+    return new CasilleroVersionConflictError();
+  }
+
+  const message =
+    status === 400
+      ? "Solicitud inválida"
+      : status === 401
+        ? "No autorizado"
+        : status === 422
+          ? "No se pueden actualizar correo, documento o estado"
+          : `HTTP ${status}`;
+  const error = new Error(message);
+  error.name = "ApiResponseError";
+  return error;
+}
+
+export async function updateMyProfile(
+  body: CasilleroUpdateMeRequest
+): Promise<CasilleroUser> {
+  const response = await fetch("/api/casillero/me", {
+    method: "PATCH",
+    headers: {
+      "Content-Type": "application/json",
+      Accept: "application/json",
+      "If-Match": String(body.expectedVersion),
+    },
+    body: JSON.stringify(body),
+    cache: "no-store",
+  });
+
+  if (!response.ok) {
+    throw errorFromUpdateMeStatus(response.status);
+  }
+
+  return response.json() as Promise<CasilleroUser>;
 }

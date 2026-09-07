@@ -1,3 +1,4 @@
+import { ChangeEvent } from "react";
 import styles from "./CountrySelect.module.scss";
 
 interface CountrySelectProps {
@@ -5,6 +6,9 @@ interface CountrySelectProps {
     name: string;
     required?: boolean;
     className?: string;
+    value?: string;
+    defaultValue?: string;
+    onChange?: (event: ChangeEvent<HTMLSelectElement>) => void;
 }
 
 const COUNTRIES = [
@@ -203,14 +207,26 @@ const COUNTRIES = [
     { code: "ZW", name: "Zimbabue" },
 ] as const;
 
-export default function CountrySelect({ id, name, required, className }: CountrySelectProps) {
+export default function CountrySelect({
+    id,
+    name,
+    required,
+    className,
+    value,
+    defaultValue,
+    onChange,
+}: CountrySelectProps) {
+    const isControlled = value !== undefined;
+
     return (
         <select
         id={id}
         name={name}
         required={required}
-        defaultValue=""
         className={`${styles.select} ${className ?? ""}`}
+        {...(isControlled
+            ? { value, onChange }
+            : { defaultValue: defaultValue ?? "" })}
         >
         <option value="" disabled>Selecciona un país</option>
         {COUNTRIES.map((country) => (

@@ -40,7 +40,7 @@
   cursor: not-allowed;
 }
 
-.outline {
+.outline, .text {
   background-color: transparent;
   color: #1d0199;                    /* texto azul como en tu UI */
   border: 2px solid $verde-oscuro-1; /* verde del borde */
@@ -48,14 +48,25 @@
   transition: background-color .15s ease, box-shadow .15s ease, transform .06s ease;
 }
 
-.outline:hover {
+.outline:hover, .text:hover {
   background-color: rgba($verde-oscuro-1, .08);  /* sutil hover */
 }
 
-.outline:active { transform: translateY(1px); }
+.outline:active, .text:active, .text:focus { transform: translateY(1px); }
+
+.text {
+  color: $azul-1;
+  background-color: transparent;
+  border: none;
+  padding: 0;
+  margin: 0 !important;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  text-decoration-thickness: 2px !important;
+}
 
 /* Accesibilidad: foco visible */
-.button:focus-visible {
+.outline:focus-visible, .text:focus-visible, .text:focus {
   outline: 2px solid rgba($verde-oscuro-1, .6);
   outline-offset: 2px;
 }

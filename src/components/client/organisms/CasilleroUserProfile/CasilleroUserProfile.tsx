@@ -7,7 +7,7 @@ import classNames from "classnames";
 import { SectionTitle } from "@/components/server/molecules/SectionTitle";
 import CardGeneral from "@/components/client/atoms/CardGeneral/CardGeneral";
 import Text from "@/components/atoms/Text/Text";
-import { Button, Input } from "@/components/server/atoms";
+import { Button, Input, Icon } from "@/components/server/atoms";
 import { editProfileSchema } from "./editProfile.schema";
 import styles from "./CasilleroUserProfile.module.scss";
 
@@ -66,93 +66,74 @@ export default function CasilleroUserProfile() {
             Darse de baja
           </Button>
 
-          <div className={styles.infoUserHeader}>
-            <Text className={classNames(styles.bold)}>
-              {mockUser.name}
-            </Text>
-            <Text className={classNames(styles.bold)}>
-              ID : {mockUser.id}
-            </Text>
-          </div>
-
-          <div className={styles.infoUserContainer}>
-          <div className={styles.fields}>
-              <label className={styles.field} htmlFor="profile-dpi">
-                <span className={styles.label}>DPI</span>
-                <Input
-                  id="profile-dpi"
-                  type="text"
-                  value={mockUser.dpi}
-                  disabled
-                  className={styles.input}
-                />
-              </label>
-
-              <label className={styles.field} htmlFor="profile-nit">
-                <span className={styles.label}>NIT</span>
-                <Input
-                  id="profile-nit"
-                  type="text"
-                  value={mockUser.nit}
-                  disabled
-                  className={styles.input}
-                />
-              </label>
-
-              <label className={styles.field} htmlFor="profile-email">
-                <span className={styles.label}>Correo electrónico</span>
-                <Input
-                  id="profile-email"
-                  type="email"
-                  value={email}
-                  disabled={!isEditing}
-                  onChange={(event) => setEmail(event.target.value)}
-                  className={styles.input}
-                />
-              </label>
-
-              <label className={styles.field} htmlFor="profile-phone">
-                <span className={styles.label}>Celular</span>
-                <Input
-                  id="profile-phone"
-                  type="tel"
-                  value={phone}
-                  disabled={!isEditing}
-                  onChange={(event) => setPhone(event.target.value)}
-                  className={styles.input}
-                />
-              </label>
+          <CardGeneral className={styles.infoUserContainer} padding="sm">
+            <div className={styles.infoUserBanner}>
+              <Image
+                className={styles.avatar}
+                src={mockUser.profileImage}
+                width={110}
+                height={110}
+                alt="Foto de perfil"
+              />
+              <div className={styles.infoUserBannerContent}>
+                <Text className={styles.infoUserBannerContentName} variant="Large">{mockUser.name}</Text>
+                <div className={styles.infoUserBannerContentItems}>  
+                  <div className={styles.infoUserBannerContentItem}>
+                    <Icon name="Mail" />
+                    <div className={styles.infoUserBannerContentItemInfo}>
+                      <Text className={styles.infoUserBannerContentItemInfoTitle}>Correo electrónico</Text>
+                      <Text className={styles.infoUserBannerContentItemInfoValue}>{mockUser.email}</Text>
+                    </div>
+                  </div>
+                  <div className={styles.infoUserBannerContentItem}>
+                    <Icon name="Phone" />
+                    <div className={styles.infoUserBannerContentItemInfo}>
+                      <Text className={styles.infoUserBannerContentItemInfoTitle}>Teléfono</Text>
+                      <Text className={styles.infoUserBannerContentItemInfoValue}>{mockUser.phone}</Text>
+                    </div>
+                  </div>
+                  <div className={styles.infoUserBannerContentItem}>
+                    <Icon name="IdCard" />
+                    <div className={styles.infoUserBannerContentItemInfo}>
+                      <Text className={styles.infoUserBannerContentItemInfoTitle}>ID</Text>
+                      <Text className={styles.infoUserBannerContentItemInfoValue}>{mockUser.id}</Text>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
 
-            <div className={styles.infoUserHeaderMobile}>
-              <Text className={classNames(styles.bold)}>
-                {mockUser.name}
-              </Text>
-              <Text className={classNames(styles.bold)}>
-                ID : {mockUser.id}
-              </Text>
-            </div>
+            <CardGeneral className={styles.personalInfoContainer} padding="sm">
+              <div className={styles.personalInfoHeader}>
+                <Icon name="User" />
+                <Text className={styles.personalInfoHeaderTitle} variant="Medium">Información personal</Text>
+              </div>
 
-            <Image
-              className={styles.avatar}
-              src={mockUser.profileImage}
-              width={110}
-              height={110}
-              alt="Foto de perfil"
-            />
-          </div>
-
-          
+              <div className={styles.personalInfoItem}>
+                <Text className={styles.personalInfoItemTitle}>Nombre</Text>
+                <Text className={styles.personalInfoItemValue}>{mockUser.name}</Text>
+              </div>
+              <div className={styles.personalInfoItem}>
+                <Text className={styles.personalInfoItemTitle}>Apellido</Text>
+                <Text className={styles.personalInfoItemValue}>{"mockUser.lastName"}</Text>
+              </div>
+              <div className={styles.personalInfoItem}>
+                <Text className={styles.personalInfoItemTitle}>Fecha de nacimiento</Text>
+                <Text className={styles.personalInfoItemValue}>{"12/12/2026"}</Text>
+              </div>
+              <div className={styles.personalInfoItem}>
+                <Text className={styles.personalInfoItemTitle}>Nacionaliad</Text>
+                <Text className={styles.personalInfoItemValue}>{"mockUser.nationality"}</Text>
+              </div>
+              <div className={styles.personalInfoItem}>
+                <Text className={styles.personalInfoItemTitle}>País de residencia</Text>
+                <Text className={styles.personalInfoItemValue}>{"residenceCountry"}</Text>
+              </div>
+            </CardGeneral>
+            
+          </CardGeneral>
 
           <div className={styles.actions}>
-            <Button
-              type="button"
-              variant="warning"
-              className={styles.editBtn}
-              onClick={handleEditProfile}
-            >
-              Editar Perfil
-            </Button>
             <Button
               type="button"
               variant="default"
@@ -161,16 +142,26 @@ export default function CasilleroUserProfile() {
             >
               Cambiar contraseña
             </Button>
+            <Button
+              type="button"
+              variant={isEditing ? "danger" : "warning"}
+              className={styles.editBtn}
+              onClick={handleEditProfile}
+            >
+              {isEditing ? "Cancelar" : "Editar Perfil"}
+            </Button>
           </div>
-          <Button
-            type="button"
-            variant="success"
-            className={styles.saveBtn}
-            onClick={handleSave}
-            disabled={!isEditing}
-          >
-            Guardar
-          </Button>
+          {isEditing && (
+            <Button
+              type="button"
+              variant="success"
+              className={styles.saveBtn}
+              onClick={handleSave}
+              disabled={!isEditing}
+            >
+              Guardar
+            </Button>
+          )}
         </div>
       </CardGeneral>
     </div>

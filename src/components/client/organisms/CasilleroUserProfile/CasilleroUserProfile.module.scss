@@ -5,7 +5,7 @@
 }
 
 .card {
-  width: 80%;
+  width: 100%;
   margin: 0 auto;
   padding: 1.25rem 1rem 1.75rem !important;
 }
@@ -16,7 +16,7 @@
   gap: 1rem;
 }
 
-.bold {
+.bold, .infoUserBannerContentItemInfoTitle, .personalInfoItemTitle, .infoUserBannerContentName {
   margin: 0;
   color: $primary-text;
   font-weight: 700;
@@ -30,70 +30,80 @@
   align-self: flex-end;
 }
 
-/* ── Cabecera desktop: nombre (izq) + ID (der) ── */
-.infoUserHeader {
-  display: none;
-  justify-content: space-between;
-  align-items: flex-start;
-  gap: 1rem;
-  width: 100%;
-}
-
-/* ── Cabecera tablet/mobile: avatar + ID + nombre (centrados) ── */
-.infoUserHeaderMobile {
-  display: flex;
-  flex-direction: column-reverse;
-  align-items: center;
-  gap: 0.35rem;
-  width: 100%;
-  order: 2;
-}
-
 /* ── Cuerpo: campos + avatar ── */
 .infoUserContainer {
   display: flex;
   flex-direction: column;
   align-items: center;
+  justify-content: space-between;
   gap: 1rem;
   width: 100%;
+}
+
+.infoUserBanner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  width: 100%;
+}
+
+.infoUserBannerContent {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  width: 100%;
+  align-items: flex-start;
+}
+
+.infoUserBannerContentItems {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  width: 100%;
+}
+
+.infoUserBannerContentItem {
+  display: flex;
+  flex-direction: row;
+  gap: 0.5rem;
+  width: 100%;
+}
+
+.infoUserBannerContentItemInfo {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  align-items: flex-start;
+  justify-content: flex-start;
 }
 
 .avatar {
   display: block;
   object-fit: contain;
-  order: 1;
-  width: 110px;
-  height: 110px;
   margin-top: 2rem;
   border-radius: 50%;
   background: #ede7f6;
   padding: 0.65rem;
 }
 
-.fields {
-  display: grid;
-  gap: 1rem;
-  order: 3;
+.personalInfoContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
   width: 100%;
 }
 
-.field {
-  display: grid;
+.personalInfoHeader, .personalInfoItem {
+  display: flex;
+  flex-direction: row;
   gap: 0.5rem;
+  width: 100%;
 }
 
-.label {
-  color: $secondary-text;
-  font-size: 0.82rem;
-  font-weight: 700;
-  text-align: left;
-}
-
-.input {
-  min-height: 42px;
-  padding: 12px 16px !important;
-  border-radius: 8px !important;
-  font-size: 0.8rem;
+.personalInfoItemTitle, .personalInfoItemValue {
+  width: min(100%, fit-content);
 }
 
 /* ── Acciones ── */
@@ -114,6 +124,10 @@
 }
 
 @media (min-width: 320px) {
+  .infoUserBanner, .personalInfoContainer {
+    overflow-x: auto;
+  }
+
   .saveBtn {
     align-self: center !important;
   }
@@ -138,36 +152,15 @@
 
   .infoUserContainer {
     gap: 1.25rem;
+    flex-direction: column;
   }
 
-  .avatar {
-    order: 1;
-    width: 120px;
-    height: 120px;
-    margin-top: 0;
-    border-radius: 50%;
-    background: #ede7f6;
-    padding: 0.75rem;
+  .infoUserBanner {
+    flex-direction: row;
   }
 
-  .infoUserHeaderMobile {
-    display: flex;
-    order: 2;
-  }
-
-  .fields {
-    order: 3;
-    width: min(420px, 100%);
-    grid-template-columns: 1fr;
-  }
-
-  .label {
-    font-size: 0.9rem;
-  }
-
-  .input {
-    min-height: 44px;
-    font-size: 0.85rem;
+  .infoUserBannerContentItems {
+    flex-direction: row;
   }
 
   .actions {
@@ -191,6 +184,10 @@
     align-self: center !important;
     width: min(100%, 180px) !important;
   }
+
+  .infoUserBanner, .personalInfoContainer {
+    overflow-x: unset;
+  }
 }
 
 /* ══════════════════════════════════════
@@ -198,47 +195,22 @@
    ══════════════════════════════════════ */
 @media (min-width: 1400px) {
   .card {
-    width: min(920px, 100%);
+    width: min(1024px, 100%);
+  }
+
+  .infoUserContainer {
+    flex-direction: row;
   }
 
   .deactivateBtn {
     align-self: flex-end;
   }
 
-  .infoUserHeader {
-    display: flex;
-  }
-
-  .infoUserHeaderMobile {
-    display: none;
-  }
-
-  .infoUserContainer {
-    display: grid;
-    align-items: start;
-    grid-template-columns: 1fr 150px;
-    grid-template-areas: "fields avatar";
-    column-gap: 2rem;
-  }
-
-  .fields {
-    grid-area: fields;
-    order: unset;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    column-gap: 2rem;
-    row-gap: 1.25rem;
-    gap: 1.25rem;
-    width: 100%;
-  }
-
   .avatar {
     grid-area: avatar;
     justify-self: end;
     order: unset;
-    width: 150px;
-    height: 150px;
     margin-top: 0;
-    border-radius: 12px;
     background: $input-background;
     padding: 0;
   }

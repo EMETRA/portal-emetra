@@ -183,6 +183,12 @@
   color: #666;
   cursor: pointer;
   font-size: 0.72rem;
+  transition: color 0.15s;
+
+  &:hover {
+    color: #1b2a6b;
+    text-decoration: underline;
+  }
 }
 
 .formMessage {
@@ -487,4 +493,156 @@
 .timerExpired {
   text-align: center;
   color: var(--color-danger, #c0392b);
+}
+
+/// TRACKING VIEW
+
+.description {
+  font-size: 0.85rem;
+  color: #6b6b6b;
+  margin: 0 0 0.5rem;
+  line-height: 1.5;
+}
+
+// Result card
+.result {
+  margin-top: 1.25rem;
+  border: 1px solid #e0e0e0;
+  border-radius: 0.75rem;
+  padding: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  background: #fafafa;
+}
+
+.resultHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.trackingCode {
+  font-family: monospace;
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: #1b2a6b;
+}
+
+// Status badge
+.statusBadge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.25rem 0.85rem;
+  border-radius: 999px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.statusPending {
+  background: #fef3cd;
+  color: #8a6200;
+}
+
+.statusReview {
+  background: #e0eaf8;
+  color: #1b2a6b;
+}
+
+.statusApproved {
+  background: #e3f3e2;
+  color: #2f7a2f;
+}
+
+.statusRejected {
+  background: #fbe4e4;
+  color: #a13b3b;
+}
+
+.submittedAt {
+  font-size: 0.8rem;
+  color: #8a8a8a;
+  margin: 0;
+}
+
+// Observations
+.observations {
+  border-top: 1px solid #ececec;
+  padding-top: 0.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.observationsTitle {
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: #1b2a6b;
+  margin: 0;
+}
+
+.observation {
+  background: #fff;
+  border: 1px solid #ececec;
+  border-radius: 0.5rem;
+  padding: 0.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+.observationMessage {
+  font-size: 0.85rem;
+  color: #4a4a4a;
+  margin: 0;
+  line-height: 1.5;
+}
+
+.observationDate {
+  font-size: 0.75rem;
+  color: #8a8a8a;
+  margin: 0;
+}
+
+.trackingLink {
+  background: none;
+  border: 1px solid #1b2a6b;
+  border-radius: 0.5rem;
+  font-size: 0.82rem;
+  color: #1b2a6b;
+  cursor: pointer;
+  padding: 0.5rem 1rem;
+  width: 65%;
+  font-weight: 600;
+
+  &:hover {
+    background: #1b2a6b;
+    color: #fff;
+  }
+}
+
+.titleTrack {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #1b2a6b;
+  text-align: center;
+  margin: 0 0 0.5rem;
+}
+
+.cardCompact {
+  min-height: unset !important;
+  height: fit-content;
+  align-self: center;
+  padding-top: 2.5rem;
+  padding-bottom: 2.5rem;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  width: 100%;
 }

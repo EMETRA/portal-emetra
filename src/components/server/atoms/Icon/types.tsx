@@ -53,6 +53,8 @@ import Whatsapp from "@/assets/icons/Whatsapp.svg";
 import GoogleAuthenticator from "@/assets/icons/GoogleAuthenticator.svg";
 import MicrosoftAuthenticator from "@/assets/icons/MicrosoftAuthenticator.svg";
 import Mail from "@/assets/icons/Mail.svg";
+import Phone from "@/assets/icons/Phone.svg";
+import IdCard from "@/assets/icons/IdCard.svg";
 
 type IconType =
   | "Camion"
@@ -107,7 +109,9 @@ type IconType =
   | "Whatsapp"
   | "GoogleAuthenticator"
   | "MicrosoftAuthenticator"
-  | "Mail";
+  | "Mail"
+  | "Phone"
+  | "IdCard";
 
 interface IconProps extends React.SVGProps<SVGSVGElement> {
   className?: string;
@@ -137,6 +141,7 @@ const IconMap: Record<IconType, React.FC<React.SVGProps<SVGSVGElement>>> = {
   GoogleAuthenticator: GoogleAuthenticator,
   Image: Image,
   Home: Home,
+  IdCard: IdCard,
   Info: Info,
   Location: Location,
   Logout: Logout,
@@ -151,6 +156,7 @@ const IconMap: Record<IconType, React.FC<React.SVGProps<SVGSVGElement>>> = {
   PDF: PDF,
   PendingExam: PendingExam,
   Pickup: Pickup,
+  Phone: Phone,
   Piloto: Piloto,
   Publicidad: Publicidad,
   Search_2: Search_2,

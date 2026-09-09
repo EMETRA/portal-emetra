@@ -10,6 +10,7 @@ import RecoverView from "./views/RecoverView";
 import VerifyEmailView from "./views/VerifyEmailView";
 import type { AccessView } from "./types";
 import styles from "./CasilleroAccess.module.scss";
+import TrackingView from "./views/TrackingView";
 
 const pageTitle: Record<AccessView, string> = {
   login: "Log In",
@@ -17,6 +18,7 @@ const pageTitle: Record<AccessView, string> = {
   register: "Registro",
   recover: "Recuperar Contraseña",
   "verify-email": "Verificar Email",
+  tracking: "Estado de Solicitud",
 };
 
 export default function CasilleroAccess() {
@@ -65,8 +67,8 @@ export default function CasilleroAccess() {
           <span />
         </div>
 
-        <div className={styles.card}>
-          {view !== "login-2fa" && view !== "verify-email" && (
+        <div className={`${styles.card} ${view === "tracking" ? styles.cardCompact : ""}`}>
+          {view !== "login-2fa" && view !== "verify-email" && view !== "tracking" && (
             <CasilleroTabs
               loginActive={view === "login" || view === "recover"}
               registerActive={view === "register"}
@@ -84,6 +86,8 @@ export default function CasilleroAccess() {
               <>Inicio de Sesión</>
             ) : view === "verify-email" ? (
               <>Verificar Email</>
+            ) : view === "tracking" ? (
+              null // ← no mostrar h2 en tracking, ya está en el titleRow
             ) : (
               <>
                 <span className={styles.desktopTitle}>Creación de Cuenta</span>
@@ -98,11 +102,13 @@ export default function CasilleroAccess() {
               onSuccess={() => changeView("login-2fa")}
               onRegister={() => changeView("register")}
               onRecover={() => changeView("recover")}
+              onTracking={() => changeView("tracking")}
             />
           )}
           {view === "login-2fa" && (
             <TwoFactorView onSuccess={() => router.push("/casillero/dashboard")} />
           )}
+          
           {view === "register" && (
             <RegisterView onLogin={() => changeView("login")} onSuccess={handleRegisterSuccess} />
           )}
@@ -118,6 +124,10 @@ export default function CasilleroAccess() {
             onResend={handleResendVerification}
           />
         )}
+        {view === "tracking" && (
+          <TrackingView onLogin={() => changeView("login")} />
+        )}
+
         </div>
       </section>
     </main>

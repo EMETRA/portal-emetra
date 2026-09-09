@@ -51,3 +51,21 @@ export type PersonalRegistrationCreated = {
   verificationId: string;
   verificationExpiresAt: string;
 };
+
+/*
+  Consulta de estado de solicitud de registro.
+*/
+
+export type RegistrationStatus = "PENDING" | "IN_REVIEW" | "APPROVED" | "REJECTED";
+
+export interface RegistrationObservation {
+  message: string;
+  recordedAt: string;
+}
+
+export interface RegistrationStatusResponse {
+  trackingCode: string;
+  status: RegistrationStatus;
+  submittedAt: string;
+  observations: RegistrationObservation[];
+}

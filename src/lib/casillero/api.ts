@@ -3,6 +3,7 @@ import type {
   ContactVerificationVerified,
   PersonalRegistrationRequest,
   PersonalRegistrationCreated,
+  RegistrationStatusResponse,
 } from "@/lib/casillero/types";
 
 // GENERAL REQUEST API
@@ -112,4 +113,37 @@ export async function createPersonalRegistration(
     errorFromRegistrationStatus,
     true
   );
+}
+
+// QUERY-REGISTRATION API
+
+function errorFromTrackingStatus(status: number): Error {
+  const message =
+    status === 404
+      ? "Código inválido o solicitud no localizada"
+      : `HTTP ${status}`;
+  const error = new Error(message);
+  error.name = "ApiResponseError";
+  return error;
+}
+
+export async function getRegistrationStatus(
+  code: string
+): Promise<RegistrationStatusResponse> {
+  const response = await fetch(
+    `/api/casillero/registrations/${encodeURIComponent(code)}`,
+    {
+      method: "GET",
+      headers: {
+        Accept: "application/json",
+      },
+      cache: "no-store",
+    }
+  );
+
+  if (!response.ok) {
+    throw errorFromTrackingStatus(response.status);
+  }
+
+  return response.json() as Promise<RegistrationStatusResponse>;
 }

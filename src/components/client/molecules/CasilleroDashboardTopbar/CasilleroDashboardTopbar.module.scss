@@ -47,6 +47,7 @@
   }
 }
 
+// Desktop/tablet mode switcher
 .modeSwitcher {
   display: flex;
   background: rgba(255, 255, 255, 0.15);
@@ -76,6 +77,98 @@
   color: #1b2a6b;
 }
 
+// User menu dropdown
+.userMenu {
+  position: relative;
+}
+
+.userMenuTrigger {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: none;
+  border: none;
+  color: #fff;
+  cursor: pointer;
+  font-size: 0.74rem;
+  font-weight: 700;
+  padding: 0;
+
+  &:hover {
+    opacity: 0.85;
+  }
+
+  svg {
+    width: 14px;
+    height: 14px;
+    transition: transform 0.18s ease;
+  }
+}
+
+.chevronOpen svg {
+  transform: rotate(180deg);
+}
+
+.dropdown {
+  position: absolute;
+  top: calc(100% + 10px);
+  right: 0;
+  background: #fff;
+  border-radius: 0.75rem;
+  box-shadow: 0 8px 24px rgba(27, 42, 107, 0.15);
+  min-width: 180px;
+  padding: 0.4rem;
+  z-index: 100;
+}
+
+.dropdownDivider {
+  height: 1px;
+  background: #ececec;
+  margin: 0.3rem 0;
+}
+
+.dropdownItem {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  width: 100%;
+  background: none;
+  border: none;
+  border-radius: 0.5rem;
+  padding: 0.6rem 0.85rem;
+  font-size: 0.85rem;
+  color: #1b2a6b;
+  cursor: pointer;
+  text-align: left;
+
+  svg {
+    width: 16px;
+    height: 16px;
+    flex-shrink: 0;
+  }
+
+  &:hover {
+    background: #f0f4ff;
+  }
+}
+
+.dropdownItemDanger {
+  color: #d65c5c;
+
+  &:hover {
+    background: #fbe4e4;
+  }
+}
+
+.mobileHomeButton {
+  display: none;
+}
+
+.searchButton {
+  display: none;
+}
+
+// Mobile mode switcher
 .mobileModeToggle {
   display: none;
 }
@@ -100,16 +193,8 @@
   color: #1b2a6b;
 }
 
-.mobileHomeButton {
-  display: none;
-}
-
-.searchButton {
-  display: none;
-}
-
-//
-@media (max-width: 900px) {
+// Tablet
+@media (max-width: 1400px) {
   .topbar {
     padding: 0 14px;
 
@@ -122,6 +207,11 @@
     display: none;
   }
 
+  // oculta el nombre en tablet pero mantiene el trigger
+  .userMenuTrigger span {
+    display: none;
+  }
+
   .modeBtn {
     padding: 3px 8px;
     font-size: 0.62rem;
@@ -129,11 +219,10 @@
 }
 
 // Mobile
-@media (max-width: 520px) {
+@media (max-width: 768px) {
   .topbar {
     height: 40px;
-    // menu | h1 | mobileHomeButton | mobileModeToggle | searchButton
-    grid-template-columns: auto 1fr auto auto auto;
+    grid-template-columns: auto 1fr auto auto auto auto; // ← una columna más
     gap: 8px;
     padding: 0 14px;
 
@@ -142,7 +231,6 @@
     }
   }
 
-  // hide desktop elements
   .modeSwitcher {
     display: none;
   }
@@ -155,7 +243,6 @@
     display: none;
   }
 
-  // show mobile elements
   .mobileHomeButton {
     display: inline-flex;
     border: 0;
@@ -188,6 +275,64 @@
     svg {
       width: 22px;
       height: 22px;
+    }
+  }
+}
+
+.mobileLogoutButton {
+  display: none;
+}
+
+@media (max-width: 768px) {
+  .mobileLogoutButton {
+    display: inline-flex;
+    border: 0;
+    background: transparent;
+    color: #fff;
+    cursor: pointer;
+
+    svg {
+      width: 22px;
+      height: 22px;
+    }
+  }
+
+  // actualiza el grid para incluirlo
+  .topbar {
+    grid-template-columns: auto 1fr auto auto auto auto;
+  }
+}
+
+
+// fuera del media query — ocultos por defecto
+.mobileNotificationButton,
+.mobileUserButton {
+  display: none;
+}
+
+@media (max-width: 768px) {
+  .topbar {
+    // menu | h1 | home | notification | user | modeToggle | logout | search
+    grid-template-columns: auto 1fr auto auto auto auto auto auto;
+    gap: 6px; // reduce gap para que quepan todos
+    padding: 0 10px;
+
+    h1 {
+      font-size: 0.82rem;
+    }
+  }
+
+  .mobileNotificationButton,
+  .mobileUserButton {
+    display: inline-flex;
+    border: 0;
+    background: transparent;
+    color: #fff;
+    cursor: pointer;
+
+    svg {
+      width: 20px;
+      height: 20px;
     }
   }
 }

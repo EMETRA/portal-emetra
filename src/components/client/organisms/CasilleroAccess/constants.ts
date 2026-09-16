@@ -1,8 +1,9 @@
+// constants.ts
 import type { IconType } from "@/components/server/atoms";
-import type { TwoFactorMethod } from "./types";
+import type { TwoFactorType } from "@/lib/casillero/types";
 
-export const twoFactorMethods: { id: TwoFactorMethod; icon: IconType; label: string }[] = [
-  { id: "google", icon: "GoogleAuthenticator", label: "Google Authenticator" },
-  { id: "microsoft", icon: "MicrosoftAuthenticator", label: "Microsoft Authenticator" },
-  { id: "email", icon: "Mail", label: "Correo electrónico" },
+export const twoFactorMethods: { id: TwoFactorType; icon: IconType; label: string }[] = [
+  { id: "CORREO",       icon: "Mail",                   label: "Correo electrónico"    },
+  { id: "TOTP",         icon: "GoogleAuthenticator",    label: "Authenticator"         },
+  { id: "RECUPERACION", icon: "MicrosoftAuthenticator", label: "Código de recuperación" },
 ];

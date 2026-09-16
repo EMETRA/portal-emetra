@@ -4,6 +4,7 @@ import { FormEvent, useState } from "react";
 import * as yup from "yup";
 import { Button } from "@/components/server/atoms";
 import { passwordSchema } from "@/schema/casillero";
+import { requestPasswordReset, resetPassword } from "@/lib/casillero/auth";
 import AccessField from "../fields/AccessField";
 import type { RecoverStep } from "../types";
 import styles from "../CasilleroAccess.module.scss";
@@ -14,30 +15,39 @@ type Props = {
 
 const submitLabel: Record<RecoverStep, string> = {
   email: "Enviar código",
-  code: "Validar",
-  password: "Reestablecer",
+  code: "Reestablecer",
 };
 
 export default function RecoverView({ onLogin }: Props) {
   const [step, setStep] = useState<RecoverStep>("email");
   const [message, setMessage] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-
-    if (step === "email") {
-      setStep("code");
-      setMessage("");
-      return;
-    }
-
-    if (step === "code") {
-      setStep("password");
-      setMessage("");
-      return;
-    }
+    setMessage("");
+    setLoading(true);
 
     const formData = new FormData(event.currentTarget);
+
+    if (step === "email") {
+      const email = String(formData.get("recovery-email") ?? "");
+
+      try {
+        await requestPasswordReset(email);
+        // siempre avanza — el backend nunca revela si el email existe
+        setStep("code");
+      } catch {
+        // igual avanza para no revelar si el email existe
+        setStep("code");
+      } finally {
+        setLoading(false);
+      }
+      return;
+    }
+
+    // step === "code" — token + nueva contraseña
+    const token = String(formData.get("recovery-token") ?? "");
     const password = String(formData.get("recovery-password") ?? "");
     const confirmPassword = String(formData.get("recovery-confirm-password") ?? "");
 
@@ -46,16 +56,25 @@ export default function RecoverView({ onLogin }: Props) {
     } catch (err) {
       if (err instanceof yup.ValidationError) {
         setMessage(err.message);
+        setLoading(false);
         return;
       }
     }
 
     if (password !== confirmPassword) {
       setMessage("Las contraseñas no coinciden.");
+      setLoading(false);
       return;
     }
 
-    onLogin("La contraseña fue restablecida correctamente.");
+    try {
+      await resetPassword(token, password);
+      onLogin("Contraseña restablecida. Inicia sesión con tu nueva contraseña.");
+    } catch (err: any) {
+      setMessage(err.message ?? "Error al restablecer la contraseña.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -70,21 +89,23 @@ export default function RecoverView({ onLogin }: Props) {
           required
         />
       )}
+
       {step === "code" && (
-        <AccessField
-          id="recovery-code"
-          label="Ingresar código"
-          type="text"
-          placeholder="8QGRH7T6"
-          autoComplete="one-time-code"
-          required
-        />
-      )}
-      {step === "password" && (
         <>
+          <p className={styles.formMessage} style={{ color: "#666" }}>
+            Revisa tu correo y copia el token que recibiste.
+          </p>
+          <AccessField
+            id="recovery-token"
+            label="Token de recuperación"
+            type="text"
+            placeholder="3YgTQ-SecureOpaqueRecoveryToken"
+            autoComplete="off"
+            required
+          />
           <AccessField
             id="recovery-password"
-            label="Nueva Contraseña"
+            label="Nueva contraseña"
             type="password"
             placeholder="Ingresa tu nueva contraseña"
             autoComplete="new-password"
@@ -92,7 +113,7 @@ export default function RecoverView({ onLogin }: Props) {
           />
           <AccessField
             id="recovery-confirm-password"
-            label="Confirmar Contraseña"
+            label="Confirmar contraseña"
             type="password"
             placeholder="Confirma tu nueva contraseña"
             autoComplete="new-password"
@@ -100,9 +121,15 @@ export default function RecoverView({ onLogin }: Props) {
           />
         </>
       )}
+
       <div className={styles.recoveryActions}>
-        <Button type="submit" variant="success" className={styles.submitButton}>
-          {submitLabel[step]}
+        <Button
+          type="submit"
+          variant="success"
+          className={styles.submitButton}
+          disabled={loading}
+        >
+          {loading ? "Procesando..." : submitLabel[step]}
         </Button>
         <button
           type="button"

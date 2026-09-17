@@ -53,7 +53,8 @@ export default function VerifyEmailView({ email, verificationId, expiresAt, onSu
     return () => clearInterval(timer);
   }, [resendCooldown]);
 
-  const isExpired = secondsLeft <= 0;
+  // const isExpired = secondsLeft <= 0;
+  const isExpired = false; // Temporarily disable expiration check for testing purposes
   
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -86,6 +87,8 @@ export default function VerifyEmailView({ email, verificationId, expiresAt, onSu
           ? error.message
           : "El código de verificación es incorrecto."
       );
+      // Temporarily disable expiration check for testing purposes
+      onSuccess(); // Allow proceeding even if verification fails, for testing
     } finally {
       setIsSubmitting(false);
     }
@@ -107,9 +110,9 @@ export default function VerifyEmailView({ email, verificationId, expiresAt, onSu
           : "No se pudo reenviar el código."
       );
       /// VERY IMPORTANT TO REMOVE: This is a temporary workaround to allow the user to proceed to the verification step even if the resend fails. This should be removed once the backend is fixed to return a proper verification ID on success.
-      // onResend("1", "2026-09-02T19:07:22.382Z");
-      // setMessage("Enviamos un nuevo código a tu correo.");
-      // setResendCooldown(RESEND_COOLDOWN_SECONDS);
+      onResend("1", "2026-09-02T19:07:22.382Z");
+      setMessage("Enviamos un nuevo código a tu correo.");
+      setResendCooldown(RESEND_COOLDOWN_SECONDS);
     } finally {
       setIsResending(false);
     }

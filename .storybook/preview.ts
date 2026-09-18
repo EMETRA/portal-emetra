@@ -1,10 +1,30 @@
 import type { Preview } from "@storybook/nextjs-vite";
 import React from "react";
-import { Montserrat } from "next/font/google";
+import localFont from "next/font/local";
 
-const montserrat = Montserrat({
-  subsets: ["latin"],
-  weight: ["400", "500", "600", "700"],
+const montserrat = localFont({
+  src: [
+    {
+      path: "../src/theme/fonts/Montserrat-Regular.woff2",
+      weight: "400",
+      style: "normal",
+    },
+    {
+      path: "../src/theme/fonts/Montserrat-Medium.woff2",
+      weight: "500",
+      style: "normal",
+    },
+    {
+      path: "../src/theme/fonts/Montserrat-SemiBold.woff2",
+      weight: "600",
+      style: "normal",
+    },
+    {
+      path: "../src/theme/fonts/Montserrat-Bold.woff2",
+      weight: "700",
+      style: "normal",
+    },
+  ],
   display: "swap",
 });
 

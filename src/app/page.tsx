@@ -1,3 +1,5 @@
+"use client";
+
 import { Separator } from "@/components/atoms/Separator";
 import styles from "./page.module.css";
 import { Banner, BannerSlide, ServicesRow } from "@/components/organisms";
@@ -11,6 +13,7 @@ import NewsCarrousel from "@/components/organisms/NewsCarrousel/NewsCarrousel";
 import { FAQ, FAQ_Type } from "@/schema";
 import { FAQQuestions } from "@/components/organisms/FAQ-Questions";
 import { API_BASE_URL } from "@/lib/config";
+import { useEffect } from "react";
 
 interface NewsSummaryDto {
   id: number;
@@ -104,6 +107,123 @@ async function fetchLatestNews(): Promise<NewsSummaryDto[]> {
   }
 }
 
+const noticias = [
+  {
+      "id": 162,
+      "slug": "curso-evial",
+      "titulo": "¡Ya puedes registrarte para Vidas en Ruta!",
+      "resumen": null,
+      "estado": "borrador",
+      "visibilidad": "publica",
+      "fecha_publicacion": null,
+      "tiempo_lectura": null,
+      "meta_titulo": null,
+      "meta_descripcion": null,
+      "url_canonica": null,
+      "idioma": "es-GT",
+      "creado_por": null,
+      "actualizado_por": null,
+      "creado": "2025-12-05T16:54:42.772Z",
+      "actualizado": "2025-12-05T16:54:42.772Z",
+      "recurso_principal": null
+    },
+    {
+      "id": 163,
+      "slug": "pago-tarjeta-circulación",
+      "titulo": "Recuerda pagar tu tarjeta de circulación.",
+      "resumen": null,
+      "estado": "borrador",
+      "visibilidad": "publica",
+      "fecha_publicacion": null,
+      "tiempo_lectura": null,
+      "meta_titulo": null,
+      "meta_descripcion": null,
+      "url_canonica": null,
+      "idioma": "es-GT",
+      "creado_por": null,
+      "actualizado_por": null,
+      "creado": "2025-12-05T16:55:19.608Z",
+      "actualizado": "2025-12-05T16:55:19.608Z",
+      "recurso_principal": null
+    },
+    {
+      "id": 164,
+      "slug": "trafico-diago6",
+      "titulo": "Tráfico intenso en Diagonal Seis",
+      "resumen": null,
+      "estado": "borrador",
+      "visibilidad": "publica",
+      "fecha_publicacion": null,
+      "tiempo_lectura": null,
+      "meta_titulo": null,
+      "meta_descripcion": null,
+      "url_canonica": null,
+      "idioma": "es-GT",
+      "creado_por": null,
+      "actualizado_por": null,
+      "creado": "2025-12-05T16:55:48.832Z",
+      "actualizado": "2025-12-05T16:55:48.832Z",
+      "recurso_principal": null
+    },
+    {
+      "id": 159,
+      "slug": "periferico-bloqueado",
+      "titulo": "¡Periférico bloqueado por accidente!",
+      "resumen": null,
+      "estado": "borrador",
+      "visibilidad": "publica",
+      "fecha_publicacion": null,
+      "tiempo_lectura": null,
+      "meta_titulo": null,
+      "meta_descripcion": null,
+      "url_canonica": null,
+      "idioma": "es-GT",
+      "creado_por": null,
+      "actualizado_por": null,
+      "creado": "2025-12-05T16:53:07.455Z",
+      "actualizado": "2025-12-05T16:53:07.455Z",
+      "recurso_principal": null
+    },
+    {
+      "id": 160,
+      "slug": "atanasio-auxiliar",
+      "titulo": "¡Carril auxiliar habilitado. Atanasio Tzul hacia el Sur!",
+      "resumen": null,
+      "estado": "borrador",
+      "visibilidad": "publica",
+      "fecha_publicacion": null,
+      "tiempo_lectura": null,
+      "meta_titulo": null,
+      "meta_descripcion": null,
+      "url_canonica": null,
+      "idioma": "es-GT",
+      "creado_por": null,
+      "actualizado_por": null,
+      "creado": "2025-12-05T16:53:46.261Z",
+      "actualizado": "2025-12-05T16:53:46.261Z",
+      "recurso_principal": null
+    },
+    {
+      "id": 161,
+      "slug": "feria-evial",
+      "titulo": "¡Feria EVIAL, próxima fecha: 15 de junio!",
+      "resumen": null,
+      "estado": "borrador",
+      "visibilidad": "publica",
+      "fecha_publicacion": null,
+      "tiempo_lectura": null,
+      "meta_titulo": null,
+      "meta_descripcion": null,
+      "url_canonica": null,
+      "idioma": "es-GT",
+      "creado_por": null,
+      "actualizado_por": null,
+      "creado": "2025-12-05T16:54:21.550Z",
+      "actualizado": "2025-12-05T16:54:21.550Z",
+      "recurso_principal": null
+    }
+]
+
 function mapCategoriaToFaqType(categoria: string): FAQ_Type {
   const normalized = categoria?.toLowerCase();
 
@@ -174,9 +294,19 @@ const slides: BannerSlide[] = [
 
 const DEFAULT_NEWS_IMAGE = "/images/Evento.jpg";
 
-export default async function Home() {
-  const latestNews = await fetchLatestNews();
-  const faqQuestions = await fetchFaqs();
+export default function Home() {
+  // const latestNews = await fetchLatestNews();
+  // const faqQuestions = await fetchFaqs();
+
+  useEffect(() => {
+  const hash = window.location.hash;
+  if (!hash) return;
+
+  const el = document.querySelector(hash);
+  if (el) {
+    el.scrollIntoView({ behavior: "smooth", block: "start" });
+  }
+}, []);
 
   return (
     <div className={styles.page}>
@@ -217,16 +347,16 @@ export default async function Home() {
           </MultimediaCarrousel>
         </div>
       </div>
-      <Separator>
-        <div className={classNames(styles.Heading)}>
+      <Separator >
+        <div className={classNames(styles.Heading)} id="noticias">
           <Icon name="Notification" className={classNames(styles.Icon)} />
           <h1 className={classNames(styles.Title)}>ÚLTIMAS NOTICIAS</h1>
         </div>
       </Separator>
 
-      {latestNews.length > 0 ? (
+      {/* {latestNews.length > 0 ? ( */}
         <NewsCarrousel>
-          {latestNews.map((news) => (
+          {noticias.map((news) => (
             <NewCard
               key={news.id}
               id={news.id.toString()}
@@ -238,20 +368,20 @@ export default async function Home() {
             />
           ))}
         </NewsCarrousel>
-      ) : (
+      {/* ) : (
         <p className={styles.noNewsMessage}>
           No hay noticias disponibles por el momento.
         </p>
-      )}
+      )} */}
       <Separator>
         <h1 className={classNames(styles.Title)}>Preguntas Frecuentes</h1>
       </Separator>
       <section id="ayuda">
-        <FAQQuestions
+        {/*<FAQQuestions
           questions={faqQuestions}
           variant="No-Landing"
           className={styles.faqQuestions}
-        />
+        />*/}
       </section>
     </div>
   );

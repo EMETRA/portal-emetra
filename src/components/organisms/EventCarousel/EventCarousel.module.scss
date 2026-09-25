@@ -1,0 +1,22 @@
+.carousel {
+    width: 100%;
+    overflow-x: auto;
+    overflow-y: hidden;
+    scroll-behavior: smooth;
+    scrollbar-width: none;
+}
+
+.carousel::-webkit-scrollbar {
+    display: none;
+}
+
+.track {
+    display: flex;
+    align-items: stretch;
+    justify-content: center;
+    gap: 24px;
+    width: max-content;
+    min-width: 100%;
+    padding: 20px 32px 30px;
+    box-sizing: border-box;
+}

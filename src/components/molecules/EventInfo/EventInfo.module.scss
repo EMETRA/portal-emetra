@@ -1,0 +1,32 @@
+.info {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.modality {
+    width: fit-content;
+    padding: 8px 16px;
+    background: #edf4ff;
+    border-radius: 14px;
+    color: #2867c7;
+}
+
+.modalityText {
+    margin: 0;
+    font-size: 16px !important;
+    font-weight: 600;
+    color: inherit;
+}
+
+.item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.text {
+    margin: 0;
+    font-size: 16px !important;
+    color: #526581;
+}

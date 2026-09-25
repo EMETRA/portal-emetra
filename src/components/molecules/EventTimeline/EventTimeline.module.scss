@@ -1,0 +1,62 @@
+.timeline {
+    display: flex;
+    flex-direction: column;
+}
+
+.item {
+    position: relative;
+    display: flex;
+    gap: 20px;
+    padding-bottom: 32px;
+}
+
+.item:not(:last-child)::before {
+    content: "";
+    position: absolute;
+    top: 12px;
+    left: 6px;
+    width: 2px;
+    height: calc(100% - 12px);
+    background: #dce7f7;
+}
+
+.marker {
+    position: relative;
+    z-index: 1;
+    flex-shrink: 0;
+    width: 14px;
+    height: 14px;
+    margin-top: 4px;
+    border-radius: 50%;
+    background: #2867c7;
+    border: 3px solid #edf4ff;
+}
+
+.content {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.time {
+    text-align: left !important;
+    margin: 0;
+    font-size: 14px !important;
+    font-weight: 600;
+    color: #2867c7;
+}
+
+.title {
+    margin: 0;
+    text-align: left !important;
+    font-size: 18px !important;
+    font-weight: 700;
+    color: #172b4d;
+}
+
+.description {
+    margin: 0;
+    text-align: left !important;
+    line-height: 1.5;
+    color: #526581;
+}

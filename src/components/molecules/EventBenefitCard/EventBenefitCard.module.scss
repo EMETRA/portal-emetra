@@ -1,0 +1,28 @@
+.card {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding: 24px;
+    background: #ffffff;
+    border: 1px solid #efefef;
+    border-radius: 20px;
+    box-shadow: 
+        0 4px 6px rgba(15,23,42, 0.04)
+        0 12px 30px rgba(15, 23, 42, 0.06)
+    ;
+}
+
+.title {
+    margin: 0;
+    text-align: left !important;
+    font-size: 18px !important;
+    font-weight: 700;
+    color: #172b4d;
+}
+
+.description {
+    margin: 0;
+    text-align: left !important;
+    line-height: 1.5;
+    color: #526581;
+}

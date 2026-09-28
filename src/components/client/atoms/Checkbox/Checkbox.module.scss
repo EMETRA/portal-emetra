@@ -1,0 +1,81 @@
+@use '../../../../theme/colors.scss' as *;
+
+.wrapper {
+  display: inline-flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.container {
+  display: inline-flex;
+  align-items: flex-start;
+  gap: 8px;
+  cursor: pointer;
+  user-select: none;
+  color: $secondary-text;
+}
+
+.containerDisabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+.containerError {
+  color: $rojo-1;
+}
+
+.input {
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+  pointer-events: none;
+}
+
+.mark {
+  display: inline-flex;
+  flex-shrink: 0;
+  color: inherit;
+}
+
+.unchecked,
+.checked {
+  display: block;
+  color: inherit;
+}
+
+.checked {
+  display: none;
+}
+
+.input:checked ~ .mark .unchecked {
+  display: none;
+}
+
+.input:checked ~ .mark .checked {
+  display: block;
+}
+
+.input:focus-visible ~ .mark {
+  outline: 2px solid $secondary-text;
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+.label {
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 400;
+  color: $secondary-text;
+  line-height: 1.4;
+}
+
+.containerDisabled .label {
+  color: $tertiary-text;
+}
+
+.errorMessage {
+  display: block;
+  color: $rojo-1;
+  margin-left: 28px;
+}

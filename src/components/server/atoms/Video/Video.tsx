@@ -1,6 +1,6 @@
 import React, { VideoHTMLAttributes } from "react";
 
-interface VideoProps extends VideoHTMLAttributes<HTMLVideoElement> {
+export interface VideoProps extends VideoHTMLAttributes<HTMLVideoElement> {
   src: string;
 }
 

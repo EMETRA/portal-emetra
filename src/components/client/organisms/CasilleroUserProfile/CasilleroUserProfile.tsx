@@ -117,12 +117,6 @@ function findContact(
   );
 }
 
-function contactPurposeLabel(purpose: CasilleroContact["purpose"]) {
-  if (purpose === "CAMBIO_ACCESO") return "Cambio de acceso";
-  if (purpose === "ACCESO") return "Acceso";
-  return "Contacto";
-}
-
 export default function CasilleroUserProfile() {
   const router = useRouter();
   const [user, setUser] = useState<CasilleroUser>(DUMMY_USER);

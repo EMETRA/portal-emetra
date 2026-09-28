@@ -9,7 +9,7 @@ const meta: Meta<typeof FileUploader> = {
     docs: {
       description: {
         component:
-          "Acepta JPG, PNG y PDF de hasta 1 MB, con un máximo de 3 archivos. Otro tipo se rechaza por formato, un archivo de más de 1 MB por tamaño y el que exceda las 3 filas por límite.",
+          "Acepta JPG, PNG y PDF de hasta 1 MB cada uno y 2 MB en total, con un máximo de 3 archivos. Otro tipo se rechaza por formato, un archivo de más de 1 MB por tamaño, el conjunto que pase de 2 MB por total y el que exceda las 3 filas por límite.",
       },
     },
   },
@@ -21,6 +21,10 @@ const meta: Meta<typeof FileUploader> = {
     maxSizeBytes: {
       control: { type: "number" },
       description: "Tamaño máximo por archivo, en bytes",
+    },
+    maxTotalSizeBytes: {
+      control: { type: "number" },
+      description: "Tamaño máximo sumado de los archivos aceptados, en bytes",
     },
     maxFiles: {
       control: { type: "number" },
@@ -44,6 +48,7 @@ export const Default: StoryObj<typeof FileUploader> = {
   args: {
     accept: ["image/jpeg", "image/png", "application/pdf"],
     maxSizeBytes: 1024 * 1024,
+    maxTotalSizeBytes: 2 * 1024 * 1024,
     maxFiles: 3,
     dropLabel: "Arrastra tus anexos aquí",
     selectLabel: "Seleccionar archivos",

@@ -11,13 +11,12 @@ import classNames from "classnames";
  * @param {IconProps} props - Las propiedades adicionales para el ícono.
  * @returns {JSX.Element} - El componente de ícono renderizado.
  */
-const Icon: React.FC<IconProps> = ({ className, name, ...props }) => {
+const Icon: React.FC<IconProps> = ({ className, name, width, height, ...props }) => {
   const SVGIcon = IconMap[name];
   return (
     <SVGIcon
       className={classNames(className ? className : styles.icon)}
-      width={50}
-      height={50}
+      style={{ width: width || 20, height: height || 20 }}
       {...props}
     />
   );

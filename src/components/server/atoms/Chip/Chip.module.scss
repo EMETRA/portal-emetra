@@ -1,0 +1,23 @@
+@use "../../../../theme/index.scss" as *;
+
+.chip {
+  font-family: var(--font-montserrat), sans-serif;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6px 12px;
+  border-radius: 16px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  white-space: nowrap;
+  gap: 8px;
+  background-color: var(--chip-backgroundColor, $azul-1);
+  color: var(--chip-color, #ffffff);
+}
+
+.outlined {
+  background-color: transparent;
+  color: var(--chip-backgroundColor, #666);
+  padding: 5px 11px;
+  border: 1px solid var(--chip-backgroundColor, #666);
+}

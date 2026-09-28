@@ -17,6 +17,8 @@ const DEFAULT_TYPE_MESSAGE =
   "Rechazado: formato no permitido. Quítalo o reemplázalo para poder enviar.";
 const DEFAULT_SIZE_MESSAGE =
   "Rechazado: el archivo supera el tamaño permitido. Quítalo o reemplázalo para poder enviar.";
+const DEFAULT_TOTAL_MESSAGE =
+  "Rechazado: el total de los archivos supera el tamaño permitido. Quítalo o reemplázalo para poder enviar.";
 const DEFAULT_LIMIT_MESSAGE =
   "Rechazado: se superó el límite de archivos. Quítalo o reemplázalo para poder enviar.";
 
@@ -33,12 +35,14 @@ function resolveFileLimit(maxFiles: number): number {
 export default function FileUploader({
   accept,
   maxSizeBytes,
+  maxTotalSizeBytes,
   maxFiles,
   onChange,
   dropLabel = DEFAULT_DROP_LABEL,
   selectLabel = DEFAULT_SELECT_LABEL,
   invalidTypeMessage = DEFAULT_TYPE_MESSAGE,
   invalidSizeMessage = DEFAULT_SIZE_MESSAGE,
+  totalSizeMessage = DEFAULT_TOTAL_MESSAGE,
   limitMessage = DEFAULT_LIMIT_MESSAGE,
   disabled = false,
 }: FileUploaderProps) {
@@ -76,12 +80,18 @@ export default function FileUploader({
 
     const created: UploadItem[] = [];
     let count = itemsRef.current.length;
+    let totalBytes = itemsRef.current.reduce(
+      (sum, item) => (item.status === "loaded" ? sum + item.file.size : sum),
+      0,
+    );
 
     for (const file of files) {
       const reason = validateFile({
         file,
         accept,
         maxSizeBytes,
+        maxTotalSizeBytes,
+        currentTotalBytes: totalBytes,
         currentCount: count,
         maxFiles: fileLimit,
       });
@@ -93,6 +103,7 @@ export default function FileUploader({
         error: reason ?? undefined,
       });
       count += 1;
+      if (!reason) totalBytes += file.size;
     }
 
     updateItems((prev) => [...prev, ...created]);
@@ -105,6 +116,7 @@ export default function FileUploader({
   function messageFor(reason: FileRejectReason): string {
     if (reason === "type") return invalidTypeMessage;
     if (reason === "size") return invalidSizeMessage;
+    if (reason === "total") return totalSizeMessage;
     return limitMessage;
   }
 

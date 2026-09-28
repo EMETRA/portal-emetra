@@ -1,4 +1,4 @@
-export type FileRejectReason = "limit" | "type" | "size";
+export type FileRejectReason = "limit" | "type" | "size" | "total";
 
 export type UploadItemStatus = "loaded" | "error";
 
@@ -14,6 +14,8 @@ export type FileUploaderProps = {
   accept: string[];
   /** Tamaño máximo de cada archivo, en bytes. */
   maxSizeBytes: number;
+  /** Tamaño máximo sumado de los archivos aceptados, en bytes. */
+  maxTotalSizeBytes: number;
   /** Cantidad máxima de archivos, incluyendo las que están en error. */
   maxFiles: number;
   /** Archivos que terminaron de cargar, en el orden de la lista. */
@@ -22,6 +24,7 @@ export type FileUploaderProps = {
   selectLabel?: string;
   invalidTypeMessage?: string;
   invalidSizeMessage?: string;
+  totalSizeMessage?: string;
   limitMessage?: string;
   disabled?: boolean;
 };

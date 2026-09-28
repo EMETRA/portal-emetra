@@ -22,7 +22,9 @@ const MultimediaCard: React.FC<MultimediaCardProps> = ({
 }) => {
   return (
     <div className={classNames(styles.card)}>
-      <div className={classNames(styles.media)}>
+      <div className={classNames(styles.media, {
+        [styles.videoMedia]: !isImageUrl(src),
+      })}>
         {isImageUrl(src) ? (
           <Image
             src={src}
@@ -34,8 +36,8 @@ const MultimediaCard: React.FC<MultimediaCardProps> = ({
         ) : (
           <Video
             src={src}
-            width={350}
-            height={"auto"}
+            width="100%"
+            height="100%"
             className={classNames(styles.video)}
           />
         )}

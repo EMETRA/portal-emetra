@@ -1,5 +1,8 @@
 .Alert {
-  margin: 1rem;
+  min-width: 0;
+  max-width: 100%;
+  overflow-wrap: anywhere;
+  margin: 1rem 0;
   padding: 1rem;
   border: 1px solid #ffccc7;
   border-radius: 8px;

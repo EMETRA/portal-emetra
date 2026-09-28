@@ -1,4 +1,5 @@
 .Title {
+  min-width: 0;
   color: #1700a5;
   margin-block: 2rem;
 }
@@ -11,6 +12,7 @@
 }
 
 .Icon {
+  flex-shrink: 0;
   width: 2rem;
   height: 2rem;
   color: #1700a5;
@@ -51,6 +53,7 @@
 
 .VideosTitle {
   color: #1700a5;
+  text-align: center;
 }
 
 .Services {

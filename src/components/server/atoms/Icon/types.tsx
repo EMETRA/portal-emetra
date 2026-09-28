@@ -17,6 +17,8 @@ import Download from "@/assets/icons/Download.svg";
 import DPI from "@/assets/icons/DPI.svg";
 import Eye from "@/assets/icons/Eye.svg";
 import EyeOff from "@/assets/icons/EyeOff.svg";
+import Exclamation from "@/assets/icons/Exclamation.svg";
+import File from "@/assets/icons/File.svg";
 import Files from "@/assets/icons/Files.svg";
 import Image from "@/assets/icons/Image.svg";
 import Info from "@/assets/icons/Info.svg";
@@ -68,6 +70,8 @@ type IconType =
   | "DPI"
   | "Eye"
   | "EyeOff"
+  | "Exclamation"
+  | "File"
   | "Files"
   | "Image"
   | "Info"
@@ -123,6 +127,8 @@ const IconMap: Record<IconType, React.FC<React.SVGProps<SVGSVGElement>>> = {
   DPI: DPI,
   Eye: Eye,
   EyeOff: EyeOff,
+  Exclamation: Exclamation,
+  File: File,
   Files: Files,
   Image: Image,
   Info: Info,

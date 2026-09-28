@@ -10,9 +10,10 @@ type Props = {
   onSuccess: () => void;
   onRegister: () => void;
   onRecover: () => void;
+  onTracking: () => void;
 };
 
-export default function LoginView({ notice, onSuccess, onRegister, onRecover }: Props) {
+export default function LoginView({ notice, onSuccess, onRegister, onRecover, onTracking }: Props) {
   const [message, setMessage] = useState(notice ?? "");
 
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
@@ -57,6 +58,13 @@ export default function LoginView({ notice, onSuccess, onRegister, onRecover }: 
           onClick={onRecover}
         >
           ¿Olvidó su contraseña?
+        </button>
+        <button
+          type="button"
+          className={styles.trackingLink}
+          onClick={onTracking}
+        >
+          Consultar estado de solicitud
         </button>
       </div>
       {message && <p className={styles.formMessage}>{message}</p>}

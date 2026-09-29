@@ -1,55 +1,101 @@
 /**
  * Tipos de vista de COM-04 (Noticia publicada).
- * Son del front: describen lo que pinta la UI, no el contrato del backend.
- * TODO [COM04-BACKEND]: mapear desde el DTO definitivo cuando backend confirme
- * si se usa /news (NewsSummaryDto/NewsDetailDto) u otro servicio.
+ *
+ * Siguen el esquema que envía el formulario de COM-03 (Sistema-tickets,
+ * `api/graphql/COM03/types.ts`: NoticiaDetalle, RecursoNoticia, SeccionNoticia).
+ * Solo difieren en categorías y etiquetas: COM-03 guarda ids y el Portal
+ * necesita los nombres para los chips.
+ *
+ * TODO [COM04-BACKEND]: el backend está en pausa. Confirmar el contrato final
+ * (el /api/news actual usa snake_case y otro servicio podría cambiarlo), y
+ * mapear aquí desde lo que llegue.
  */
 
+/** TB_RECURSO.tipo */
 export type NewsResourceType = "imagen" | "video" | "archivo" | "externo";
 
+/**
+ * TB_NOTICIA.estado. En COM-03 va en mayúsculas (en la BD está en minúsculas).
+ * TODO [COM04-BACKEND]: confirmar el formato que envía la API.
+ */
+export type NewsStatus = "PUBLICADA" | "PROGRAMADA" | "BORRADOR" | "ARCHIVADA";
+
+/** TB_NOTICIA.visibilidad */
+export type NewsVisibility = "publica" | "privada";
+
+/** TB_RECURSO. No tiene nombre de archivo ni tamaño. */
 export interface NewsResource {
-  id: number;
+  id: string;
   tipo: NewsResourceType;
   url: string;
-  nombre?: string | null;
-  textoAlternativo?: string | null;
-  pie?: string | null;
+  tipoMime: string | null;
+  ancho: number | null;
+  alto: number | null;
+  duracionSegundos: number | null;
+  textoAlternativo: string | null;
+  pieImagen: string | null;
+  creditos: string | null;
 }
 
+/** TB_SECCION_NOTICIA */
 export interface NewsSection {
-  id: number;
+  id: string;
   orden: number;
   encabezado: string;
   /**
-   * Texto plano; los saltos de línea dobles separan párrafos.
-   * TODO [COM04-BACKEND]: el CMS guarda contenido_html. Confirmar si llega
-   * sanitizado antes de renderizarlo como HTML.
+   * HTML generado por COM-03 con textToHtml: solo <p> y <br>, con el texto
+   * escapado. El Portal no lo inyecta: lo convierte a párrafos
+   * (helpers/newsHtml.ts).
    */
-  contenido: string;
-  recurso?: NewsResource | null;
+  contenidoHtml: string;
+  /** Imagen de la sección (COM-03 solo acepta imagen aquí). */
+  recurso: NewsResource | null;
 }
 
+/** Categoría, subcategoría o etiqueta con su nombre, para los chips. */
 export interface NewsChip {
-  id: number;
+  id: string;
   nombre: string;
 }
 
 export interface PublishedNewsSummary {
-  id: number;
+  id: string;
   slug: string;
+  estado: NewsStatus;
+  visibilidad: NewsVisibility;
   titulo: string;
-  resumen: string | null;
-  autor: string | null;
-  /** "YYYY-MM-DD" o ISO completo. */
+  resumen: string;
+  /** Texto libre. */
+  autor: string;
+  /** "YYYY-MM-DD" */
   fechaPublicacion: string | null;
   recursoPrincipal: NewsResource | null;
 }
 
+/** Página del listado, con la forma de NewsListResponseDto. */
+export interface PublishedNewsPage {
+  items: PublishedNewsSummary[];
+  total: number;
+  page: number;
+  limit: number;
+}
+
 export interface PublishedNews extends PublishedNewsSummary {
-  tiempoLecturaMin: number | null;
-  categorias: NewsChip[];
+  /** Por defecto es-GT. */
+  idioma: string;
+  /** Minutos de lectura. */
+  tiempoLectura: number | null;
+  /**
+   * TODO [COM04-BACKEND]: COM-03 guarda categoriaId, subcategoriaId y
+   * etiquetaIds. El Portal necesita los nombres: que la API los resuelva, o
+   * pedir los catálogos.
+   */
+  categoria: NewsChip | null;
+  subcategoria: NewsChip | null;
   etiquetas: NewsChip[];
   secciones: NewsSection[];
-  /** Galería y adjuntos, en una sola lista como en el diseño. */
+  /** Recursos con rol galeria (TB_NOTICIA_RECURSO), en orden. */
   galeria: NewsResource[];
+  /** Recursos con rol adjunto. El formulario de COM-03 todavía no los envía. */
+  adjuntos: NewsResource[];
 }

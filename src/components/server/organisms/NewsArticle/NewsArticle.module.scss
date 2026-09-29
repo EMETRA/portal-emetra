@@ -1,0 +1,65 @@
+.article {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.header {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.title {
+  padding-bottom: 0.75rem;
+  border-bottom: 4px solid $verde-claro-2;
+  color: $azul-1;
+  font-size: 1.5rem;
+  font-weight: 700;
+  line-height: 1.25;
+  overflow-wrap: anywhere;
+}
+
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  list-style: none;
+}
+
+.chip {
+  padding: 0.25rem 0.75rem;
+  border-radius: 999px;
+  background-color: rgba($azul-10, 0.25);
+  color: $azul-1;
+  font-size: 0.6875rem;
+  font-weight: 600;
+}
+
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.sectionTitle {
+  color: $azul-1;
+  font-size: 1rem;
+  font-weight: 700;
+}
+
+.paragraph {
+  color: $secondary-text;
+  font-size: 0.8125rem;
+  line-height: 1.55;
+}
+
+.sectionMedia {
+  margin-top: 1rem;
+}
+
+@media (min-width: $breakpoint-desktop) {
+  .title {
+    font-size: 1.75rem;
+  }
+}

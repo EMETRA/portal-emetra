@@ -6,6 +6,7 @@ import MultimediaCarrousel from "@/components/server/organisms/MultimediaCarrous
 import MultimediaCard from "@/components/server/molecules/MultimediaCard/MultimediaCard";
 import CalendarWidgetFetcher from "@/components/client/CalendarWidgetFetcher/CalendarWidgetFetcher";
 import HomeNewsSection from "@/components/client/HomeNewsSection/HomeNewsSection";
+import HomeNewsListSection from "@/components/client/HomeNewsListSection/HomeNewsListSection";
 import HomeFaqSection from "@/components/client/HomeFaqSection/HomeFaqSection";
 
 const slides: BannerSlide[] = [
@@ -47,6 +48,7 @@ export default function Home() {
         </div>
       </div>
       <HomeNewsSection />
+      <HomeNewsListSection />
       <HomeFaqSection />
     </div>
   );

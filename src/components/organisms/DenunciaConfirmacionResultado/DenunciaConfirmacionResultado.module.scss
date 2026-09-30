@@ -1,0 +1,241 @@
+.card {
+    width: 50%;
+    min-width: 0;
+    background: #fff;
+    border: 1px solid #e5e7eb;
+    border-radius: 16px;
+    overflow: hidden;
+}
+
+.content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 24px;
+    padding: 32px;
+}
+
+.statusIcon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    font-size: 38px;
+    font-weight: 700;
+    flex-shrink: 0;
+}
+
+.successIcon {
+    background: #dcfce7;
+    color: #16a34a;
+    border: 1px solid #bbf7d0;
+}
+
+.errorIcon {
+    background: #fee2e2;
+    color: #dc2626;
+    border: 1px solid #fecaca;
+}
+
+.message {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    max-width: 520px;
+    text-align: center;
+}
+
+.title {
+    margin: 0;
+    font-size: 22px;
+    font-weight: 700;
+    line-height: 1.4;
+    color: #1f2937;
+}
+
+.description {
+    margin: 0;
+    font-size: 14px;
+    line-height: 1.7;
+    color: #6b7280;
+}
+
+.remision {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    width: 100%;
+    padding: 8px 0;
+    text-align: center;
+}
+
+.remisionLabel {
+    font-size: 14px;
+    color: #1e40af;
+}
+
+.remisionNumber {
+    font-size: 26px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    color: #1e40af;
+    overflow-wrap: anywhere;
+}
+
+/* Datos */
+
+.details {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 24px;
+    width: 100%;
+}
+
+.detailItem {
+    min-width: 0;
+}
+
+.label {
+    display: block;
+    margin-bottom: 8px;
+    font-size: 13px;
+    color: #6b7280;
+}
+
+.value {
+    margin: 0;
+    font-size: 16px;
+    font-weight: 600;
+    color: #1f2937;
+    overflow-wrap: anywhere;
+}
+
+.amount {
+    margin: 0;
+    font-size: 20px;
+    font-weight: 700;
+    color: #1d4ed8;
+    overflow-wrap: anywhere;
+}
+
+.note {
+    width: 100%;
+    margin: 0;
+    padding: 12px 16px;
+    border-left: 3px solid #93c5fd;
+    background: #f8fafc;
+    color: #64748b;
+    font-size: 13px;
+    line-height: 1.6;
+    box-sizing: border-box;
+}
+
+.payment {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    width: 100%;
+}
+
+.paymentTitle {
+    margin: 0;
+    font-size: 17px;
+    font-weight: 700;
+    color: #1f2937;
+}
+
+.paymentList {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin: 0;
+    padding-left: 24px;
+    color: #4b5563;
+    font-size: 14px;
+    line-height: 1.7;
+
+    li {
+        padding-left: 4px;
+    }
+}
+
+.footer {
+    width: 100%;
+    padding-top: 8px;
+}
+
+.errorActions {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    width: 100%;
+}
+
+.primaryButton,
+.secondaryButton {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    min-height: 48px;
+    padding: 12px 16px;
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: 600;
+    text-align: center;
+    cursor: pointer;
+    transition: background 0.2s ease;
+}
+
+.primaryButton {
+    color: #fff;
+    background: #2563eb;
+    border: 1px solid #2563eb;
+
+    &:hover {
+        background: #1d4ed8;
+    }
+}
+
+.secondaryButton {
+    color: #1d4ed8;
+    background: #fff;
+    border: 1px solid #2563eb;
+
+    &:hover {
+        background: #eff6ff;
+    }
+}
+
+.primaryButton:disabled,
+.secondaryButton:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+@media (max-width: 600px) {
+    .content {
+        padding: 24px 18px;
+        gap: 20px;
+    }
+
+    .title {
+        font-size: 19px;
+    }
+
+    .remisionNumber {
+        font-size: 22px;
+    }
+
+    .details {
+        gap: 16px;
+    }
+
+    .amount {
+        font-size: 18px;
+    }
+}

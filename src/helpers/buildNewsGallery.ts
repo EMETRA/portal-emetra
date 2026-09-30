@@ -5,16 +5,12 @@ import type {
 
 /**
  * Reúne en "Galería y adjuntos" todos los recursos de imagen o video de la
- * noticia: principal, imágenes de sección, galería y adjuntos, en ese orden y
- * sin repetir id.
- * TODO [COM04-FLUJO]: los adjuntos de tipo archivo o externo (PDF, enlaces) no
- * entran; definir con diseño si se muestran y cómo.
+ * noticia: principal, imágenes de sección y galería, en ese orden y sin
+ * repetir id. Los de tipo archivo o externo no entran (en COM-03 solo se suben
+ * imágenes y videos).
  */
 export function buildNewsGallery(
-  news: Pick<
-    PublishedNews,
-    "recursoPrincipal" | "secciones" | "galeria" | "adjuntos"
-  >
+  news: Pick<PublishedNews, "recursoPrincipal" | "secciones" | "galeria">
 ): NewsResource[] {
   const candidatos: (NewsResource | null)[] = [
     news.recursoPrincipal,
@@ -22,10 +18,9 @@ export function buildNewsGallery(
       .sort((a, b) => a.orden - b.orden)
       .map((seccion) => seccion.recurso),
     ...news.galeria,
-    ...news.adjuntos,
   ];
 
-  const vistos = new Set<string>();
+  const vistos = new Set<number>();
   const recursos: NewsResource[] = [];
   for (const recurso of candidatos) {
     if (

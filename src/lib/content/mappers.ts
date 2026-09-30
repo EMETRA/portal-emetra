@@ -1,5 +1,4 @@
 import { FAQ, FAQ_Type } from "@/schema";
-import type { NewsSummaryDto } from "@/lib/content/types";
 
 export type FaqApiDto = {
   id: number;
@@ -15,13 +14,6 @@ export type FaqApiDto = {
 
 export type FaqListResponseDto = {
   items: FaqApiDto[];
-  total: number;
-  page: number;
-  limit: number;
-};
-
-export type NewsListResponseDto = {
-  items: NewsSummaryDto[];
   total: number;
   page: number;
   limit: number;

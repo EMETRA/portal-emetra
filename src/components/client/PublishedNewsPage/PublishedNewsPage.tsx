@@ -10,7 +10,7 @@ import { NewsSkeleton } from "@/components/server/molecules/NewsSkeleton";
 import { NewsStateCard } from "@/components/server/molecules/NewsStateCard";
 import { NewsArticle } from "@/components/server/organisms/NewsArticle";
 import { isNewsAvailable } from "@/helpers/isNewsAvailable";
-import { fetchPublishedNewsBySlugDummy } from "@/lib/content/publishedNews.dummy";
+import { fetchPublishedNewsBySlug } from "@/lib/content/publishedNews.api";
 import type { PublishedNews } from "@/lib/content/publishedNews.types";
 import styles from "./PublishedNewsPage.module.scss";
 
@@ -33,8 +33,7 @@ type Estado =
 
 /**
  * Detalle de una noticia publicada (COM-04), por slug.
- * TODO [COM04-BACKEND]: usa datos dummy mientras backend confirma las queries
- * (hoy solo existe /news/:id; se propone /news/slug/:slug).
+ * Datos de GET /public/news/:slug/:idioma (api-portal); 404 → "no disponible".
  */
 export default function PublishedNewsPage() {
   const params = useParams<{ slug: string }>();
@@ -47,7 +46,7 @@ export default function PublishedNewsPage() {
     let cancelado = false;
     setEstado({ tipo: "cargando" });
 
-    fetchPublishedNewsBySlugDummy(slug)
+    fetchPublishedNewsBySlug(slug)
       .then((noticia) => {
         if (cancelado) return;
         // Privada, archivada, en borrador o programada: no se muestra.

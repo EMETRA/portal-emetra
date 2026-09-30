@@ -9,7 +9,6 @@ import {
 } from "@/helpers/buildNewsGallery";
 import { formatNewsDate } from "@/helpers/formatNewsDate";
 import { htmlToParagraphs } from "@/helpers/newsHtml";
-import type { NewsChip } from "@/lib/content/publishedNews.types";
 import styles from "./NewsArticle.module.scss";
 import { NewsArticleProps } from "./types";
 
@@ -18,11 +17,7 @@ import { NewsArticleProps } from "./types";
  * chips, secciones y "Galería y adjuntos" (solo si hay más de un recurso).
  */
 const NewsArticle: React.FC<NewsArticleProps> = ({ noticia, className }) => {
-  const chips = [
-    noticia.categoria,
-    noticia.subcategoria,
-    ...noticia.etiquetas,
-  ].filter((chip): chip is NewsChip => chip !== null);
+  const chips = [...noticia.categorias, ...noticia.etiquetas];
   const galeria = buildNewsGallery(noticia);
   const secciones = [...noticia.secciones].sort((a, b) => a.orden - b.orden);
 

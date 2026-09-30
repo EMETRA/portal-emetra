@@ -110,6 +110,8 @@ const NewsGallery: React.FC<NewsGalleryProps> = ({ recursos, className }) => {
                   src={actual.url}
                   width="100%"
                   height="100%"
+                  privacyEnhanced
+                  title={actual.textoAlternativo ?? "Video de YouTube"}
                 />
               ) : (
                 <Image

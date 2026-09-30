@@ -35,6 +35,11 @@
   }
 }
 
+// Video dentro de una sección: formato de video en todos los tamaños.
+.seccion.seccionVideo {
+  aspect-ratio: 16 / 9;
+}
+
 .image {
   object-fit: cover;
 }

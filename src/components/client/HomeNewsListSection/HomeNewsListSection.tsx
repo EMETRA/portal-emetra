@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { NewsList } from "@/components/server/organisms/NewsList";
 import type { NewsListStatus } from "@/components/server/organisms/NewsList";
-import { fetchPublishedNewsDummy } from "@/lib/content/publishedNews.dummy";
+import { fetchPublishedNews } from "@/lib/content/publishedNews.api";
 import type {
   PublishedNewsPage,
   PublishedNewsSummary,
@@ -20,8 +20,8 @@ const getHref = (noticia: PublishedNewsSummary) =>
   `/noticias/${encodeURIComponent(noticia.slug)}`;
 
 /**
- * Sección "Noticias" del home (COM-04, ancla #noticias).
- * TODO [COM04-BACKEND]: usa datos dummy mientras backend confirma las queries.
+ * Sección "Noticias" del home (COM-04, ancla #noticias). Reemplaza a la
+ * antigua "Últimas noticias". Datos de GET /public/news (api-portal).
  */
 export default function HomeNewsListSection() {
   const sectionRef = useRef<HTMLElement>(null);
@@ -34,7 +34,7 @@ export default function HomeNewsListSection() {
     let cancelado = false;
     setStatus("loading");
 
-    fetchPublishedNewsDummy({ page, limit: PAGE_SIZE })
+    fetchPublishedNews({ page, limit: PAGE_SIZE })
       .then((respuesta) => {
         if (cancelado) return;
         setData(respuesta);

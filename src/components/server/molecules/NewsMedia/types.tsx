@@ -1,8 +1,8 @@
 import type { NewsResource } from "@/lib/content/publishedNews.types";
 
 /**
- * - principal: media principal del detalle (video reproducible).
- * - seccion: imagen de una sección del detalle.
+ * - principal: recurso principal del detalle (video reproducible).
+ * - seccion: imagen o video de una sección del detalle (video reproducible, en 16:9).
  * - tarjeta: portada de una card del listado (sin interacción; la card es el enlace).
  * - miniatura: miniatura de la galería (sin interacción; el botón es el padre).
  */

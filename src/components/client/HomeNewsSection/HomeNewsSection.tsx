@@ -1,15 +1,13 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Icon } from "@/components/server/atoms";
+import { SectionTitle } from "@/components/server/molecules/SectionTitle";
 import { NewCard } from "@/components/molecules/NewCard";
 import NewsCarrousel from "@/components/organisms/NewsCarrousel/NewsCarrousel";
-import { Separator } from "@/components/atoms/Separator";
 import ServiceErrorAlert from "@/components/molecules/ServiceErrorAlert/ServiceErrorAlert";
 import { assertOkResponse } from "@/lib/bff/raw";
 import type { NewsListResponseDto } from "@/lib/content/mappers";
 import type { NewsSummaryDto } from "@/lib/content/types";
-import classNames from "classnames";
 import styles from "@/app/page.module.css";
 
 const DEFAULT_NEWS_IMAGE = "/images/Evento.jpg";
@@ -64,12 +62,7 @@ export default function HomeNewsSection() {
 
   return (
     <>
-      <Separator>
-        <div className={classNames(styles.Heading)}>
-          <Icon name="Notification" className={classNames(styles.Icon)} />
-          <h1 className={classNames(styles.Title)}>ÚLTIMAS NOTICIAS</h1>
-        </div>
-      </Separator>
+      <SectionTitle iconName="Notification">ÚLTIMAS NOTICIAS</SectionTitle>
 
       {error ? (
         <ServiceErrorAlert title="Noticias no disponibles" message={error} />

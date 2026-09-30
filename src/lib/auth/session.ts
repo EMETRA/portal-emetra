@@ -1,4 +1,5 @@
-/** Shared portal gate cookie — safe for Edge middleware and server routes. */
+import "server-only";
+
 export const AUTH_COOKIE_NAME = "portal_auth_token";
 
 export function isAppAuthorizationEnabled(): boolean {

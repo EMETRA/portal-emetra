@@ -1,12 +1,33 @@
 import type { Metadata } from "next";
-import { Montserrat } from "next/font/google";
+import localFont from "next/font/local";
 import "./globals.css";
-import AppShell from "@/components/client/AppShell/AppShell";
+import { NavBar } from "@/components/server/molecules/NavBar";
+import { Footer } from "@/components/server/molecules/Footer";
 
-const montserrat = Montserrat({
+const montserrat = localFont({
+  src: [
+    {
+      path: "../theme/fonts/Montserrat-Regular.woff2",
+      weight: "400",
+      style: "normal",
+    },
+    {
+      path: "../theme/fonts/Montserrat-Medium.woff2",
+      weight: "500",
+      style: "normal",
+    },
+    {
+      path: "../theme/fonts/Montserrat-SemiBold.woff2",
+      weight: "600",
+      style: "normal",
+    },
+    {
+      path: "../theme/fonts/Montserrat-Bold.woff2",
+      weight: "700",
+      style: "normal",
+    },
+  ],
   variable: "--font-montserrat",
-  subsets: ["latin"],
-  weight: ["400", "500", "600", "700"],
   display: "swap",
 });
 
@@ -25,7 +46,9 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={montserrat.variable}>
-        <AppShell>{children}</AppShell>
+        <NavBar />
+        {children}
+        <Footer />
       </body>
     </html>
   );

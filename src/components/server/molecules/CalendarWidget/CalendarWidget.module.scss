@@ -10,6 +10,8 @@
   flex-direction: column;
   align-items: center;
   width: fit-content;
+  max-width: 100%;
+  min-width: 0;
   justify-content: center;
   padding-block-end: 1.75rem;
   padding-block-start: 1rem;
@@ -136,4 +138,26 @@
 
 .Title {
   color: $azul-1;
+}
+
+@media (max-width: 480px) {
+  .WidgetLink {
+    padding-inline: 1rem;
+  }
+
+  .MiniCalendar {
+    width: 100%;
+    min-width: 0;
+    padding: 0.5rem;
+  }
+
+  .Weekdays,
+  .Grid {
+    grid-template-columns: repeat(7, minmax(0, 1fr));
+  }
+
+  .Cell {
+    min-width: 0;
+    aspect-ratio: auto;
+  }
 }

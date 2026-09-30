@@ -19,7 +19,6 @@ import Eye from "@/assets/icons/Eye.svg";
 import EyeOff from "@/assets/icons/EyeOff.svg";
 import Files from "@/assets/icons/Files.svg";
 import Image from "@/assets/icons/Image.svg";
-import Home from "@/assets/icons/Home.svg";
 import Info from "@/assets/icons/Info.svg";
 import Location from "@/assets/icons/Location.svg";
 import Logout from "@/assets/icons/Logout.svg";
@@ -49,10 +48,6 @@ import TucTuc from "@/assets/icons/TucTuc.svg";
 import Facebook from "@/assets/icons/Facebook.svg";
 import Twitter from "@/assets/icons/Twitter.svg";
 import Instagram from "@/assets/icons/Instagram.svg";
-import Whatsapp from "@/assets/icons/Whatsapp.svg";
-import GoogleAuthenticator from "@/assets/icons/GoogleAuthenticator.svg";
-import MicrosoftAuthenticator from "@/assets/icons/MicrosoftAuthenticator.svg";
-import Mail from "@/assets/icons/Mail.svg";
 
 type IconType =
   | "Camion"
@@ -75,7 +70,6 @@ type IconType =
   | "EyeOff"
   | "Files"
   | "Image"
-  | "Home"
   | "Info"
   | "Location"
   | "Logout"
@@ -103,11 +97,7 @@ type IconType =
   | "Back"
   | "Facebook"
   | "Twitter"
-  | "Instagram"
-  | "Whatsapp"
-  | "GoogleAuthenticator"
-  | "MicrosoftAuthenticator"
-  | "Mail";
+  | "Instagram";
 
 interface IconProps extends React.SVGProps<SVGSVGElement> {
   className?: string;
@@ -134,15 +124,11 @@ const IconMap: Record<IconType, React.FC<React.SVGProps<SVGSVGElement>>> = {
   Eye: Eye,
   EyeOff: EyeOff,
   Files: Files,
-  GoogleAuthenticator: GoogleAuthenticator,
   Image: Image,
-  Home: Home,
   Info: Info,
   Location: Location,
   Logout: Logout,
-  Mail: Mail,
   Menu: Menu,
-  MicrosoftAuthenticator: MicrosoftAuthenticator,
   Moto: Moto,
   Multa: Multa,
   Next: Next,
@@ -167,7 +153,6 @@ const IconMap: Record<IconType, React.FC<React.SVGProps<SVGSVGElement>>> = {
   Facebook: Facebook,
   Twitter: Twitter,
   Instagram: Instagram,
-  Whatsapp: Whatsapp,
 };
 
 export type { IconProps, IconType };

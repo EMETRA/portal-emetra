@@ -13,7 +13,6 @@ const navItems: { name: string; icon: IconType; href: string }[] = [
   { name: "SERVICIOS5", icon: "Files", href: "/#servicios" },
   { name: "VIDEOS", icon: "DPI", href: "/videos" },
   { name: "FAQ", icon: "Info", href: "/#ayuda" },
-  { name: "CASILLERO", icon: "Files", href: "/casillero" },
   { name: "SÚMATE", icon: "User", href: "/sumate" },
 ];
 
@@ -105,10 +104,8 @@ const NavBar: React.FC = () => {
         )}
       >
         {itemsForRender.map((item) => {
-          const isActive = currentPath && (
-            normalize(currentPath) === normalize(item.href) ||
-            (item.href !== "/" && currentPath.startsWith(`${normalize(item.href)}/`))
-          );
+          const isActive =
+            currentPath && normalize(currentPath) === normalize(item.href);
           
           if (isSumate && item.name === "SÚMATE") {
             return (

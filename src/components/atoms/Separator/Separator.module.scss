@@ -20,10 +20,13 @@
 }
 
 .Text {
+  min-width: 0;
   padding: 0 0.5rem;
   color: $verde-oscuro-1;
   font-weight: 600;
-  white-space: nowrap;
+  white-space: normal;
+  overflow-wrap: anywhere;
+  text-align: center;
   font-size: 1rem;
   letter-spacing: 0.5px;
 }

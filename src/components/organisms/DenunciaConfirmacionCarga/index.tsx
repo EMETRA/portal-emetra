@@ -1,0 +1,1 @@
+export { DenunciaConfirmacionCarga } from "./DenunciaConfirmacionCarga";

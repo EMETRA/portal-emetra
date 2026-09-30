@@ -1,0 +1,149 @@
+.card {
+    width: 100%;
+    min-width: 0;
+    background: #fff;
+    border: 1px solid #e5e7eb;
+    border-radius: 16px;
+    overflow: hidden;
+}
+
+.header {
+    padding: 24px;
+}
+
+.title {
+    margin: 0;
+    font-size: 20px;
+    font-weight: 700;
+    color: #1f2937;
+}
+
+.content {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    padding: 24px;
+}
+
+.details {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 24px 32px;
+}
+
+.detailItem {
+    min-width: 0;
+}
+
+.label {
+    display: block;
+    margin-bottom: 8px;
+    font-size: 13px;
+    color: #6b7280;
+}
+
+.value {
+    margin: 0;
+    font-size: 15px;
+    font-weight: 600;
+    line-height: 1.5;
+    overflow-wrap: anywhere;
+    color: #1f2937;
+}
+
+.amountContainer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+    width: 100%;
+}
+
+.amountDescription {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    align-items: start;
+}
+
+.amountTitle {
+    font-size: 18px;
+    font-weight: 600;
+}
+
+.amount {
+    font-size: 28px;
+    font-weight: 700;
+}
+
+.evidence {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+    width: 100%;
+}
+
+.evidenceTitle {
+    margin: 0;
+    font-size: 16px;
+    font-weight: 600;
+    color: #1f2937;
+}
+
+.evidenceList {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 16px;
+    width: 100%;
+}
+
+.evidenceImage {
+    width: calc((100% - 32px) / 3);
+    max-width: 220px;
+    aspect-ratio: 4/3;
+    object-fit: cover;
+    border-radius: 10px;
+    border: 1px solid #e5e7eb;
+}
+
+.noEvidence {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    min-height: 150px;
+    padding: 24px;
+    border: 2px dashed #d1d5db;
+    border-radius: 10px;
+    background: #f9fafb;
+    color: #6b7280;
+    font-size: 14px;
+    text-align: center;
+    box-sizing: border-box;
+    font-size: 24px;
+    font-weight: 600;
+    gap: 18px;
+}
+
+.icon {
+    width: 50px;
+}
+
+@media (max-width: 600px) {
+    .header,
+    .content {
+        padding: 18px
+    }
+
+    .details {
+        gap: 20px 16px;
+    }
+
+    .evidenceImage {
+        width: 100%;
+        max-width: 100%;
+    }
+}

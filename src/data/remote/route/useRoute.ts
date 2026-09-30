@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
-import { api } from "@/lib/apiClient";
 import type { Route } from "@/components/templates/MapView/MapView";
+import { fetchBffJson } from "@/lib/bff/client";
 
 export function useRoute(id?: string | number) {
   const [route, setRoute] = useState<Route | null>(null);
@@ -8,15 +8,18 @@ export function useRoute(id?: string | number) {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    if (!id) return;
+    if (!id) {
+      setLoading(false);
+      return;
+    }
 
     async function load() {
       try {
-        const response = await api.get(`/routes/${id}`);
-        setRoute(response.data);
+        const data = await fetchBffJson<Route>(`/api/routes/${id}`);
+        setRoute(data);
       } catch (err) {
-        const error = err as Error;
-        setError(error.message);
+        const loadError = err as Error;
+        setError(loadError.message);
       } finally {
         setLoading(false);
       }

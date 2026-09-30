@@ -1,6 +1,10 @@
 import { useEffect, useState } from "react";
-import { api } from "@/lib/apiClient";
 import type { Route } from "@/components/templates/MapView/MapView";
+import { fetchBffJson } from "@/lib/bff/client";
+
+type RoutesListResponse = {
+  items: Route[];
+};
 
 export function useRoutes() {
   const [routes, setRoutes] = useState<Route[]>([]);
@@ -10,11 +14,11 @@ export function useRoutes() {
   useEffect(() => {
     async function load() {
       try {
-        const response = await api.get("/routes");
-        setRoutes(response.data.items);
+        const response = await fetchBffJson<RoutesListResponse>("/api/routes");
+        setRoutes(response.items ?? []);
       } catch (err) {
-        const error = err as Error;
-        setError(error.message);
+        const loadError = err as Error;
+        setError(loadError.message);
       } finally {
         setLoading(false);
       }

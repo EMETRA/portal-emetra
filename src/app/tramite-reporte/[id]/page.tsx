@@ -13,7 +13,7 @@ import { DenunciaConfirmacionCarga } from "@/components/organisms/DenunciaConfir
 import { DenunciaConfirmacionResultado } from "@/components/organisms/DenunciaConfirmacionResultado/DenunciaConfirmacionResultado";
 import { Button } from "@/components/server/atoms";
 
-import type { Case } from "@/lib/vivi/vivi";
+import type { Case } from "@/lib/vivi/types";
 
 const denuncias: Case[] = [
     {

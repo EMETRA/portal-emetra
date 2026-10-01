@@ -1,4 +1,4 @@
-import type { Case } from "@/lib/vivi/vivi";
+import type { Case } from "@/lib/vivi/types";
 
 type ResultadoStatus = "success" | "error";
 

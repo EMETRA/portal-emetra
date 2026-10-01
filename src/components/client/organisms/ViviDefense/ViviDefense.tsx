@@ -72,7 +72,26 @@ const denuncias: Case[] = [
         placa: "P 123ABC",
         denuncia: {
             descripcion: "Estacionamiento en linea roja - defensa",
-            evidencias: [],
+            evidencias: [
+                {
+                    id: "1",
+                    name: "evidencia1.jpg",
+                    sourceUrl: "https://picsum.photos/200/300",
+                    size: "100",
+                },
+                {
+                    id: "2",
+                    name: "evidencia2.jpg",
+                    sourceUrl: "https://picsum.photos/200/300",
+                    size: "100",
+                },
+                {
+                    id: "3",
+                    name: "evidencia3.mp4",
+                    sourceUrl: "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+                    size: "100",
+                },
+            ],
         }
     },
     {
@@ -121,7 +140,7 @@ export default function ViviDefense({ caseId }: { caseId: Case["caseNumber"] }) 
 
         const timer = setTimeout(() => {
             try {
-                if (Math.random() > 0.5) {
+                if (Math.random() > 0.9) {
                     throw new Error();
                 }
                 setCaseData(denuncias.find((item) => item.caseNumber === caseId));

@@ -1,5 +1,6 @@
 'use client';
 
+import { useParams, useRouter } from "next/navigation";
 import { AlertBadge } from "@/components/molecules/AlertBadge";
 import { SectionTitle } from "@/components/server/molecules";
 import styles from "./Page.module.scss";
@@ -12,22 +13,72 @@ import { DenunciaConfirmacionCarga } from "@/components/organisms/DenunciaConfir
 import { DenunciaConfirmacionResultado } from "@/components/organisms/DenunciaConfirmacionResultado/DenunciaConfirmacionResultado";
 import { Button } from "@/components/server/atoms";
 
-const denuncia = {
-    numero: "D-2026-000123",
-    placa: "P 123ABC",
-    hecho: "Estacionamiento en linea roja",
-    fechaHora: "14/09/2026 10:42",
-    montoBase: 500,
-    evidencias: [
+import type { Case } from "@/lib/vivi/vivi";
 
-    ]
-};
+const denuncias: Case[] = [
+    {
+        caseNumber: "D-2026-000123",
+        caseDate: "14/09/2026 10:42",
+        place: "San Salvador",
+        title: "Estacionamiento en linea roja",
+        placa: "P 123ABC",
+        denuncia: {
+            descripcion: "Estacionamiento en linea roja",
+            evidencias: [],
+        }
+    },
+    {
+        caseNumber: "D-2026-000124",
+        caseDate: "15/09/2026 10:42",
+        place: "San Miguel",
+        title: "Estacionado en linea roja",
+        placa: "P 123DEF",
+        denuncia: {
+            descripcion: "Estacionamiento en linea roja",
+            evidencias: [],
+        }
+    },
+    {
+        caseNumber: "D-2026-000125",
+        caseDate: "16/09/2026 10:42",
+        place: "Guatemala City",
+        title: "Estacionado en zona roja",
+        placa: "P 123GHI",
+        denuncia: {
+            descripcion: "Estacionado en zona roja",
+            evidencias: [],
+        }
+    },
+    {
+        caseNumber: "D-2026-000126",
+        caseDate: "17/09/2026 10:42",
+        place: "Mixco",
+        title: "Mal estacionamiento",
+        placa: "P 123JKL",
+        denuncia: {
+            descripcion: "Mal estacionamiento. Parqueado a media calle",
+            evidencias: [],
+        }
+    },
+]
 
 const remision = "R-2026-004512";
 
 export default function DenunciaPage() {
-
+    const params = useParams<{ id: string }>();
+    const router = useRouter();
+    const [denuncia, setDenuncia] = useState<Case | undefined>();
     const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        setLoading(true);
+        const timer = setTimeout(() => {
+            setDenuncia(denuncias.find((item) => item.caseNumber === params.id));
+            setLoading(false);
+        }, 5000);
+
+        return () => clearTimeout(timer);
+    }, [params.id]);
     const [vista, setVista] = useState<"detalle" | "confirmacion" | "carga" | "resultado">("detalle");
     const [result, setResult] = useState<"success" | "error">("success");
 
@@ -36,8 +87,7 @@ export default function DenunciaPage() {
     }
 
     const handlePresentarDefensa = () => {
-        console.log("Se presentará la defensa");
-        alert("Redirección a presentar defensa");
+        router.push(`/tramite-reporte/${params.id}/defensa`);
     }
 
     const handleConfirmar = () => {
@@ -68,18 +118,21 @@ export default function DenunciaPage() {
         setResult("error");
     }
 
-    useEffect(() => {
-        const timer = setTimeout(() => {
-            setLoading(false);
-        }, 2000);
+    
 
-        return () => clearTimeout(timer);
-    },[])
+    if (!loading && !denuncia) {
+        return (
+            <div className={styles.main}>
+                <SectionTitle>Denuncia de tránsito</SectionTitle>
+                <Text>No se encontró la denuncia.</Text>
+            </div>
+        );
+    }
 
     return (
         <div className={styles.main}>
 
-            {vista === "detalle" ? (
+            {vista === "detalle" || !denuncia ? (
                 <>
                     <SectionTitle>Denuncia de tránsito</SectionTitle>
                     <AlertBadge>
@@ -91,9 +144,10 @@ export default function DenunciaPage() {
                             denuncia={denuncia}
                             loading={loading}
                         />
-                        <DenunciaDetalleAcciones 
+                        <DenunciaDetalleAcciones
                             onAceptarPago={handleAceptarPago}
                             onPresentarDefensa={handlePresentarDefensa}
+                            loading={loading}
                         />
                     </div>
                 </>

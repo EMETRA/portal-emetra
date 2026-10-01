@@ -11,30 +11,14 @@ export const DenunciaDetalleCard: React.FC <DenunciaDetalleCardProps> = ({
     loading
 }) => {
 
-    const datos = [
-        {
-            label: "Numero de denuncia",
-            value: denuncia.numero
-        },
-        {
-            label: "Placa",
-            value: denuncia.placa
-        },
-        {
-            label: "Hecho denunciado",
-            value: denuncia.hecho
-        },
-        {
-            label: "Fecha y hora",
-            value: denuncia.fechaHora
-        }
-    ];
-
-    const formatoMonto = new Intl.NumberFormat("es-GT", {
-        style: "currency",
-        currency: "GTQ",
-        minimumFractionDigits: 2
-    });
+    const datos = denuncia
+        ? [
+            { label: "Numero de denuncia", value: denuncia.caseNumber },
+            { label: "Placa", value: denuncia.placa },
+            { label: "Hecho denunciado", value: denuncia.denuncia.descripcion },
+            { label: "Fecha y hora", value: denuncia.caseDate },
+        ]
+        : [];
 
     return (
         <article className={styles.card}>
@@ -74,19 +58,19 @@ export const DenunciaDetalleCard: React.FC <DenunciaDetalleCardProps> = ({
                     <div className={styles.amountContainer}>
                         <div className={styles.amountDescription}>
                             <Text className={styles.amountTitle}>
-                                Monto base
+                                Lugar
                             </Text>
                             <Text>
-                                Según el tipo de denuncia
+                                Donde ocurrió el hecho
                             </Text>
                         </div>
-                        {loading ? (
+                        {loading || !denuncia ? (
                             <div className={styles.amount}>
                                 <Skeleton width="120px" height="34px"/>
                             </div>
                         ): (
                             <Text className={styles.amount}>
-                                {formatoMonto.format(denuncia.montoBase)}
+                                {denuncia.place}
                             </Text>
                         )}
                         
@@ -109,13 +93,13 @@ export const DenunciaDetalleCard: React.FC <DenunciaDetalleCardProps> = ({
                                 />
                             ))}
                         </div>
-                    ): denuncia.evidencias.length > 0 ? (
+                    ) : denuncia && denuncia.denuncia.evidencias.length > 0 ? (
                         <div className={styles.evidenceList}>
-                            {denuncia.evidencias.map((evidencia) => (
-                                <img 
+                            {denuncia.denuncia.evidencias.map((evidencia) => (
+                                <img
                                     key={evidencia.id}
-                                    src={evidencia.url}
-                                    alt={evidencia.alt ?? "Evidencia de la denuncia"}
+                                    src={evidencia.sourceUrl}
+                                    alt={evidencia.name || "Evidencia de la denuncia"}
                                     className={styles.evidenceImage}
                                 />
                             ))}

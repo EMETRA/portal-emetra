@@ -1,7 +1,7 @@
-import { DenunciaDetalle } from "../DenunciaDetalleCard/types";
+import type { Case } from "@/lib/vivi/vivi";
 
 export interface DenunciaDetalleConfirmacionProps {
-    denuncia: DenunciaDetalle;
+    denuncia: Case;
     onConfirmar: () => void;
     onVolver: () => void;
     loading?: boolean;

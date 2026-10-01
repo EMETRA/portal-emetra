@@ -13,7 +13,7 @@ export type Case = {
     title: string,
     placa: string,
     denuncia: {
-        descripción: string,
+        descripcion: string,
         evidencias: DefenseFile[]
     }
 }

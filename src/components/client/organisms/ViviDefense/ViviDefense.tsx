@@ -1,7 +1,8 @@
 "use client";
 
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 
+import { LoadingSpinner } from '@/components/server/atoms/LoadingSpinner';
 import { SectionTitle } from "@/components/server/molecules/SectionTitle";
 import CardGeneral from "@/components/client/atoms/CardGeneral/CardGeneral";
 import { Text } from "@/components/atoms/Text";
@@ -18,6 +19,8 @@ import styles from "./ViviDefense.module.scss";
 import { Case, DefenseFile, defenseData } from "./types"
 import TextArea from '@/components/server/atoms/TextArea/TextArea';
 import { Button } from '@/components/server/atoms/Button';
+import { useRouter } from 'next/navigation';
+import { defenseAttachmentAccept, defenseAttachmentMaxBytes, defenseAttachmentMaxFiles, defenseSchema } from "@/schema/vivi";
 
 
 const IMAGE_EXTENSIONS = ["jpg", "jpeg", "png", "gif", "webp", "svg"];
@@ -60,7 +63,82 @@ const toMediaGridItem = (file: DefenseFile): MediaGridItem => {
     };
 };
 
-export default function ViviDefense({ caseData }: { caseData: Case }) {
+const denuncias: Case[] = [
+    {
+        caseNumber: "D-2026-000123",
+        caseDate: "14/09/2026 10:42",
+        place: "San Salvador - defensa",
+        title: "Estacionamiento en linea roja - defensa",
+        placa: "P 123ABC",
+        denuncia: {
+            descripcion: "Estacionamiento en linea roja - defensa",
+            evidencias: [],
+        }
+    },
+    {
+        caseNumber: "D-2026-000124",
+        caseDate: "15/09/2026 10:42",
+        place: "San Miguel",
+        title: "Estacionado en linea roja",
+        placa: "P 123DEF",
+        denuncia: {
+            descripcion: "Estacionamiento en linea roja - defensa",
+            evidencias: [],
+        }
+    },
+    {
+        caseNumber: "D-2026-000125",
+        caseDate: "16/09/2026 10:42",
+        place: "Guatemala City",
+        title: "Estacionado en zona roja",
+        placa: "P 123GHI",
+        denuncia: {
+            descripcion: "Estacionado en zona roja - defensa",
+            evidencias: [],
+        }
+    },
+    {
+        caseNumber: "D-2026-000126",
+        caseDate: "17/09/2026 10:42",
+        place: "Mixco",
+        title: "Mal estacionamiento",
+        placa: "P 123JKL",
+        denuncia: {
+            descripcion: "Mal estacionamiento. Parqueado a media calle",
+            evidencias: [],
+        }
+    },
+]
+
+export default function ViviDefense({ caseId }: { caseId: Case["caseNumber"] }) {
+    const [caseData, setCaseData] = useState<Case | undefined>();
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState<{ message: string } | undefined>();
+    const router = useRouter();
+    useEffect(() => {
+        setLoading(true);
+        setError(undefined);
+
+        const timer = setTimeout(() => {
+            try {
+                if (Math.random() > 0.5) {
+                    throw new Error();
+                }
+                setCaseData(denuncias.find((item) => item.caseNumber === caseId));
+                setLoading(false);
+                
+            } catch (error) {
+                setError({ message: "Error al cargar la denuncia." });
+                setLoading(false);
+            }
+            finally {
+                setLoading(false);
+            }
+        }, 5000);
+
+        return () => clearTimeout(timer);
+    }, [caseId]);
+
     const [defenseData, setDefenseData] = useState<defenseData>({
         name: "",
         personalDocumentType: "dpi",
@@ -76,7 +154,7 @@ export default function ViviDefense({ caseData }: { caseData: Case }) {
     const isMobile = useMediaQuery('(max-width: 768px)');
 
     const handleFileUpload = (files: File[]) => {
-        console.log(files);
+        setDefenseData((current) => ({ ...current, attachments: files }));
     }
 
     const renderCaseInfo = (key: string, value: string) => {
@@ -89,11 +167,44 @@ export default function ViviDefense({ caseData }: { caseData: Case }) {
     }
 
     const handleSubmit = () => {
+        const parsed = defenseSchema.safeParse(defenseData);
+        if (!parsed.success) {
+            const message = parsed.error.issues.map((issue) => issue.message).join("\n");
+            alert(message || "Revisa los datos de la defensa");
+            return;
+        }
         console.log(defenseData);
     }
 
     const handleCancel = () => {
-        console.log("Cancelar");
+        router.push(`/tramite-reporte/${caseId}`);
+    }
+
+    if (loading) {
+        return (
+            <div className={styles.mainContainer}>
+                <SectionTitle>Presentar defensa</SectionTitle>
+                <LoadingSpinner variant='page-wide' />
+            </div>
+        );
+    }
+
+    if (error) {
+        return (
+            <div className={styles.mainContainer}>
+                <SectionTitle>Presentar defensa</SectionTitle>
+                <Text>{error.message}</Text>
+            </div>
+        );
+    }
+
+    if (!caseData) {
+        return (
+            <div className={styles.mainContainer}>
+                <SectionTitle>Presentar defensa</SectionTitle>
+                <Text>No se encontró la denuncia.</Text>
+            </div>
+        );
     }
 
     return (
@@ -109,7 +220,7 @@ export default function ViviDefense({ caseData }: { caseData: Case }) {
                         {renderCaseInfo("Número de denuncia", caseData.caseNumber)}
                         {renderCaseInfo("Placa", caseData.placa)}
                         {renderCaseInfo("Fecha y hora", caseData.caseDate)}
-                        {renderCaseInfo("Hecho denunciado", caseData.denuncia.descripción)}
+                        {renderCaseInfo("Hecho denunciado", caseData.denuncia.descripcion)}
                     </div>
                     <MediaGrid items={caseData.denuncia.evidencias.map(toMediaGridItem)} columns={isMobile ? 2 : 3} />
                 </CardGeneral>
@@ -143,7 +254,7 @@ export default function ViviDefense({ caseData }: { caseData: Case }) {
                         id={defenseData.personalDocumentType === "dpi" ? "dpi" : "passport"}
                         type="text"
                         value={defenseData.personalDocumentType === "dpi" ? defenseData.dpi : defenseData.passport}
-                        placeholder="Ingresa tu número de DPI"
+                        placeholder={defenseData.personalDocumentType === "dpi" ? "Ingresa tu número de DPI" : "Ingresa tu número de pasaporte"}
                         onChange={(event) => setDefenseData({ ...defenseData, [defenseData.personalDocumentType === "dpi" ? "dpi" : "passport"]: event.target.value })}
                         required
                         />
@@ -191,10 +302,10 @@ export default function ViviDefense({ caseData }: { caseData: Case }) {
                     <Text variant="Large" className={styles.attachmentsTitle}><strong>Anexos de defensa</strong></Text>
                     <Text variant="Medium" className={styles.attachmentsDescription}>Tus anexos de defensa se guardan por separado de las evidencias originales de la denuncia. Requisitos: Imágenes en JPG, PNG o GIF, video en MP4. El total de todos los archivos no puede superar 20 MB.</Text>
                     <FileUploader
-                        accept={["image/jpeg", "image/png", "image/gif", "video/mp4", ".jpg", ".jpeg", ".png", ".gif", ".mp4"]}
-                        maxSizeBytes={20 * 1024 * 1024}
-                        maxTotalSizeBytes={20 * 1024 * 1024}
-                        maxFiles={10}
+                        accept={[...defenseAttachmentAccept]}
+                        maxSizeBytes={defenseAttachmentMaxBytes}
+                        maxTotalSizeBytes={defenseAttachmentMaxBytes}
+                        maxFiles={defenseAttachmentMaxFiles}
                         onChange={handleFileUpload}
                     />
                 </CardGeneral>

@@ -15,6 +15,8 @@ import { Button } from "@/components/server/atoms";
 
 import type { Case } from "@/lib/vivi/types";
 
+// import { fetchDenunciaByIdClient } from "@/lib/vivi/api";
+
 const denuncias: Case[] = [
     {
         caseNumber: "D-2026-000123",
@@ -69,15 +71,48 @@ export default function DenunciaPage() {
     const router = useRouter();
     const [denuncia, setDenuncia] = useState<Case | undefined>();
     const [loading, setLoading] = useState(true);
+    const [error, setError] = useState<{ message: string } | undefined>();
 
     useEffect(() => {
-        setLoading(true);
-        const timer = setTimeout(() => {
-            setDenuncia(denuncias.find((item) => item.caseNumber === params.id));
-            setLoading(false);
-        }, 5000);
+        let cancelled = false;
 
-        return () => clearTimeout(timer);
+        async function loadDenuncia() {
+            setLoading(true);
+            setError(undefined);
+
+            try {
+                let data: Case | undefined;
+
+                await new Promise((resolve) => setTimeout(resolve, 5000));
+                data = denuncias.find((item) => item.caseNumber === params.id);
+
+                // data = (await fetchDenunciaByIdClient(params.id)) ?? undefined;
+
+                if (!cancelled) {
+                    setDenuncia(data);
+                }
+            } catch (loadError) {
+                if (!cancelled) {
+                    setDenuncia(undefined);
+                    setError({
+                        message:
+                            loadError instanceof Error && loadError.message
+                                ? loadError.message
+                                : "No se pudo cargar la denuncia.",
+                    });
+                }
+            } finally {
+                if (!cancelled) {
+                    setLoading(false);
+                }
+            }
+        }
+
+        void loadDenuncia();
+
+        return () => {
+            cancelled = true;
+        };
     }, [params.id]);
     const [vista, setVista] = useState<"detalle" | "confirmacion" | "carga" | "resultado">("detalle");
     const [result, setResult] = useState<"success" | "error">("success");
@@ -119,6 +154,15 @@ export default function DenunciaPage() {
     }
 
     
+
+    if (!loading && error) {
+        return (
+            <div className={styles.main}>
+                <SectionTitle>Denuncia de tránsito</SectionTitle>
+                <Text>{error.message}</Text>
+            </div>
+        );
+    }
 
     if (!loading && !denuncia) {
         return (

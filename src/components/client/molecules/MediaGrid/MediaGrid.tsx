@@ -23,7 +23,7 @@ const MediaGrid = ({ items, columns = 1 }: MediaGridProps) => {
                     if (item.type === "image") {
                         const { type, ...imageProps } = item;
                         return (
-                            <Image {...imageProps} />
+                            <Image {...imageProps} key={`image-${index}`} />
                         );
                     }
 

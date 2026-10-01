@@ -22,6 +22,8 @@ import { Button } from '@/components/server/atoms/Button';
 import { useRouter } from 'next/navigation';
 import { defenseAttachmentAccept, defenseAttachmentMaxBytes, defenseAttachmentMaxFiles, defenseSchema } from "@/schema/vivi";
 
+// import { fetchDenunciaByIdClient, submitDefenseClient } from "@/lib/vivi/api";
+
 
 const IMAGE_EXTENSIONS = ["jpg", "jpeg", "png", "gif", "webp", "svg"];
 const VIDEO_EXTENSIONS = ["mp4", "webm", "ogg", "mov"];
@@ -133,29 +135,51 @@ export default function ViviDefense({ caseId }: { caseId: Case["caseNumber"] }) 
     const [caseData, setCaseData] = useState<Case | undefined>();
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<{ message: string } | undefined>();
+    const [submitting, setSubmitting] = useState(false);
+    const [submitError, setSubmitError] = useState<string | undefined>();
     const router = useRouter();
     useEffect(() => {
-        setLoading(true);
-        setError(undefined);
+        let cancelled = false;
 
-        const timer = setTimeout(() => {
+        async function loadDenuncia() {
+            setLoading(true);
+            setError(undefined);
+
             try {
+                let data: Case | undefined;
+
+                await new Promise((resolve) => setTimeout(resolve, 5000));
                 if (Math.random() > 0.9) {
                     throw new Error();
                 }
-                setCaseData(denuncias.find((item) => item.caseNumber === caseId));
-                setLoading(false);
-                
-            } catch (error) {
-                setError({ message: "Error al cargar la denuncia." });
-                setLoading(false);
-            }
-            finally {
-                setLoading(false);
-            }
-        }, 5000);
+                data = denuncias.find((item) => item.caseNumber === caseId);
 
-        return () => clearTimeout(timer);
+                // data = (await fetchDenunciaByIdClient(caseId)) ?? undefined;
+
+                if (!cancelled) {
+                    setCaseData(data);
+                }
+            } catch (loadError) {
+                if (!cancelled) {
+                    setError({
+                        message:
+                            loadError instanceof Error && loadError.message
+                                ? loadError.message
+                                : "Error al cargar la denuncia.",
+                    });
+                }
+            } finally {
+                if (!cancelled) {
+                    setLoading(false);
+                }
+            }
+        }
+
+        void loadDenuncia();
+
+        return () => {
+            cancelled = true;
+        };
     }, [caseId]);
 
     const [defenseData, setDefenseData] = useState<defenseData>({
@@ -185,14 +209,30 @@ export default function ViviDefense({ caseId }: { caseId: Case["caseNumber"] }) 
         )
     }
 
-    const handleSubmit = () => {
+    const handleSubmit = async () => {
         const parsed = defenseSchema.safeParse(defenseData);
         if (!parsed.success) {
             const message = parsed.error.issues.map((issue) => issue.message).join("\n");
             alert(message || "Revisa los datos de la defensa");
             return;
         }
-        console.log(defenseData);
+
+        try {
+            setSubmitting(true);
+            setSubmitError(undefined);
+
+            console.log(parsed.data);
+
+            // await submitDefenseClient(caseId, parsed.data);
+        } catch (submitErr) {
+            setSubmitError(
+                submitErr instanceof Error && submitErr.message
+                    ? submitErr.message
+                    : "No se pudo enviar la defensa."
+            );
+        } finally {
+            setSubmitting(false);
+        }
     }
 
     const handleCancel = () => {
@@ -334,16 +374,19 @@ export default function ViviDefense({ caseId }: { caseId: Case["caseNumber"] }) 
                     onChange={(event) => setDefenseData({ ...defenseData, declaration: event.target.checked })}
                     label='Declaro que la información y los archivos que presento son verdaderos. Esta información es autodeclarada y EMETRA puede verificarla más adelante.'
                 />
+                {submitError ? <Text variant='Medium' className={styles.errorText}>{submitError}</Text> : null}
                 <div className={styles.actionsContainer}>
                     <Button
                         variant="default"
                         onClick={handleSubmit}
+                        disabled={submitting}
                     >
-                        Enviar defensa
+                        {submitting ? "Enviando defensa..." : "Enviar defensa"}
                     </Button>
                     <Button
                         variant="outline"
                         onClick={handleCancel}
+                        disabled={submitting}
                     >
                         Cancelar
                     </Button>

@@ -29,3 +29,8 @@ export type defenseData = {
     attachments: File[],
     declaration: boolean,
 }
+
+export type DefenseResponse = {
+    caseNumber: Case["caseNumber"],
+    pdfUrl: string,
+}

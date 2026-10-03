@@ -1,0 +1,7 @@
+.grid {
+    width: fit-content;
+    display: grid;
+    grid-template-columns: repeat(var(--columns, 1), minmax(0, 1fr));
+    grid-column-gap: 12px;
+    grid-row-gap: 12px;
+}

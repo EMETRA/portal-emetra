@@ -9,12 +9,6 @@ export const DenunciaDetalleConfirmacion: React.FC<DenunciaDetalleConfirmacionPr
     loading = false
 }) => {
 
-    const formatoMonto = new Intl.NumberFormat("es-GT", {
-        style: "currency",
-        currency: "GTQ",
-        minimumFractionDigits: 2
-    });
-
     return (
         <article className={styles.card}>
             <header className={styles.header}>
@@ -44,7 +38,7 @@ export const DenunciaDetalleConfirmacion: React.FC<DenunciaDetalleConfirmacionPr
                                 Fecha y hora
                             </span>
                             <p className={styles.value}>
-                                {denuncia.fechaHora}
+                                {denuncia.caseDate}
                             </p>
                         </div>
                     </div>
@@ -54,16 +48,16 @@ export const DenunciaDetalleConfirmacion: React.FC<DenunciaDetalleConfirmacionPr
                             Hecho denunciado
                         </span>
                         <p className={styles.value}>
-                            {denuncia.hecho}
+                            {denuncia.denuncia.descripcion}
                         </p>
                     </div>
-                    
+
                     <div className={styles.fullDetail}>
                         <span className={styles.label}>
-                            Monto base
+                            Lugar
                         </span>
                         <p className={styles.amount}>
-                            {formatoMonto.format(denuncia.montoBase)}
+                            {denuncia.place}
                         </p>
                     </div>
                 </section>

@@ -13,12 +13,6 @@ export const DenunciaConfirmacionResultado: React.FC<DenunciaConfirmacionResulta
     loading = false
 }) => {
 
-    const formatoMonto = new Intl.NumberFormat("es-GT", {
-        style: "currency",
-        currency: "GTQ",
-        minimumFractionDigits: 2
-    });
-
     if (status === "error") {
         return (
             <article className={styles.card}>
@@ -106,11 +100,11 @@ export const DenunciaConfirmacionResultado: React.FC<DenunciaConfirmacionResulta
 
                     <div className={styles.detailItem}>
                         <span className={styles.label}>
-                            Monto base
+                            Lugar
                         </span>
 
                         <p className={styles.amount}>
-                            {formatoMonto.format(denuncia.montoBase)}
+                            {denuncia.place}
                         </p>
                     </div>
                 </div>

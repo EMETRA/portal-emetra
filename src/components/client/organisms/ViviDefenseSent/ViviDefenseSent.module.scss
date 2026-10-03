@@ -9,7 +9,7 @@
     background-color: #F4F5FA;
     padding: 1rem 2rem;
 
-    .nextStepsText {
+    .nextStepsText, .pdfCardTitle, .nextStepsCardTitle {
         text-align: left;
     }
 }
@@ -26,12 +26,6 @@
 
 .downloadButton {
     width: 100%;
-}
-
-.pdfCard h1,
-.nextSetpsCard h1,
-.pdfFile p {
-    text-align: left;
 }
 
 .infoHeader {
@@ -57,6 +51,45 @@
 
 .title, .caseNumberLabel, .caseNumber {
     color: $azul-1;
+}
+
+.loadingPdf, .errorPdf {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: left;
+    gap: 0.5rem;
+    border-radius: 8px;
+    padding: 0.5rem 1rem;
+}
+
+.loadingPdf {
+    border: 1px solid #C9CCF5;
+}
+
+.errorPdf {
+    border: 1px solid #E5A6A1;
+    background-color: #FDECEA;
+
+    .fileErrorIcon {
+        path {
+          fill: #B3261E;
+        }
+      }
+}
+
+.loadingPdfContent, .errorPdfContent {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+
+    .loadingPdfTitle, .loadingPdfDescription, .errorPdfTitle, .errorPdfDescription {
+        text-align: left;
+    }
+}
+
+.errorPdfTitle {
+    color: #8C1D18;
 }
 
 .nextStepsContent {

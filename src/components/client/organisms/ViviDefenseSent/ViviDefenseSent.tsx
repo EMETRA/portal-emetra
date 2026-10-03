@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import CardGeneral from "@components/client/atoms/CardGeneral/CardGeneral";
 import { Heading } from "@/components/server/atoms";
 import { Text } from "@/components/atoms/Text";
@@ -14,8 +15,21 @@ import styles from "./ViviDefenseSent.module.scss";
 export default function ViviDefenseSent({ caseNumber, pdfUrl }: DefenseSentProps) {
     const isMobile = useMediaQuery('(max-width: 768px)');
 
+    const [loadingPdf, setLoadingPdf] = useState(false);
+    const [errorPdf, setErrorPdf] = useState<{ message: string } | null>(null);
+    const [pdf, setPdf] = useState(false);
+
     const handleDowloadPdf = () => {
-        alert("Descargando PDF...");
+        setLoadingPdf(true);
+        setTimeout(() => {
+            if (Math.random() < 0.5) {
+                setErrorPdf({ message: "Error al generar tu PDF" });
+            } else {
+                setPdf(true);
+                setLoadingPdf(false);
+            }
+            setLoadingPdf(false);
+        }, 5000);
     }
 
     return (
@@ -32,12 +46,30 @@ export default function ViviDefenseSent({ caseNumber, pdfUrl }: DefenseSentProps
                 </div>
             </CardGeneral>
             <CardGeneral className={styles.pdfCard} padding={isMobile ? "sm" : "md"}>
-                <Heading variant="Medium">Tu PDF de defensa</Heading>
-                <File className={styles.pdfFile} name={`defensa-${caseNumber}.pdf`} id={`defensa-${caseNumber}`} />
-                <Button variant="default" className={styles.downloadButton} onClick={handleDowloadPdf}>Descargar PDF</Button>
+                <Heading variant="Medium" className={styles.pdfCardTitle}>Tu PDF de defensa</Heading>
+                {loadingPdf ? (
+                    <div className={styles.loadingPdf}>
+                        <Icon name="File" color="#1e7a46" width={60} height={60} />
+                        <div className={styles.loadingPdfContent}>
+                            <Text variant="Medium" className={styles.loadingPdfTitle}><strong>Estamos generando tu PDF</strong></Text>
+                            <Text variant="Small" className={styles.loadingPdfDescription}>Puede tardar unos segundos. Tu defensa quedó registrada</Text>
+                        </div>
+                    </div>
+                ) : errorPdf ? (
+                    <div className={styles.errorPdf}>
+                        <Icon name="Exclamation" className={styles.fileErrorIcon} width={60} height={60} />
+                        <div className={styles.errorPdfContent}>
+                            <Text variant="Medium" className={styles.errorPdfTitle}><strong>No pudimos generar tu PDF</strong></Text>
+                            <Text variant="Small" className={styles.errorPdfDescription}>{errorPdf.message}</Text>
+                        </div>
+                    </div>
+                ) : (
+                    <File className={styles.pdfFile} name={`defensa-${caseNumber}.pdf`} id={`defensa-${caseNumber}`} />
+                )}
+                <Button variant="default" className={styles.downloadButton} onClick={handleDowloadPdf} disabled={loadingPdf}>Descargar PDF</Button>
             </CardGeneral>
             <CardGeneral className={styles.nextSetpsCard} padding={isMobile ? "sm" : "md"}>
-                <Heading variant="Medium">¿Qué debes de hacer ahora?</Heading>
+                <Heading variant="Medium" className={styles.nextStepsCardTitle}>¿Qué debes de hacer ahora?</Heading>
                 <div className={styles.nextStepsContent}>
                     <Text variant="Small" className={styles.nextStepsText}>Imprime el PDF de tu defensa.</Text>
                     <Text variant="Small" className={styles.nextStepsText}>Fírmalo.</Text>

@@ -33,4 +33,5 @@ export type defenseData = {
 export type DefenseResponse = {
     caseNumber: Case["caseNumber"],
     pdfUrl: string,
+    idDefensa: string,
 }

@@ -1,6 +1,6 @@
 'use client';
 
-import { useParams, useRouter } from "next/navigation";
+import { useParams } from "next/navigation";
 import { AlertBadge } from "@/components/molecules/AlertBadge";
 import { SectionTitle } from "@/components/server/molecules";
 import styles from "./Page.module.scss";
@@ -12,8 +12,13 @@ import { DenunciaDetalleConfirmacion } from "@/components/organisms/DenunciaDeta
 import { DenunciaConfirmacionCarga } from "@/components/organisms/DenunciaConfirmacionCarga";
 import { DenunciaConfirmacionResultado } from "@/components/organisms/DenunciaConfirmacionResultado/DenunciaConfirmacionResultado";
 import { Button } from "@/components/server/atoms";
+import { CasilleroPopUp } from "@/components/client/molecules/CasilleroPopUp";
 
-import type { Case } from "@/lib/vivi/types";
+// import type { Case, DefenseResponse } from "@/lib/vivi/types";
+// import type { Case } from "@/lib/vivi/types";
+import type { Case, DefenseResponse } from "@/lib/vivi/types";
+// import { submitDefenseClient } from "@/lib/vivi/api";
+import { ViviDefenseSent } from "@/components/client/organisms/ViviDefenseSent";
 
 // import { fetchDenunciaByIdClient } from "@/lib/vivi/api";
 
@@ -68,9 +73,12 @@ const remision = "R-2026-004512";
 
 export default function DenunciaPage() {
     const params = useParams<{ id: string }>();
-    const router = useRouter();
+    // const router = useRouter();
     const [denuncia, setDenuncia] = useState<Case | undefined>();
     const [loading, setLoading] = useState(true);
+    const [presentandoDefensa, setPresentandoDefensa] = useState(false);
+    const [defenseSent, setDefenseSent] = useState<DefenseResponse | undefined>();
+    const [submitError, setSubmitError] = useState<{ message: string, isRetried?: boolean } | undefined>();
     const [error, setError] = useState<{ message: string } | undefined>();
 
     useEffect(() => {
@@ -121,8 +129,35 @@ export default function DenunciaPage() {
         setVista("confirmacion");
     }
 
-    const handlePresentarDefensa = () => {
-        router.push(`/tramite-reporte/${params.id}/defensa`);
+    // const handlePresentarDefensa = () => {
+    const handlePresentarDefensa = async () => {
+        setPresentandoDefensa(true);
+        setSubmitError(undefined);
+        try {
+            // const response = await submitDefenseClient(params.id);
+            // if (!response?.idDefensa) {
+            //     throw new Error("No se pudo registrar la defensa.");
+            // }
+            // setDefenseSent(response);
+            if (Math.random() > 0.5) {
+                throw new Error("No se pudo enviar la defensa.");
+            }
+            await new Promise((resolve) => setTimeout(resolve, 5000));
+            setDefenseSent({
+                caseNumber: params.id,
+                pdfUrl: "https://www.google.com",
+                idDefensa: "1234567890"
+            });
+        } catch (submitErr) {
+            setSubmitError({
+                message: submitErr instanceof Error && submitErr.message
+                    ? submitErr.message
+                    : "No se pudo enviar la defensa.",
+                isRetried: Math.random() > 0.5,
+            });
+        } finally {
+            setPresentandoDefensa(false);
+        }
     }
 
     const handleConfirmar = () => {
@@ -154,6 +189,18 @@ export default function DenunciaPage() {
     }
 
     
+
+    if (defenseSent) {
+        return (
+            <div className={styles.main}>
+                <ViviDefenseSent
+                    caseNumber={defenseSent.caseNumber}
+                    pdfUrl={defenseSent.pdfUrl}
+                    idDefensa={defenseSent.idDefensa}
+                />
+            </div>
+        );
+    }
 
     if (!loading && error) {
         return (
@@ -191,7 +238,8 @@ export default function DenunciaPage() {
                         <DenunciaDetalleAcciones
                             onAceptarPago={handleAceptarPago}
                             onPresentarDefensa={handlePresentarDefensa}
-                            loading={loading}
+                            // loading={loading}
+                            loading={loading || presentandoDefensa}
                         />
                     </div>
                 </>
@@ -242,7 +290,18 @@ export default function DenunciaPage() {
                 </>
             )}
 
-            
+            <CasilleroPopUp
+                isOpen={!!submitError}
+                variant={submitError?.isRetried ? "error" : "default"}
+                title="Error al enviar la defensa"
+                description={submitError?.message ?? "Ocurrió un error al enviar la defensa."}
+                onClose={() => setSubmitError(undefined)}
+                actions={[{
+                    text: "Reintentar",
+                    variant: "default",
+                    onClick: handlePresentarDefensa,
+                }]}
+            />
         </div>
     );
 

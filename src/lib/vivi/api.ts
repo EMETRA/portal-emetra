@@ -1,5 +1,6 @@
 import { assertOkResponse } from "@/lib/bff/raw";
-import type { Case, defenseData } from "@/lib/vivi/types";
+// import type { Case, defenseData } from "@/lib/vivi/types";
+import type { Case, DefenseResponse } from "@/lib/vivi/types";
 
 export type { Case, DefenseFile, defenseData } from "@/lib/vivi/types";
 
@@ -23,33 +24,34 @@ export async function fetchDenunciaByIdClient(
 }
 
 export async function submitDefenseClient(
+  // caseId: string,
+  // payload: defenseData
   caseId: string,
-  payload: defenseData
-): Promise<unknown> {
-  const formData = new FormData();
-  formData.set("name", payload.name);
-  formData.set("personalDocumentType", payload.personalDocumentType);
-  if (payload.dpi) {
-    formData.set("dpi", payload.dpi);
-  }
-  if (payload.passport) {
-    formData.set("passport", payload.passport);
-  }
-  formData.set("email", payload.email);
-  formData.set("phone", payload.phone);
-  formData.set("arguments", payload.arguments);
-  formData.set("declaration", String(payload.declaration));
+): Promise<DefenseResponse | null> {
+  // const formData = new FormData();
+  // formData.set("name", payload.name);
+  // formData.set("personalDocumentType", payload.personalDocumentType);
+  // if (payload.dpi) {
+  //   formData.set("dpi", payload.dpi);
+  // }
+  // if (payload.passport) {
+  //   formData.set("passport", payload.passport);
+  // }
+  // formData.set("email", payload.email);
+  // formData.set("phone", payload.phone);
+  // formData.set("arguments", payload.arguments);
+  // formData.set("declaration", String(payload.declaration));
 
-  for (const file of payload.attachments) {
-    formData.append("attachments", file);
-  }
+  // for (const file of payload.attachments) {
+  //   formData.append("attachments", file);
+  // }
 
   const response = await fetch(
     `/api/vivi/denuncias/${encodeURIComponent(caseId)}/defensa`,
     {
       method: "POST",
       headers: { Accept: "application/json" },
-      body: formData,
+      // body: formData,
     }
   );
 
@@ -64,5 +66,5 @@ export async function submitDefenseClient(
     return null;
   }
 
-  return JSON.parse(body) as unknown;
+  return JSON.parse(body) as DefenseResponse;
 }

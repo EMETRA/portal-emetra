@@ -6,7 +6,7 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: start;
+    justify-content: flex-start;
     gap: 1rem;
     padding: 1rem 2rem;
     background-color: #F4F5FA;
@@ -39,7 +39,7 @@
 .caseInfoHeader {
     display: flex;
     flex-direction: row;
-    align-items: start;
+    align-items: flex-start;
     justify-content: space-between;
 }
 

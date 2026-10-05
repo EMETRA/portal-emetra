@@ -12,6 +12,7 @@ import { Input } from "@/components/server/atoms/Input";
 import SelectGeneral from "@/components/client/atoms/SelectGeneral/SelectGeneral";
 import { Checkbox } from '@/components/client/atoms/Checkbox';
 import { FileUploader } from "@/components/client/molecules/FileUploader";
+import { CasilleroPopUp } from "@/components/client/molecules/CasilleroPopUp";
 
 import useMediaQuery from '@mui/material/useMediaQuery';
 
@@ -136,7 +137,7 @@ export default function ViviDefense({ caseId }: { caseId: Case["caseNumber"] }) 
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<{ message: string } | undefined>();
     const [submitting, setSubmitting] = useState(false);
-    const [submitError, setSubmitError] = useState<string | undefined>();
+    const [submitError, setSubmitError] = useState<{ message: string, isRetried?: boolean } | undefined>();
     const router = useRouter();
     useEffect(() => {
         let cancelled = false;
@@ -221,14 +222,22 @@ export default function ViviDefense({ caseId }: { caseId: Case["caseNumber"] }) 
             setSubmitting(true);
             setSubmitError(undefined);
 
+            await new Promise((resolve) => setTimeout(resolve, 5000));
+            if (Math.random() > 0.1) {
+                throw new Error("Error al enviar la defensa.");
+            }
+
             console.log(parsed.data);
 
             // await submitDefenseClient(caseId, parsed.data);
         } catch (submitErr) {
             setSubmitError(
-                submitErr instanceof Error && submitErr.message
-                    ? submitErr.message
-                    : "No se pudo enviar la defensa."
+                {
+                    message: submitErr instanceof Error && submitErr.message
+                        ? submitErr.message
+                        : "No se pudo enviar la defensa.",
+                    isRetried: Math.random() > 0.5,
+                }
             );
         } finally {
             setSubmitting(false);
@@ -366,6 +375,7 @@ export default function ViviDefense({ caseId }: { caseId: Case["caseNumber"] }) 
                         maxTotalSizeBytes={defenseAttachmentMaxBytes}
                         maxFiles={defenseAttachmentMaxFiles}
                         onChange={handleFileUpload}
+                        disabled={submitting}
                     />
                 </CardGeneral>
                 <Checkbox
@@ -373,8 +383,8 @@ export default function ViviDefense({ caseId }: { caseId: Case["caseNumber"] }) 
                     checked={defenseData.declaration}
                     onChange={(event) => setDefenseData({ ...defenseData, declaration: event.target.checked })}
                     label='Declaro que la información y los archivos que presento son verdaderos. Esta información es autodeclarada y EMETRA puede verificarla más adelante.'
+                    disabled={submitting}
                 />
-                {submitError ? <Text variant='Medium' className={styles.errorText}>{submitError}</Text> : null}
                 <div className={styles.actionsContainer}>
                     <Button
                         variant="default"
@@ -392,6 +402,18 @@ export default function ViviDefense({ caseId }: { caseId: Case["caseNumber"] }) 
                     </Button>
                 </div>
             </div>
+            <CasilleroPopUp
+                isOpen={!!submitError}
+                variant={submitError?.isRetried ? "error" : "default"}
+                title="Error al enviar la defensa"
+                description={submitError?.message ?? "Ocurrió un error al enviar la defensa."}
+                onClose={() => setSubmitError(undefined)}
+                actions={[{
+                    text: "Reintentar",
+                    variant: "default",
+                    onClick: handleSubmit,
+                }]}
+            />
         </div>
     )
 }

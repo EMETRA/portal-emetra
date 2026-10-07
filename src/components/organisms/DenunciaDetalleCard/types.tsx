@@ -1,19 +1,6 @@
-export interface Evidencia {
-    id: string | number;
-    url: string;
-    alt?: string;
-};
-
-export interface DenunciaDetalle {
-    numero: string;
-    placa: string;
-    hecho: string;
-    fechaHora: string;
-    montoBase: number;
-    evidencias: Evidencia[];
-};
+import type { Case } from "@/lib/vivi/types";
 
 export interface DenunciaDetalleCardProps {
-    denuncia: DenunciaDetalle;
+    denuncia?: Case;
     loading?: boolean;
-};
+}

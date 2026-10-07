@@ -1,6 +1,6 @@
 import React, { VideoHTMLAttributes } from "react";
 
-interface VideoProps extends VideoHTMLAttributes<HTMLVideoElement> {
+export interface VideoProps extends VideoHTMLAttributes<HTMLVideoElement> {
   src: string;
   /**
    * Solo YouTube: usa youtube-nocookie.com (YouTube no guarda cookies hasta

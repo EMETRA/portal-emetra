@@ -1,0 +1,210 @@
+@use "../../../../theme/colors.scss" as *;
+
+$action: #3c2f8f;
+$loaded: #1e7a46;
+$error: #b3261e;
+$error-bg: #fdecea;
+$error-border: #e5a6a1;
+$zone-bg: #f8f8fd;
+$zone-border: #9a9db8;
+
+.root {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.dropzone {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 0.75rem;
+  background: $zone-bg;
+  border: 1.5px dashed $zone-border;
+  border-radius: 16px;
+  padding: 1rem;
+}
+
+.dropzoneActive {
+  border-color: $action;
+  background: #efedfb;
+}
+
+.dropzoneDisabled {
+  opacity: 0.6;
+}
+
+.dropLabel {
+  color: $action;
+  font-weight: 700;
+}
+
+.input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.dropzone .selectButton,
+.file .actionButton {
+  background-color: #fff;
+  color: $action;
+  border: 2px solid $action;
+  border-radius: 12px;
+  font-weight: 700;
+  padding: 0.55rem 1.15rem;
+  white-space: nowrap;
+}
+
+.dropzone .selectButton:hover,
+.file .actionButton:hover {
+  background-color: rgba($action, 0.06);
+}
+
+.dropzone .selectButton {
+  width: 100%;
+}
+
+.list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.file {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  background: #fff;
+  border: 1px solid #ececf4;
+  border-radius: 14px;
+  padding: 0.85rem 0.9rem;
+}
+
+.fileError {
+  background: $error-bg;
+  border-color: $error-border;
+}
+
+.fileMain {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  min-width: 0;
+  flex: 1;
+}
+
+.fileIcon {
+  width: 2rem;
+  height: 2rem;
+  flex-shrink: 0;
+
+  path {
+    fill: currentColor;
+  }
+}
+
+.iconLoaded {
+  color: $loaded;
+}
+
+.iconError {
+  color: $error;
+}
+
+.fileText {
+  min-width: 0;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+.fileName, .metaLoaded, .metaError {
+  text-align: left;
+}
+
+.fileName {
+  color: $primary-text;
+  font-weight: 700;
+  line-height: 1.3;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+
+.metaLoaded {
+  color: $loaded;
+  font-weight: 600;
+}
+
+.metaError {
+  color: $error;
+}
+
+.file .actionButton {
+  flex-shrink: 0;
+  align-self: center;
+  min-width: 6.5rem;
+}
+
+/* TABLET ≥ 768px */
+@media (min-width: 768px) {
+  .dropzone {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 1.15rem 1.25rem;
+  }
+
+  .dropzone .selectButton {
+    width: auto;
+    padding: 0.6rem 1.35rem;
+  }
+
+  .file {
+    padding: 1rem 1.15rem;
+    gap: 1rem;
+  }
+}
+
+/* DESKTOP ≥ 1400px */
+@media (min-width: 1400px) {
+  .root {
+    gap: 1rem;
+  }
+
+  .dropzone {
+    padding: 1.35rem 1.5rem;
+    border-radius: 18px;
+  }
+
+  .dropzone .selectButton,
+  .file .actionButton {
+    padding: 0.65rem 1.5rem;
+  }
+
+  .file {
+    padding: 1.15rem 1.35rem;
+    border-radius: 16px;
+  }
+
+  .list {
+    gap: 1rem;
+  }
+}

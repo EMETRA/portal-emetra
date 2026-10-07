@@ -1,0 +1,28 @@
+.meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  column-gap: 1.25rem;
+  row-gap: 0.5rem;
+  list-style: none;
+  color: $secondary-text;
+  font-size: 0.75rem;
+}
+
+.item {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+}
+
+.icon {
+  width: 0.875rem;
+  height: 0.875rem;
+  flex-shrink: 0;
+}
+
+@media (max-width: $breakpoint-mobile-max) {
+  .author {
+    flex-basis: 100%;
+  }
+}

@@ -1,0 +1,11 @@
+.section {
+  width: 100%;
+  padding: 1rem 1.25rem 2rem;
+  scroll-margin-top: 5rem;
+}
+
+@media (min-width: $breakpoint-desktop) {
+  .section {
+    padding: 1.5rem $page-inline-padding 3rem;
+  }
+}

@@ -89,10 +89,8 @@ export default function DenunciaPage() {
             setError(undefined);
 
             try {
-                let data: Case | undefined;
-
                 await new Promise((resolve) => setTimeout(resolve, 5000));
-                data = denuncias.find((item) => item.caseNumber === params.id);
+                const data: Case | undefined = denuncias.find((item) => item.caseNumber === params.id);
 
                 // data = (await fetchDenunciaByIdClient(params.id)) ?? undefined;
 

@@ -11,9 +11,17 @@ export const SectionTitle: React.FC<SectionTitleProps> = ({
     children,
     className,
     iconName,
+    mobileUnderline = false,
     ...rest
 }) => (
-    <div className={classNames(styles.wrapper, className)} {...rest}>
+    <div
+        className={classNames(
+            styles.wrapper,
+            mobileUnderline && styles.mobileUnderline,
+            className
+        )}
+        {...rest}
+    >
         <Separator variant="green" className={styles.separator}/>
         { iconName ? (<Icon name={iconName} className={styles.icon}/>) : null } 
         <Heading variant="Medium" className={styles.title}>

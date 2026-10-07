@@ -35,3 +35,33 @@
     font-size: 1.2rem;
   }
 }
+
+// Variante opcional "Título - Mobile": izquierda y subrayado verde.
+@media (max-width: $breakpoint-mobile-max) {
+  .mobileUnderline {
+    justify-content: flex-start;
+    margin: 1rem 0;
+
+    .separator {
+      display: none;
+    }
+
+    .title {
+      position: relative;
+      margin: 0;
+      padding-bottom: 0.5rem;
+      font-size: 1.25rem;
+      text-align: left;
+
+      &::after {
+        content: "";
+        position: absolute;
+        left: 0;
+        bottom: 0;
+        width: 2.25rem;
+        height: 3px;
+        background-color: $verde-claro-2;
+      }
+    }
+  }
+}

@@ -2,16 +2,33 @@ import React, { VideoHTMLAttributes } from "react";
 
 export interface VideoProps extends VideoHTMLAttributes<HTMLVideoElement> {
   src: string;
+  /**
+   * Solo YouTube: usa youtube-nocookie.com (YouTube no guarda cookies hasta
+   * que se reproduce). Por defecto false.
+   */
+  privacyEnhanced?: boolean;
 }
 
 const isYouTubeUrl = (url: string) =>
   /^(https?:\/\/)?(www\.)?(youtube\.com|youtu\.be)\//.test(url);
 
-const getYouTubeEmbedUrl = (url: string) => {
+/**
+ * En YouTube, `autoPlay` inicia el video al cargar el iframe (útil cuando ya
+ * se hizo clic en un botón propio de reproducir) y `title` se usa en el iframe.
+ */
+const getYouTubeEmbedUrl = (
+  url: string,
+  { autoplay = false, privacyEnhanced = false } = {}
+) => {
   const match = url.match(
     /(?:youtube\.com\/(?:watch\?v=|embed\/)|youtu\.be\/)([A-Za-z0-9_-]{11})/
   );
-  return match ? `https://www.youtube.com/embed/${match[1]}` : url;
+  if (!match) return url;
+  const host = privacyEnhanced
+    ? "https://www.youtube-nocookie.com"
+    : "https://www.youtube.com";
+  const query = autoplay ? "?autoplay=1&rel=0" : "";
+  return `${host}/embed/${match[1]}${query}`;
 };
 
 function getDimensions(
@@ -41,6 +58,7 @@ const Video: React.FC<VideoProps> = ({
   width,
   height,
   style,
+  privacyEnhanced = false,
   ...props
 }) => {
   const { width: w, height: h } = getDimensions(width, height);
@@ -49,8 +67,11 @@ const Video: React.FC<VideoProps> = ({
     return (
       <div style={{ width: w, height: h, position: "relative" }}>
         <iframe
-          src={getYouTubeEmbedUrl(src)}
-          title="YouTube video player"
+          src={getYouTubeEmbedUrl(src, {
+            autoplay: Boolean(props.autoPlay),
+            privacyEnhanced,
+          })}
+          title={props.title ?? "YouTube video player"}
           allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
           allowFullScreen
           style={{

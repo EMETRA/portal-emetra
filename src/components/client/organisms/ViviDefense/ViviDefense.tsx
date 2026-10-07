@@ -147,13 +147,11 @@ export default function ViviDefense({ caseId }: { caseId: Case["caseNumber"] }) 
             setError(undefined);
 
             try {
-                let data: Case | undefined;
-
                 await new Promise((resolve) => setTimeout(resolve, 5000));
                 if (Math.random() > 0.9) {
                     throw new Error();
                 }
-                data = denuncias.find((item) => item.caseNumber === caseId);
+                const data: Case | undefined = denuncias.find((item) => item.caseNumber === caseId);
 
                 // data = (await fetchDenunciaByIdClient(caseId)) ?? undefined;
 

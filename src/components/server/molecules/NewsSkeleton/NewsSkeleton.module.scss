@@ -1,0 +1,112 @@
+@keyframes pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.55;
+  }
+}
+
+.block,
+.line {
+  background-color: $secondary-card-background;
+  animation: pulse 1.4s ease-in-out infinite;
+}
+
+.line {
+  height: 0.625rem;
+  border-radius: 999px;
+}
+
+.lineTall {
+  height: 1.25rem;
+}
+
+.w25 { width: 25%; }
+.w50 { width: 50%; }
+.w60 { width: 60%; }
+.w80 { width: 80%; }
+.w90 { width: 90%; }
+.w100 { width: 100%; }
+
+// Card del listado
+.card {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border-radius: 12px;
+  background-color: $card-background;
+}
+
+.cardMedia {
+  aspect-ratio: 400 / 180;
+}
+
+.cardBody {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding: 1rem 1.25rem 1.25rem;
+}
+
+.cardText {
+  height: 1.75rem;
+  margin-top: 0.25rem;
+  border-radius: 6px;
+}
+
+// Detalle
+.detail {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.detailTop {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.5rem;
+}
+
+.detailMedia {
+  aspect-ratio: 16 / 9;
+  border-radius: 12px;
+}
+
+.detailInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.row {
+  display: flex;
+  gap: 0.75rem;
+}
+
+.detailCard {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  padding: 1.25rem;
+  border-radius: 12px;
+  background-color: $card-background;
+}
+
+@media (min-width: $breakpoint-desktop) {
+  .detailTop {
+    grid-template-columns: 2fr 3fr;
+  }
+
+  .detailMedia {
+    aspect-ratio: 4 / 3;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .block,
+  .line {
+    animation: none;
+  }
+}

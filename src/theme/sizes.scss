@@ -9,3 +9,9 @@ $card-radius: 16px;
 
 // Shadows
 $card-shadow: 0px 5px 10px 0 rgba(0, 0, 0, 0.25);
+
+// Breakpoints
+// Desde este ancho se usa el diseño desktop; por debajo, el mobile (COM-04).
+$breakpoint-desktop: 1400px;
+// Máximo del diseño mobile, para usar en @media (max-width: ...).
+$breakpoint-mobile-max: $breakpoint-desktop - 0.02px;

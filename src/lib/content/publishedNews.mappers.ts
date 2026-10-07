@@ -15,12 +15,30 @@ import type {
 import { parseYouTubeId, toYouTubeWatchUrl } from "@/helpers/youtube";
 
 /**
- * El README siempre trae `tipo`; si faltara, un enlace de YouTube se toma como
- * video y lo demás como imagen.
+ * Un enlace de YouTube siempre es video, aunque `tipo` diga "externo" (README
+ * "Noticias CMS", sección 4: los videos se registran como "video" o
+ * "externo"). Sin `tipo`, lo demás se toma como imagen.
  */
 function resolverTipo(dto: PublicNewsResourceDto, url: string): NewsResourceType {
-  if (dto.tipo) return dto.tipo;
-  return parseYouTubeId(url) ? "video" : "imagen";
+  if (parseYouTubeId(url)) return "video";
+  return dto.tipo ?? "imagen";
+}
+
+/** Ruta en la que api-portal sirve las imágenes de noticias. */
+const UPLOADS_BACKEND = "/uploads/";
+/** Ruta del Portal que las reenvía a api-portal (app/api/public-news/uploads). */
+const UPLOADS_PORTAL = "/api/public-news/uploads/";
+
+/**
+ * api-portal devuelve las imágenes con ruta relativa a su dominio
+ * ("/uploads/noticias/2026/09/foto.jpg"). Se piden al Portal, que las reenvía,
+ * así no hace falta conocer el dominio público de api-portal. Las URL
+ * absolutas y las rutas propias del Portal ("/images/...") quedan igual.
+ */
+function resolverUrl(url: string): string {
+  return url.startsWith(UPLOADS_BACKEND)
+    ? `${UPLOADS_PORTAL}${url.slice(UPLOADS_BACKEND.length)}`
+    : url;
 }
 
 /**
@@ -35,7 +53,7 @@ export function toNewsResource(
   if (!dto || !urlOriginal) return null;
 
   const tipo = resolverTipo(dto, urlOriginal);
-  let url = urlOriginal;
+  let url = resolverUrl(urlOriginal);
   if (tipo === "video") {
     const youtubeId = parseYouTubeId(urlOriginal);
     if (!youtubeId) return null;

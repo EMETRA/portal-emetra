@@ -17,7 +17,7 @@ import type {
  * true = usa los datos de desarrollo de publishedNews.dummy.ts en lugar de
  * api-portal. Debe quedar en false en lo que se sube.
  */
-const USAR_DUMMY = false;
+export const USAR_DUMMY = true;
 
 /** Idioma del Portal. TODO [COM04-FLUJO]: si se agregan idiomas, tomarlo del sitio. */
 export const NEWS_IDIOMA = "es-GT";

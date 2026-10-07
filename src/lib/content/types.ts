@@ -17,7 +17,10 @@ export type NewsTipoRecursoDto = "imagen" | "video" | "archivo" | "externo";
 export interface PublicNewsResourceDto {
   id: number;
   tipo?: NewsTipoRecursoDto | null;
-  /** URL absoluta, p. ej. "https://cdn.emetra.gob.gt/noticias/principal_banner.png". */
+  /**
+   * Imagen: ruta relativa a api-portal ("/uploads/noticias/2026/09/foto.jpg");
+   * el mapper la pide por el Portal. Video: URL de YouTube.
+   */
   url?: string | null;
   texto_alternativo?: string | null;
   pie_imagen?: string | null;

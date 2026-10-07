@@ -36,8 +36,7 @@
   color: $secondary-text;
 }
 
-// TODO [COM04-FLUJO]: el rojo del Figma es más oscuro que $rojo-1; confirmar el
-// color con diseño (no se pudo leer del Figma por el límite del MCP).
+// Rojo del tema ($rojo-1), aprobado por diseño (2026-10-07).
 .errorIcon {
   display: inline-flex;
   align-items: center;

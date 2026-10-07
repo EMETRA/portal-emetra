@@ -1,0 +1,25 @@
+const test = require('node:test');
+const assert = require('node:assert/strict');
+const path = require('node:path');
+const root=path.resolve(__dirname,'../..');
+const load=require('./load-ts.cjs')(root);
+const api=load('src/lib/vivi/acciones.ts');
+const originalFetch=global.fetch;
+test.afterEach(()=>{global.fetch=originalFetch;});
+test('consultar usa POST local con token en el cuerpo y nunca emite una aceptación',async()=>{
+ const calls=[];global.fetch=async(url,init)=>{calls.push({url,init});return Response.json({estadoEnlace:'VIGENTE'});};
+ await api.consultarAceptacion('token-qa');assert.equal(calls.length,1);assert.equal(calls[0].url,'/api/vivi/aceptaciones/consulta');assert.equal(calls[0].init.method,'POST');assert.deepEqual(JSON.parse(calls[0].init.body),{token:'token-qa'});assert.equal(calls[0].init.cache,'no-store');
+});
+test('aceptación y reintento conservan requestId y propagan el 503 real',async()=>{
+ const bodies=[];global.fetch=async(_,init)=>{bodies.push(JSON.parse(init.body));return Response.json({codigo:'FALLO_INSTITUCIONAL',message:['No se pudo emitir la multa']},{status:503});};
+ for(let i=0;i<2;i++)await assert.rejects(()=>api.aceptarDenuncia('token-qa','web-idempotente'),e=>e.status===503&&e.codigo==='FALLO_INSTITUCIONAL');assert.deepEqual(bodies[0],bodies[1]);
+});
+test('rechaza una respuesta 200 JSON que pretendiera ser una descarga PDF',async()=>{
+ global.fetch=async()=>Response.json({error:'PDF no generado'});await assert.rejects(()=>api.descargarPlantilla('token-qa'),/PDF válido/);
+});
+test('descarga únicamente bytes PDF desde el endpoint de plantilla',async()=>{
+ let path;global.fetch=async(url)=>{path=url;return new Response('%PDF-1.4\nQA',{headers:{'Content-Type':'application/pdf','Cache-Control':'private, no-store'}});};const blob=await api.descargarPlantilla('token-qa');assert.equal(path,'/api/vivi/defensas/plantilla');assert.equal(blob.type,'application/pdf');assert.match(await blob.text(),/^%PDF-/);
+});
+test('no inventa enlace de pago y rechaza protocolos ejecutables',()=>{
+ assert.equal(api.urlPagoSeguro({estado:'PREPARANDO'}),null);assert.equal(api.urlPagoSeguro({estado:'DISPONIBLE',urlPago:'javascript:alert(1)'}),null);assert.equal(api.urlPagoSeguro({estado:'DISPONIBLE',urlPago:'https://pagos.example/30'}),'https://pagos.example/30');
+});

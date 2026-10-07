@@ -38,6 +38,8 @@ export type ProxyBackendOptions = {
   method?: string;
   /** Defaults to true for methods other than GET and HEAD. */
   forwardBody?: boolean;
+  /** Límite opcional para flujos que permiten reintentar sin duplicar operaciones. */
+  timeoutMs?: number;
 };
 
 /**
@@ -70,6 +72,7 @@ export async function proxyBackendRequest(
       headers,
       body,
       cache: "no-store",
+      ...(options.timeoutMs ? { signal: AbortSignal.timeout(options.timeoutMs) } : {}),
     });
   } catch (error) {
     console.error("[proxyBackendRequest] network error:", {

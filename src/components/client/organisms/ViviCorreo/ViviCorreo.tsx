@@ -4,11 +4,12 @@ import { useEffect, useRef, useState } from "react";
 import { Button } from "@/components/server/atoms";
 import { aceptarDenuncia, consultarAceptacion, consultarPlantilla, crearRequestId, descargarPlantilla, urlPagoSeguro, type Aceptacion, type ConsultaAceptacion, type ConsultaPlantilla } from "@/lib/vivi/acciones";
 import styles from "./ViviCorreo.module.scss";
+import { comprobarCasoReporte } from '@/lib/vivi/enlace-reporte';
 
-type Props = { token: string; accion: 'aceptar' | 'refutar' };
+type Props = { token: string; accion: 'aceptar' | 'refutar'; codigoCasoEsperado?: string };
 const mensajeError = (error: unknown) => error instanceof Error ? error.message : 'No se pudo completar la solicitud. Intenta de nuevo.';
 
-export default function ViviCorreo({ token, accion }: Props) {
+export default function ViviCorreo({ token, accion, codigoCasoEsperado }: Props) {
   const [consulta, setConsulta] = useState<ConsultaAceptacion | null>(null);
   const [plantilla, setPlantilla] = useState<ConsultaPlantilla | null>(null);
   const [resultado, setResultado] = useState<Aceptacion | null>(null);
@@ -25,12 +26,12 @@ export default function ViviCorreo({ token, accion }: Props) {
     const abort = new AbortController();
     setCargando(true); setError(null);
     const leer = accion === 'aceptar'
-      ? consultarAceptacion(token, abort.signal).then(setConsulta)
-      : consultarPlantilla(token, abort.signal).then(setPlantilla);
+      ? consultarAceptacion(token, abort.signal).then(datos => { if (datos.estadoEnlace === 'VIGENTE') comprobarCasoReporte(datos.denuncia.codigoCaso, codigoCasoEsperado); if (!abort.signal.aborted) setConsulta(datos); })
+      : consultarPlantilla(token, abort.signal).then(datos => { comprobarCasoReporte(datos.caso.codigo, codigoCasoEsperado); if (!abort.signal.aborted) setPlantilla(datos); });
     leer.catch(e => { if (!abort.signal.aborted) setError(mensajeError(e)); })
       .finally(() => { if (!abort.signal.aborted) setCargando(false); });
     return () => abort.abort();
-  }, [token, accion, recarga]);
+  }, [token, accion, recarga, codigoCasoEsperado]);
 
   async function confirmar() {
     if (enCurso.current || !consentimiento || consulta?.estadoEnlace !== 'VIGENTE' || !consulta.puedeAceptar) return;

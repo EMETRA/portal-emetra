@@ -1,16 +1,20 @@
 .main {
     width: 100%;
-    padding: 24px;
-    background-color: #f2f2f2;
+    padding: 36px max(24px, calc((100% - 1248px) / 2));
+    min-height: 75vh;
+    background-color: #F4F5FA;
 }
 
 .layout {
     display: grid;
-    grid-template-columns: minmax(0, 3fr) minmax(280px, 1fr);
+    grid-template-columns: minmax(0, 2fr) minmax(280px, 1fr);
     gap: 24px;
     align-items: start;
     margin-top: 18px;
 }
+
+.notice { margin-top: 24px; border: 1px solid #C9CCF5; background: #EEF0FF; color: #17256d; padding: 18px; border-radius: 8px; }
+.error { margin: 20px 0; color: #8C1D18; }
 
 .confirmContainer {
     display: flex;

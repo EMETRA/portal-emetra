@@ -1,10 +1,12 @@
 export type Remision = { ciudad: number; serie: string; numero: string; emitidaEn?: string };
 export type Pago = { estado: "PREPARANDO" } | { estado: "DISPONIBLE"; urlPago: string };
+export type VistaDenuncia = { idDenuncia: string; codigoCaso: string; estado: string; usoPlaca?: string; placa?: string; regla?: number; capturadaEn?: string | null; latitud?: number | null; longitud?: number | null; descripcionHecho?: string | null };
+export type EvidenciaReporte = { idEvidencia: string; mime: string; capturadaEn?: string | null };
 export type ConsultaAceptacion =
   | { estadoEnlace: "VIGENTE"; estadoCaso: string; puedeAceptar: boolean; versionTexto: string;
-      denuncia: { idDenuncia: string; codigoCaso: string; estado: string; usoPlaca?: string; placa?: string; regla?: number; capturadaEn?: string | null } }
-  | { estadoEnlace: "USADO"; estadoCaso: string; remision: Remision | null; pago: Pago | null }
-  | { estadoEnlace: "VENCIDO" | "REVOCADO"; estadoCaso: string };
+      denuncia: VistaDenuncia; evidencias?: EvidenciaReporte[] }
+  | { estadoEnlace: "USADO"; codigoCaso: string; denuncia?: VistaDenuncia; estadoCaso: string; remision: Remision | null; pago: Pago | null }
+  | { estadoEnlace: "VENCIDO" | "REVOCADO"; codigoCaso: string; estadoCaso: string };
 export type Aceptacion = { idDenuncia: string; remision: Remision; reutilizada: boolean; pago: Pago };
 export type ConsultaPlantilla = { caso: { id: string; codigo: string; estado: string; usoPlaca?: string; placa?: string; regla?: string; descripcionHecho?: string | null } };
 
@@ -25,6 +27,13 @@ async function post<T>(path: string, body: object, signal?: AbortSignal): Promis
 export const consultarAceptacion = (token: string, signal?: AbortSignal) => post<ConsultaAceptacion>('aceptaciones/consulta', { token }, signal);
 export const aceptarDenuncia = (token: string, requestId: string) => post<Aceptacion>('aceptaciones', { token, requestId });
 export const consultarPlantilla = (token: string, signal?: AbortSignal) => post<ConsultaPlantilla>('defensas/consulta', { token }, signal);
+export async function leerEvidencia(token: string, codigoCaso: string, id: string, signal?: AbortSignal): Promise<Blob> {
+  const response = await fetch(`/api/vivi/denuncias/${encodeURIComponent(codigoCaso)}/evidencias/${encodeURIComponent(id)}`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ token }), cache: 'no-store', signal });
+  await comprobar(response);
+  const mime = response.headers.get('content-type')?.split(';')[0];
+  if (!mime || !['image/jpeg', 'image/png', 'image/gif', 'video/mp4', 'video/webm'].includes(mime)) throw new ViviApiError('Evidencia no disponible por ahora', 502);
+  return response.blob();
+}
 export async function descargarPlantilla(token: string): Promise<Blob> {
   const response = await fetch('/api/vivi/defensas/plantilla', { method: 'POST', headers: { 'Content-Type': 'application/json', Accept: 'application/pdf' }, body: JSON.stringify({ token }), cache: 'no-store' });
   await comprobar(response);

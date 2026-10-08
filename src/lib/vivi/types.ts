@@ -4,6 +4,7 @@ export type DefenseFile = {
     name: string,
     sourceUrl: string,
     size: string
+    mime?: string,
 }
 
 export type Case = {
@@ -12,6 +13,7 @@ export type Case = {
     place: string,
     title: string,
     placa: string,
+    evidenceError?: boolean,
     denuncia: {
         descripcion: string,
         evidencias: DefenseFile[]

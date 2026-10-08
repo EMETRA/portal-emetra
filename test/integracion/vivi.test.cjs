@@ -35,3 +35,10 @@ test('rechaza cruzar el token con un número de caso distinto antes de aceptar o
  assert.doesNotThrow(()=>enlaces.comprobarCasoReporte('QA-E0710C-PDF_P','QA-E0710C-PDF_P'));
  assert.throws(()=>enlaces.comprobarCasoReporte('QA-E0710C-PDF_P','QA-OTRO'),/no corresponde/);
 });
+test('evidencias privadas: token en POST, caso e ID en la ruta, MIME verificado',async()=>{
+ let llamada;global.fetch=async(url,init)=>{llamada={url,init};return new Response('bytes',{headers:{'Content-Type':'image/png'}});};
+ const blob=await api.leerEvidencia('token-privado','QA-CASO','19');
+ assert.equal(blob.type,'image/png');assert.equal(llamada.url,'/api/vivi/denuncias/QA-CASO/evidencias/19');assert.deepEqual(JSON.parse(llamada.init.body),{token:'token-privado'});assert.equal(llamada.init.cache,'no-store');
+ global.fetch=async()=>new Response('<svg/>',{headers:{'Content-Type':'image/svg+xml'}});
+ await assert.rejects(()=>api.leerEvidencia('token','QA-CASO','19'),/no disponible/);
+});

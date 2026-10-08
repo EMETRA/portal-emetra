@@ -96,7 +96,7 @@ export const DenunciaDetalleCard: React.FC <DenunciaDetalleCardProps> = ({
                     ) : denuncia && denuncia.denuncia.evidencias.length > 0 ? (
                         <div className={styles.evidenceList}>
                             {denuncia.denuncia.evidencias.map((evidencia) => (
-                                <img
+                                evidencia.mime?.startsWith('video/') ? <video key={evidencia.id} src={evidencia.sourceUrl} controls preload="metadata" className={styles.evidenceImage} aria-label={evidencia.name} /> : <img
                                     key={evidencia.id}
                                     src={evidencia.sourceUrl}
                                     alt={evidencia.name || "Evidencia de la denuncia"}
@@ -110,9 +110,9 @@ export const DenunciaDetalleCard: React.FC <DenunciaDetalleCardProps> = ({
                                 name="Image"
                                 className={styles.icon}
                             />
-                            No hay evidencias para mostrar
+                            {denuncia?.evidenceError ? 'Las evidencias no están disponibles por ahora' : 'No hay evidencias para mostrar'}
                             <Text>
-                                Por ahora este enlace no incluye fotos ni video de la denuncia.
+                                {denuncia?.evidenceError ? 'Puedes reintentar la consulta o revisar los adjuntos del correo recibido.' : 'Por ahora este enlace no incluye fotos ni video de la denuncia.'}
                             </Text>
                         </div>
                     )}

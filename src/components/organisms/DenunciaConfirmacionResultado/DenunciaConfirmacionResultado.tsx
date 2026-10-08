@@ -10,7 +10,10 @@ export const DenunciaConfirmacionResultado: React.FC<DenunciaConfirmacionResulta
     onContinuar,
     onReintentar,
     onVolver,
-    loading = false
+    loading = false,
+    pagoDisponible = false,
+    yaAceptada = false,
+    errorMessage
 }) => {
 
     if (status === "error") {
@@ -27,7 +30,7 @@ export const DenunciaConfirmacionResultado: React.FC<DenunciaConfirmacionResulta
                         </h2>
 
                         <p className={styles.description}>
-                            Ocurrió un problema al procesar tu solicitud.
+                            {errorMessage || 'Ocurrió un problema al procesar tu solicitud.'}
                             Puedes intentarlo de nuevo; tus datos siguen
                             en pantalla.
                         </p>
@@ -66,12 +69,11 @@ export const DenunciaConfirmacionResultado: React.FC<DenunciaConfirmacionResulta
 
                 <div className={styles.message}>
                     <h2 className={styles.title}>
-                        Tu aceptación fue registrada
+                        {yaAceptada ? 'Esta denuncia ya fue aceptada' : 'Tu aceptación fue registrada'}
                     </h2>
 
                     <p className={styles.description}>
-                        Ya puedes pagar tu remisión. Guarda el número
-                        para buscarla en el portal institucional.
+                        {pagoDisponible ? 'Ya puedes continuar al pago institucional. Guarda el número de remisión.' : 'La remisión fue emitida. El cobro está en preparación; guarda el número y vuelve a consultar más tarde.'}
                     </p>
                 </div>
 
@@ -114,7 +116,7 @@ export const DenunciaConfirmacionResultado: React.FC<DenunciaConfirmacionResulta
                     institucional.
                 </p>
 
-                <section className={styles.payment}>
+                {pagoDisponible && <section className={styles.payment}>
                     <h3 className={styles.paymentTitle}>
                         ¿Cómo pagar?
                     </h3>
@@ -132,16 +134,16 @@ export const DenunciaConfirmacionResultado: React.FC<DenunciaConfirmacionResulta
                             Realiza el pago y conserva tu comprobante.
                         </li>
                     </ol>
-                </section>
+                </section>}
 
                 <footer className={styles.footer}>
                     <button
                         type="button"
                         className={styles.primaryButton}
-                        onClick={onContinuar}
+                        onClick={pagoDisponible ? onContinuar : onReintentar}
                         disabled={loading}
                     >
-                        Continuar al portal institucional
+                        {pagoDisponible ? 'Continuar al portal institucional' : 'Consultar disponibilidad de pago'}
                     </button>
                 </footer>
             </div>

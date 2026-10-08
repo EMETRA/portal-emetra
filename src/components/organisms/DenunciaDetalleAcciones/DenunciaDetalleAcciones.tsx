@@ -5,13 +5,15 @@ import styles from "./DenunciaDetalleAcciones.module.scss";
 export const DenunciaDetalleAcciones: React.FC <DenunciaDetalleAccionesProps> = ({
     onAceptarPago,
     onPresentarDefensa,
-    loading
+    loading,
+    puedeAceptar = true,
+    puedeDefender = true
 }) => {
     return (
         <aside className={styles.card}>
             <header className={styles.header}>
                 <h2 className={styles.title}>
-                    ¿Que deseas hacer?
+                    ¿Qué deseas hacer?
                 </h2>
 
                 <p className={styles.description}>
@@ -24,7 +26,7 @@ export const DenunciaDetalleAcciones: React.FC <DenunciaDetalleAccionesProps> = 
                     type="button"
                     className={styles.primaryButton}
                     onClick={onAceptarPago}
-                    disabled={loading}
+                    disabled={loading || !puedeAceptar}
                 >
                     Aceptar y pagar
                 </button>
@@ -32,7 +34,7 @@ export const DenunciaDetalleAcciones: React.FC <DenunciaDetalleAccionesProps> = 
                     type="button"
                     className={styles.secondaryButton}
                     onClick={onPresentarDefensa}
-                    disabled={loading}
+                    disabled={loading || !puedeDefender}
                 >
                     Presentar defensa
                 </button>

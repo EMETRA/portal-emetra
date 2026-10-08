@@ -19,11 +19,11 @@ const nextConfig = {
     ],
   },
   async headers() {
-    return [{ source: '/vivi/correo/:path*', headers: [
+    return ['/vivi/correo/:path*', '/tramite-reporte/:path*'].map(source => ({ source, headers: [
       { key: 'Cache-Control', value: 'private, no-store' },
       { key: 'Referrer-Policy', value: 'no-referrer' },
       { key: 'X-Robots-Tag', value: 'noindex, nofollow, noarchive' },
-    ] }];
+    ] }));
   },
   webpack: (config) => {
     config.module.rules.push({

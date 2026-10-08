@@ -4,6 +4,7 @@ const path = require('node:path');
 const root=path.resolve(__dirname,'../..');
 const load=require('./load-ts.cjs')(root);
 const api=load('src/lib/vivi/acciones.ts');
+const enlaces=load('src/lib/vivi/enlace-reporte.ts');
 const originalFetch=global.fetch;
 test.afterEach(()=>{global.fetch=originalFetch;});
 test('consultar usa POST local con token en el cuerpo y nunca emite una aceptación',async()=>{
@@ -22,4 +23,15 @@ test('descarga únicamente bytes PDF desde el endpoint de plantilla',async()=>{
 });
 test('no inventa enlace de pago y rechaza protocolos ejecutables',()=>{
  assert.equal(api.urlPagoSeguro({estado:'PREPARANDO'}),null);assert.equal(api.urlPagoSeguro({estado:'DISPONIBLE',urlPago:'javascript:alert(1)'}),null);assert.equal(api.urlPagoSeguro({estado:'DISPONIBLE',urlPago:'https://pagos.example/30'}),'https://pagos.example/30');
+});
+test('ruta por número de caso lee los dos tokens privados del fragmento',()=>{
+ const aceptar='A'.repeat(43),refutar='R'.repeat(43);
+ assert.deepEqual(enlaces.leerEnlaceReporte(`#accion=refutar&aceptar=${aceptar}&refutar=${refutar}`),{accion:'refutar',aceptar,refutar});
+ assert.equal(enlaces.leerEnlaceReporte(''),null);
+ assert.equal(enlaces.leerEnlaceReporte(`#accion=aceptar&aceptar=${aceptar}&aceptar=${refutar}`),null);
+ assert.equal(enlaces.leerEnlaceReporte('#accion=aceptar&aceptar=javascript:alert(1)'),null);
+});
+test('rechaza cruzar el token con un número de caso distinto antes de aceptar o descargar',()=>{
+ assert.doesNotThrow(()=>enlaces.comprobarCasoReporte('QA-E0710C-PDF_P','QA-E0710C-PDF_P'));
+ assert.throws(()=>enlaces.comprobarCasoReporte('QA-E0710C-PDF_P','QA-OTRO'),/no corresponde/);
 });

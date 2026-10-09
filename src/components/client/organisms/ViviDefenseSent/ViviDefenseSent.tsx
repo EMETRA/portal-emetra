@@ -85,7 +85,7 @@ export default function ViviDefenseSent({ caseNumber, token, onVolver }: Defense
                     <Text variant="Medium" className={styles.nextStepsText}>Consulta la sede y el horario de atención vigentes del juzgado antes de presentarte.</Text>
                 </div>
                 <Text variant="Small">Este paso no registra una defensa ni confirma recepción en el juzgado. La presentación es presencial.</Text>
-                {onVolver && <Button variant="outline" onClick={onVolver}>Volver al resumen</Button>}
+                {onVolver && <Button variant="outline" className={styles.backButton} onClick={onVolver}>Volver al resumen</Button>}
             </CardGeneral>
         </div>
     )

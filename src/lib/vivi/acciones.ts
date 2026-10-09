@@ -1,6 +1,6 @@
-export type Remision = { ciudad: number; serie: string; numero: string; emitidaEn?: string };
+export type Remision = { ciudad: number; serie: string; numero: string; emitidaEn?: string; origen?: 'ACEPTACION' | 'JUZGADO' };
 export type Pago = { estado: "PREPARANDO" } | { estado: "DISPONIBLE"; urlPago: string };
-export type VistaDenuncia = { idDenuncia: string; codigoCaso: string; estado: string; usoPlaca?: string; placa?: string; regla?: number; capturadaEn?: string | null; latitud?: number | null; longitud?: number | null; descripcionHecho?: string | null };
+export type VistaDenuncia = { idDenuncia: string; codigoCaso: string; estado: string; usoPlaca?: string; placa?: string; regla?: number; capturadaEn?: string | null; latitud?: number | null; longitud?: number | null; descripcionHecho?: string | null; remision?: Remision | null };
 export type EvidenciaReporte = { idEvidencia: string; mime: string; capturadaEn?: string | null };
 export type ConsultaAceptacion =
   | { estadoEnlace: "VIGENTE"; estadoCaso: string; puedeAceptar: boolean; versionTexto: string;

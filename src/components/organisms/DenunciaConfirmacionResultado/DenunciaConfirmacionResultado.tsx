@@ -1,7 +1,6 @@
 import React from "react";
 import { DenunciaConfirmacionResultadoProps } from "./types";
 import styles from "./DenunciaConfirmacionResultado.module.scss";
-import { AlertBadge } from "@/components/molecules/AlertBadge";
 
 export const DenunciaConfirmacionResultado: React.FC<DenunciaConfirmacionResultadoProps> = ({
     status,
@@ -77,17 +76,15 @@ export const DenunciaConfirmacionResultado: React.FC<DenunciaConfirmacionResulta
                     </p>
                 </div>
 
-                <AlertBadge>
                     <div className={styles.remision}>
                         <span className={styles.remisionLabel}>
-                            Número de remisión:
+                            Número de remisión
                         </span>
 
                         <strong className={styles.remisionNumber}>
                             {numeroRemision}
                         </strong>
                     </div>
-                </AlertBadge>
 
                 <div className={styles.details}>
                     <div className={styles.detailItem}>
@@ -102,11 +99,11 @@ export const DenunciaConfirmacionResultado: React.FC<DenunciaConfirmacionResulta
 
                     <div className={styles.detailItem}>
                         <span className={styles.label}>
-                            Lugar
+                            Monto base
                         </span>
 
-                        <p className={styles.amount}>
-                            {denuncia.place}
+                        <p className={styles.value}>
+                            Por confirmar
                         </p>
                     </div>
                 </div>
@@ -118,7 +115,7 @@ export const DenunciaConfirmacionResultado: React.FC<DenunciaConfirmacionResulta
 
                 {pagoDisponible && <section className={styles.payment}>
                     <h3 className={styles.paymentTitle}>
-                        ¿Cómo pagar?
+                        Cómo pagar
                     </h3>
 
                     <ol className={styles.paymentList}>

@@ -1,30 +1,9 @@
-.main {
-    width: 100%;
-    padding: 36px max(24px, calc((100% - 1248px) / 2));
-    min-height: 75vh;
-    background-color: #F4F5FA;
-}
-
-.layout {
-    display: grid;
-    grid-template-columns: minmax(0, 2fr) minmax(280px, 1fr);
-    gap: 24px;
-    align-items: start;
-    margin-top: 18px;
-}
-
-.notice { margin-top: 24px; border: 1px solid #C9CCF5; background: #EEF0FF; color: #17256d; padding: 18px; border-radius: 8px; }
-.error { margin: 20px 0; color: #8C1D18; }
-
-.confirmContainer {
-    display: flex;
-    justify-content: center;
-    width: 100%;
-    margin-top: 18px;
-}
-
-@media (max-width: 900px) {
-    .layout {
-        grid-template-columns: 1fr;
-    }
-}
+@use '../../../theme/vivi' as *;
+.main { width: 100%; min-height: 85vh; padding: 36px max(24px, calc((100% - 1248px) / 2)); background: $vivi-background; color: $vivi-text; }
+.sectionTitle { margin: 24px 0 32px; h1 { color: $vivi-title; font-size: 32px; font-weight: 700; } }
+.layout { display: grid; grid-template-columns: minmax(0, 2fr) minmax(280px, 1fr); gap: 32px; align-items: start; margin-top: 32px; }
+.notice { margin-top: 24px; border: 1px solid $vivi-highlight-border; background: $vivi-highlight; color: $vivi-title; padding: 18px 20px; border-radius: 8px; font-size: 15px; line-height: 1.5; }
+.error { margin: 20px 0; color: #8c1d18; }
+.confirmContainer { display: flex; justify-content: center; width: 100%; margin-top: 32px; }
+@media (max-width: 900px) { .layout { grid-template-columns: 1fr; } }
+@media (max-width: 600px) { .main { padding: 24px 16px; } .sectionTitle h1 { font-size: 24px; white-space: normal; } .layout { gap: 20px; } }

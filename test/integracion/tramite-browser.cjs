@@ -21,6 +21,13 @@ async function probar() {
     const datos = texto ? JSON.parse(texto) : {};
     llamadas.push({ metodo: req.method, ruta: req.url, datos });
     const json = (valor, estado = 200) => { res.writeHead(estado, { 'Content-Type': 'application/json', 'Cache-Control': 'private, no-store' }); res.end(JSON.stringify(valor)); };
+    if (req.url.startsWith('/faq')) return json({ items: [{ id: 1, pregunta: '¿Cómo consultar mi reporte de prueba?', respuesta: 'Respuesta ficticia para verificar la carga del servicio.', estado: 'activo', idioma: 'es-GT' }], total: 1, page: 1, limit: 50 });
+    if (req.url.startsWith('/predice/eventos')) {
+      const hoy = new Date();
+      const fecha = `${String(hoy.getDate()).padStart(2, '0')}/${String(hoy.getMonth() + 1).padStart(2, '0')}/${hoy.getFullYear()}`;
+      return json([{ id: 1, title: 'Evento QA de carga', start: fecha, end: fecha, extendedProps: { status: 'ACTIVO', latitud: 14.6, longitud: -90.5 } }]);
+    }
+    if (req.url.startsWith('/routes')) return json({ items: [{ id: 1, name: 'Ruta QA de carga', state: 'Normal', time: 10, distance: 2, coordinates: [[14.6349, -90.5069], [14.639, -90.502]] }], total: 1 });
     if (req.url === '/vivi/aceptaciones/consulta' && datos.token === tokenError) return json(consultaFalla
       ? { message: ['Error Interno de Servidor'], referencia: referenciaError }
       : { estadoEnlace: 'VIGENTE', estadoCaso: 'NOTIFICADA', puedeAceptar: true, denuncia: { idDenuncia: '8010', codigoCaso: codigoError, estado: 'NOTIFICADA', usoPlaca: 'P', placa: '113BBB' }, evidencias: [] }, consultaFalla ? 500 : 200);
@@ -30,7 +37,7 @@ async function probar() {
       : { estadoEnlace: 'VIGENTE', estadoCaso: 'NOTIFICADA', puedeAceptar: true, denuncia: { idDenuncia: '8005', codigoCaso: codigoCaduca, estado: 'NOTIFICADA', usoPlaca: 'P', placa: '113BBB' }, evidencias: [] });
     if (req.url === '/vivi/aceptaciones/consulta' && datos.token === tokenDefensa) return json({ estadoEnlace: 'REVOCADO', codigoCaso: codigoDefensa, estadoCaso: 'DEFENSA_WEB' });
     const segundo = datos.token === aceptarPdf || datos.token === refutarPdf;
-    const denuncia = { idDenuncia: segundo ? '8002' : '8001', codigoCaso: segundo ? codigoPdf : codigo, estado: !segundo && aceptada ? 'REMISION_EMITIDA' : 'NOTIFICADA', usoPlaca: 'P', placa: '113BBB', descripcionHecho: 'Estacionamiento en lugar prohibido', capturadaEn: '2026-10-08T15:00:00Z', latitud: 14.6, longitud: -90.5, regla: 39 };
+    const denuncia = { idDenuncia: segundo ? '8002' : '8001', codigoCaso: segundo ? codigoPdf : codigo, estado: !segundo && aceptada ? 'REMISION_EMITIDA' : 'NOTIFICADA', usoPlaca: 'P', placa: '113BBB', descripcionHecho: 'Estacionamiento en lugar prohibido', capturadaEn: '2026-10-08T15:00:00Z', latitud: 14.6, longitud: -90.5, regla: 39, montoBase: 250 };
     if (req.url === '/vivi/aceptaciones/consulta') return json(!segundo && aceptada ? { estadoEnlace: 'USADO', codigoCaso: codigo, denuncia, estadoCaso: 'REMISION_EMITIDA', remision: { ciudad: 1, serie: 'V', numero: '90' }, pago: pagoDisponible ? { estado: 'DISPONIBLE', urlPago: 'https://pagos.example/90' } : { estado: 'PREPARANDO' } } : { estadoEnlace: 'VIGENTE', estadoCaso: 'NOTIFICADA', puedeAceptar: true, denuncia, evidencias: [] });
     if (req.url === '/vivi/aceptaciones') {
       await new Promise(resolve => setTimeout(resolve, 700));
@@ -39,7 +46,7 @@ async function probar() {
     }
     if (req.url === '/vivi/defensas/consulta') {
       if (datos.token === refutar && aceptada) return json({ message: ['Este enlace ya está revocado'] }, 410);
-      return json({ caso: { id: denuncia.idDenuncia, codigo: denuncia.codigoCaso, estado: 'NOTIFICADA', usoPlaca: 'P', placa: '113BBB', descripcionHecho: denuncia.descripcionHecho } });
+      return json({ caso: { id: denuncia.idDenuncia, codigo: denuncia.codigoCaso, estado: 'NOTIFICADA', usoPlaca: 'P', placa: '113BBB', descripcionHecho: denuncia.descripcionHecho, montoBase: denuncia.montoBase, latitud: denuncia.latitud, longitud: denuncia.longitud, capturadaEn: denuncia.capturadaEn } });
     }
     if (req.url === '/vivi/defensas/plantilla') {
       await new Promise(resolve => setTimeout(resolve, 700));
@@ -72,12 +79,25 @@ async function probar() {
     };
     const fragmento = `#accion=aceptar&aceptar=${aceptar}&refutar=${refutar}`;
     const abrir = `http://127.0.0.1:3731/tramite-reporte/${codigo}${fragmento}`;
+    await page.goto('http://127.0.0.1:3731/');
+    await page.getByText('¿Cómo consultar mi reporte de prueba?', { exact: true }).waitFor();
+    await page.goto('http://127.0.0.1:3731/predice');
+    await page.getByRole('link', { name: 'Evento QA de carga', exact: true }).waitFor();
+    await page.goto('http://127.0.0.1:3731/desplazamiento');
+    await page.locator('path.leaflet-interactive').first().waitFor();
+    await page.locator('.leaflet-control-attribution').getByRole('link', { name: 'OpenStreetMap', exact: true }).waitFor();
+    for (const ruta of ['/faq', '/predice/eventos', '/routes']) assert.ok(llamadas.some(l => l.ruta.startsWith(ruta)), `La pantalla no consultó ${ruta}`);
     const response = await page.goto(abrir);
     await page.getByText(codigo, { exact: true }).waitFor();
     assert.match(response.headers()['referrer-policy'], /no-referrer/);
     assert.match(response.headers()['x-robots-tag'], /noindex/);
     assert.equal(llamadas.filter(l => l.ruta === '/vivi/aceptaciones').length, 0);
     await page.getByRole('button', { name: 'Aceptar y pagar', exact: true }).waitFor();
+    await page.getByText('Q 250.00', { exact: true }).waitFor();
+    const enlaceMapa = page.getByRole('link', { name: 'Ver ubicación en OpenStreetMap' });
+    assert.equal(await enlaceMapa.getAttribute('href'), 'https://www.openstreetmap.org/?mlat=14.6&mlon=-90.5#map=18/14.6/-90.5');
+    assert.equal(await enlaceMapa.getAttribute('rel'), 'noopener noreferrer');
+    assert.equal(await enlaceMapa.getAttribute('referrerpolicy'), 'no-referrer');
     await capturar({ path: path.join(out, 'portal-resumen.png'), fullPage: true });
     const left = await page.getByRole('heading', { name: 'Resumen de la denuncia' }).boundingBox();
     const right = await page.getByRole('heading', { name: '¿Qué deseas hacer?' }).boundingBox();
@@ -92,6 +112,7 @@ async function probar() {
     await otraPestana.getByRole('heading', { name: 'Confirma tu aceptación' }).waitFor();
     await page.getByRole('button', { name: 'Aceptar y pagar', exact: true }).click();
     await page.getByRole('heading', { name: 'Confirma tu aceptación' }).waitFor();
+    await page.getByText('Q 250.00', { exact: true }).waitFor();
     assert.equal(llamadas.filter(l => l.ruta === '/vivi/aceptaciones').length, 0);
     await page.bringToFront();
     await capturar({ path: path.join(out, 'portal-confirmacion.png'), fullPage: true });
@@ -103,6 +124,7 @@ async function probar() {
     fallaInstitucional = false;
     await page.getByRole('button', { name: 'Reintentar', exact: true }).click();
     await page.getByRole('heading', { name: 'Tu aceptación fue registrada' }).waitFor();
+    await page.getByText('Q 250.00', { exact: true }).waitFor();
     const escrituras = llamadas.filter(l => l.ruta === '/vivi/aceptaciones');
     assert.deepEqual(escrituras[0].datos, escrituras[1].datos);
     assert.equal(await page.getByRole('button', { name: 'Continuar al portal institucional' }).count(), 0);
@@ -115,6 +137,8 @@ async function probar() {
     await otraPestana.close();
     await page.reload();
     await page.getByRole('heading', { name: 'Esta denuncia ya fue aceptada' }).waitFor();
+    await page.getByText('Q 250.00', { exact: true }).waitFor();
+    await page.getByRole('link', { name: 'Ver ubicación en OpenStreetMap' }).waitFor();
     assert.equal(llamadas.filter(l => l.ruta === '/vivi/aceptaciones').length, 2);
     assert.equal(await page.getByRole('button', { name: 'Aceptar y pagar', exact: true }).count(), 0);
     await capturar({ path: path.join(out, 'portal-ya-aceptado.png'), fullPage: true });
@@ -151,6 +175,12 @@ async function probar() {
     await capturar({ path: path.join(out, 'portal-pdf-descargado.png'), fullPage: true });
     assert.equal(llamadas.filter(l => l.ruta === '/vivi/defensas').length, 0);
     assert.equal(llamadas.find(l => l.ruta === '/vivi/defensas/plantilla').datos.token, refutarPdf);
+    const consultasAceptacionAntes = llamadas.filter(l => l.ruta === '/vivi/aceptaciones/consulta').length;
+    await page.goto(`http://127.0.0.1:3731/tramite-reporte/${codigoPdf}#accion=refutar&refutar=${refutarPdf}`);
+    await page.getByText('Q 250.00', { exact: true }).waitFor();
+    await page.getByRole('link', { name: 'Ver ubicación en OpenStreetMap' }).waitFor();
+    assert.equal(await page.getByRole('button', { name: 'Aceptar y pagar', exact: true }).isDisabled(), true);
+    assert.equal(llamadas.filter(l => l.ruta === '/vivi/aceptaciones/consulta').length, consultasAceptacionAntes, 'Un enlace solo REFUTAR consultó ACEPTAR');
     await page.goto(`http://127.0.0.1:3731/tramite-reporte/OTRO-CASO/defensa${fragmentoPdf}`);
     await page.getByRole('alert').filter({ hasText: 'no corresponde' }).waitFor();
     assert.equal(await page.getByRole('button', { name: 'Descargar PDF' }).count(), 0);
@@ -192,7 +222,7 @@ async function probar() {
     await page.goto(`http://127.0.0.1:3731/tramite-reporte/${codigo}`);
     await page.getByText('abre el enlace privado del correo recibido', { exact: false }).waitFor();
     assert.equal(llamadas.slice(previas).filter(l => l.ruta.startsWith('/vivi/')).length, 0);
-    console.log('OK | Resumen, confirmación, dos pestañas, doble clic, 503/reintento, recarga sin otra aceptación, Ya aceptado, pago PREPARANDO/DISPONIBLE, enlace vencido/revocado, caducidad durante confirmación, defensa registrada, PDF/reintento y caso cruzado. Backend controlado; sin Oracle ni SMTP.');
+    console.log('OK | FAQ, Predice y desplazamiento; monto y mapa; resumen, confirmación, dos pestañas, doble clic, 503/reintento, recarga sin otra aceptación, Ya aceptado, pago PREPARANDO/DISPONIBLE, enlace vencido/revocado, defensa, PDF/reintento y caso cruzado. Backend controlado; sin Oracle ni SMTP.');
   } catch (error) {
     console.error('Diagnóstico del navegador:', JSON.stringify({ rutas: llamadas.map(l => l.ruta), texto: page ? await page.locator('body').innerText() : salida }));
     throw error;

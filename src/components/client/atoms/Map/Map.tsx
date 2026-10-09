@@ -99,7 +99,7 @@ export default function Map({ events = [] }: MapProps) {
         >
           <TileLayer
             attribution='&copy; <a href="https://osm.org/copyright">OpenStreetMap</a> contributors'
-            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+            url="https://tile.openstreetmap.org/{z}/{x}/{y}.png"
           />
           <Marker position={position} icon={personaIcon}>
             <Popup>Tu ubicación actual</Popup>

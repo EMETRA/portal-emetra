@@ -14,6 +14,7 @@ import ErrorConsulta from './ErrorConsulta';
 import { leerEnlaceReporte, comprobarCasoReporte, type EnlaceReporte } from '@/lib/vivi/enlace-reporte';
 import { aceptarDenuncia, consultarAceptacion, consultarPlantilla, crearRequestId, leerEvidencia, urlPagoSeguro, ViviApiError, type Aceptacion, type ConsultaAceptacion, type ConsultaPlantilla } from '@/lib/vivi/acciones';
 import type { Case, DefenseFile } from '@/lib/vivi/types';
+import { coordenadasValidas } from '@/lib/vivi/presentacion';
 import styles from '@/app/tramite-reporte/[id]/Page.module.scss';
 
 type Vista = 'resumen' | 'confirmacion' | 'procesando' | 'resultado' | 'error';
@@ -87,7 +88,10 @@ function FlujoReporte({ codigoCaso, enlace, defensa }: { codigoCaso: string; enl
       if (!aceptacion && !pdf) throw falloConsulta || new Error('El enlace venció o ya no permite consultar este reporte. Abre de nuevo el correo recibido.');
       const datos = aceptacion && (aceptacion.estadoEnlace === 'VIGENTE' || aceptacion.estadoEnlace === 'USADO') ? aceptacion.denuncia : undefined;
       const placa = [datos?.usoPlaca ?? pdf?.caso.usoPlaca, datos?.placa ?? pdf?.caso.placa].filter(Boolean).join('-') || 'No disponible';
-      const fecha = datos?.capturadaEn ? new Date(datos.capturadaEn) : null;
+      const capturadaEn = datos?.capturadaEn ?? pdf?.caso.capturadaEn;
+      const fecha = capturadaEn ? new Date(capturadaEn) : null;
+      const latitud = datos?.latitud ?? pdf?.caso.latitud;
+      const longitud = datos?.longitud ?? pdf?.caso.longitud;
       const evidencias: DefenseFile[] = [];
       let evidenceError = false;
       if (aceptacion?.estadoEnlace === 'VIGENTE' && enlace.aceptar) {
@@ -102,7 +106,7 @@ function FlujoReporte({ codigoCaso, enlace, defensa }: { codigoCaso: string; enl
       }
       if (abort.signal.aborted) return;
       setConsulta(aceptacion); setPlantilla(pdf);
-      setCaso({ caseNumber: codigoCaso, placa, caseDate: fecha && !Number.isNaN(fecha.getTime()) ? fecha.toLocaleString('es-GT', { timeZone: 'America/Guatemala' }) : 'No disponible', place: datos?.latitud != null && datos?.longitud != null ? `Coordenadas: ${datos.latitud}, ${datos.longitud}` : 'No disponible', title: 'Denuncia de tránsito', evidenceError, denuncia: { descripcion: datos?.descripcionHecho || pdf?.caso.descripcionHecho || `Regla ${datos?.regla ?? pdf?.caso.regla ?? 'no disponible'}`, evidencias } });
+      setCaso({ caseNumber: codigoCaso, placa, caseDate: fecha && !Number.isNaN(fecha.getTime()) ? fecha.toLocaleString('es-GT', { timeZone: 'America/Guatemala' }) : 'No disponible', place: coordenadasValidas(latitud, longitud) ? `Coordenadas: ${latitud}, ${longitud}` : 'No disponible', latitud, longitud, montoBase: datos?.montoBase ?? pdf?.caso.montoBase, title: 'Denuncia de tránsito', evidenceError, denuncia: { descripcion: datos?.descripcionHecho || pdf?.caso.descripcionHecho || `Regla ${datos?.regla ?? pdf?.caso.regla ?? 'no disponible'}`, evidencias } });
       if (aceptacion?.estadoEnlace === 'USADO') {
         if (!aceptacion.remision) throw new Error('El caso está aceptado, pero la remisión no está disponible para consulta.');
         setResultado({ idDenuncia: datos?.idDenuncia || '', remision: aceptacion.remision, reutilizada: true, pago: aceptacion.pago || { estado: 'PREPARANDO' } }); setVista('resultado');
@@ -169,7 +173,7 @@ function FlujoReporte({ codigoCaso, enlace, defensa }: { codigoCaso: string; enl
   const volver = () => router.push(`/tramite-reporte/${encodeURIComponent(codigoCaso)}${window.location.hash}`);
   if (cerrado && !cargando) return <main className={styles.main}><EstadoEnlace tipo={cerrado} /></main>;
   if (!cargando && error && !caso) return <main className={styles.main}><ErrorConsulta mensaje={error} referencia={referenciaConsulta} onReintentar={reconsultar} /></main>;
-  if (!cargando && !error && caso && resultado?.reutilizada && vista === 'resultado') return <main className={styles.main}><EstadoEnlace tipo="aceptado" numeroRemision={`${resultado.remision.ciudad}-${resultado.remision.serie}-${resultado.remision.numero}`} placa={caso.placa} pagoUrl={urlPagoSeguro(resultado.pago)} onConsultar={reconsultar} /></main>;
+  if (!cargando && !error && caso && resultado?.reutilizada && vista === 'resultado') return <main className={styles.main}><EstadoEnlace tipo="aceptado" numeroRemision={`${resultado.remision.ciudad}-${resultado.remision.serie}-${resultado.remision.numero}`} placa={caso.placa} montoBase={caso.montoBase} lugar={caso.place} latitud={caso.latitud} longitud={caso.longitud} pagoUrl={urlPagoSeguro(resultado.pago)} onConsultar={reconsultar} /></main>;
   if (defensa && plantilla && !cargando && !error) return <main className={styles.main}><ViviDefenseSent caseNumber={codigoCaso} token={enlace.refutar || undefined} onVolver={volver} /></main>;
   const titulo = vista === 'confirmacion' ? 'Confirma tu aceptación' : 'Denuncia de tránsito';
   return <main className={styles.main}>

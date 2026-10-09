@@ -9,6 +9,7 @@
 .details { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px; margin-block: 32px 24px; padding: 20px; background: $vivi-highlight; border: 1px solid $vivi-highlight-border; border-radius: 8px; color: $vivi-title; }
 .label { display: block; margin-bottom: 6px; font-size: 13px; font-weight: 600; }
 .value { font-size: 20px; font-weight: 700; overflow-wrap: anywhere; }
+.locationDetail { min-width: 0; }
 .actions { display: flex; flex-direction: column; gap: 12px; margin-top: 24px; }
 .primary { @include button; width: 100%; }
 .secondary { @include button(true); width: 100%; }
@@ -17,4 +18,5 @@
   .card { padding: 32px 20px; }
   .title { font-size: 24px; }
   .details { gap: 16px; padding: 16px; }
+  .locationDetail { grid-column: 1 / -1; }
 }

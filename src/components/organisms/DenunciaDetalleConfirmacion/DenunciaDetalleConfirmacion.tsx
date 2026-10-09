@@ -53,10 +53,15 @@ export const DenunciaDetalleConfirmacion: React.FC<DenunciaDetalleConfirmacionPr
                     </div>
 
                     <div className={styles.fullDetail}>
+                        <span className={styles.label}>Monto base</span>
+                        <p className={styles.value}>Por confirmar en el portal institucional</p>
+                    </div>
+
+                    <div className={styles.fullDetail}>
                         <span className={styles.label}>
                             Lugar
                         </span>
-                        <p className={styles.amount}>
+                        <p className={styles.value}>
                             {denuncia.place}
                         </p>
                     </div>
@@ -64,10 +69,10 @@ export const DenunciaDetalleConfirmacion: React.FC<DenunciaDetalleConfirmacionPr
 
                 <section className={styles.nextSteps}>
                     <h3 className={styles.stepsTitle}>
-                        ¿Qué sucede después?
+                        Qué sucede después
                     </h3>
 
-                    <ul className={styles.stepList}>
+                    <ul className={styles.stepsList}>
                         <li>Se genera tu número de remisión.</li>
                         <li>Recibes las instrucciones de pago.</li>
                         <li>Continúas al portal institucional para iniciar sesión y pagar.</li>

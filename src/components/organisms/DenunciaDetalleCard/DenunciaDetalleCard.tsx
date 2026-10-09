@@ -1,7 +1,6 @@
 import React from "react";
 import { DenunciaDetalleCardProps } from "./types";
 import styles from "./DenunciaDetalleCard.module.scss";
-import { AlertBadge } from "@/components/molecules/AlertBadge";
 import { Text } from "@/components/atoms";
 import { Skeleton } from "@/components/atoms/Skeleton";
 import { Icon } from "@/components/server/atoms";
@@ -13,10 +12,11 @@ export const DenunciaDetalleCard: React.FC <DenunciaDetalleCardProps> = ({
 
     const datos = denuncia
         ? [
-            { label: "Numero de denuncia", value: denuncia.caseNumber },
+            { label: "Número de denuncia", value: denuncia.caseNumber },
             { label: "Placa", value: denuncia.placa },
             { label: "Hecho denunciado", value: denuncia.denuncia.descripcion },
             { label: "Fecha y hora", value: denuncia.caseDate },
+            { label: "Lugar", value: denuncia.place },
         ]
         : [];
 
@@ -32,7 +32,7 @@ export const DenunciaDetalleCard: React.FC <DenunciaDetalleCardProps> = ({
                 {loading ? (
                     <div className={styles.details}>
                         {Array.from({ length: 4 }).map((_, index) => (
-                            <div className={styles.detalleItem} key={index}>
+                            <div className={styles.detailItem} key={index}>
                                 <Skeleton width="65%" height="14px" />
                                 <Skeleton width={index === 2 ? "90%" : "75%"} height="20px"/>
                             </div>
@@ -41,7 +41,7 @@ export const DenunciaDetalleCard: React.FC <DenunciaDetalleCardProps> = ({
                 ) : (
                     <div className={styles.details}>
                         {datos.map((dato) => (
-                            <div className={styles.detalleItem} key={dato.label}>
+                            <div className={styles.detailItem} key={dato.label}>
                                 <span className={styles.label}>
                                     {dato.label}
                                 </span>
@@ -54,32 +54,24 @@ export const DenunciaDetalleCard: React.FC <DenunciaDetalleCardProps> = ({
                     </div>
                 )}
 
-                <AlertBadge>
                     <div className={styles.amountContainer}>
                         <div className={styles.amountDescription}>
-                            <Text className={styles.amountTitle}>
-                                Lugar
-                            </Text>
-                            <Text>
-                                Donde ocurrió el hecho
-                            </Text>
+                            <span className={styles.amountTitle}>Monto base</span>
+                            <p>Se confirma en el portal institucional</p>
                         </div>
                         {loading || !denuncia ? (
                             <div className={styles.amount}>
                                 <Skeleton width="120px" height="34px"/>
                             </div>
                         ): (
-                            <Text className={styles.amount}>
-                                {denuncia.place}
-                            </Text>
+                            <span className={styles.amount}>Por confirmar</span>
                         )}
                         
                     </div>
-                </AlertBadge>
 
                 <section className={styles.evidence}>
                     <h3 className={styles.evidenceTitle}>
-                        Evidencias
+                        Evidencias permitidas
                     </h3>
 
                     {loading ? (

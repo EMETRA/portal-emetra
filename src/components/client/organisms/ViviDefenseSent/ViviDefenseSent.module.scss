@@ -1,13 +1,25 @@
-@use "../../../../theme/colors.scss" as *;
+@use "../../../../theme/vivi" as *;
 
 .mainContainer {
     width: 100%;
     height: 100%;
     display: flex;
     flex-direction: column;
-    gap: 1rem;
+    gap: 24px;
     background-color: #F4F5FA;
-    padding: 1rem 2rem;
+    padding: 0;
+
+    .infoCard, .pdfCard, .nextSetpsCard {
+        @include card;
+        padding: 32px;
+        box-shadow: none;
+    }
+    .title { color: $vivi-primary; font-size: 28px; font-weight: 700; line-height: 1.3; }
+    .pdfCardTitle, .nextStepsCardTitle { color: $vivi-text; font-size: 22px; font-weight: 700; }
+    .caseNumber { font-size: 28px; font-weight: 700; overflow-wrap: anywhere; }
+    .description, .nextStepsText { color: $vivi-muted; font-size: 15px; line-height: 1.5; }
+    .downloadButton { @include button; }
+    .backButton { @include button(true); width: 100%; }
 
     .nextStepsText, .pdfCardTitle, .nextStepsCardTitle {
         text-align: left;
@@ -50,7 +62,7 @@
 }
 
 .title, .caseNumberLabel, .caseNumber {
-    color: $azul-1;
+    color: $vivi-title;
 }
 
 .loadingPdf, .errorPdf {
@@ -109,7 +121,7 @@
     .mainContainer {
         display: grid;
         grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-        gap: 1rem;
+        gap: 24px;
         align-items: start;
         margin-inline: auto;
 
@@ -129,5 +141,12 @@
             grid-column: 2;
             grid-row: 2;
         }
+    }
+}
+
+@media (max-width: 600px) {
+    .mainContainer {
+        .infoCard, .pdfCard, .nextSetpsCard { padding: 24px 20px; }
+        .title, .caseNumber { font-size: 24px; }
     }
 }

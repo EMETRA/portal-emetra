@@ -11,13 +11,15 @@ export type Aceptacion = { idDenuncia: string; remision: Remision; reutilizada: 
 export type ConsultaPlantilla = { caso: { id: string; codigo: string; estado: string; usoPlaca?: string; placa?: string; regla?: string; descripcionHecho?: string | null } };
 
 export class ViviApiError extends Error {
-  constructor(message: string, public readonly status: number, public readonly codigo?: string) { super(message); this.name = "ViviApiError"; }
+  constructor(message: string, public readonly status: number, public readonly codigo?: string, public readonly referencia?: string) { super(message); this.name = "ViviApiError"; }
 }
 async function comprobar(response: Response): Promise<void> {
   if (response.ok) return;
   const body = await response.json().catch(() => ({}));
   const message = Array.isArray(body.message) ? body.message.filter((m: unknown) => typeof m === 'string').join(' ') : body.message;
-  throw new ViviApiError(typeof message === 'string' && message ? message : "No se pudo completar la solicitud. Intenta de nuevo.", response.status, body.codigo);
+  const candidata = body.referencia || response.headers.get('x-request-id');
+  const referencia = typeof candidata === 'string' && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(candidata) ? candidata : undefined;
+  throw new ViviApiError(typeof message === 'string' && message ? message : "No se pudo completar la solicitud. Intenta de nuevo.", response.status, body.codigo, referencia);
 }
 async function post<T>(path: string, body: object, signal?: AbortSignal): Promise<T> {
   const response = await fetch(`/api/vivi/${path}`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body), cache: 'no-store', signal });

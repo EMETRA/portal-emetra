@@ -1,6 +1,6 @@
 export type Remision = { ciudad: number; serie: string; numero: string; emitidaEn?: string; origen?: 'ACEPTACION' | 'JUZGADO' };
 export type Pago = { estado: "PREPARANDO" } | { estado: "DISPONIBLE"; urlPago: string };
-export type VistaDenuncia = { idDenuncia: string; codigoCaso: string; estado: string; usoPlaca?: string; placa?: string; regla?: number; capturadaEn?: string | null; latitud?: number | null; longitud?: number | null; descripcionHecho?: string | null; remision?: Remision | null };
+export type VistaDenuncia = { idDenuncia: string; codigoCaso: string; estado: string; usoPlaca?: string; placa?: string; regla?: number; capturadaEn?: string | null; latitud?: number | null; longitud?: number | null; descripcionHecho?: string | null; montoBase?: number | null; remision?: Remision | null };
 export type EvidenciaReporte = { idEvidencia: string; mime: string; capturadaEn?: string | null };
 export type ConsultaAceptacion =
   | { estadoEnlace: "VIGENTE"; estadoCaso: string; puedeAceptar: boolean; versionTexto: string;
@@ -8,7 +8,7 @@ export type ConsultaAceptacion =
   | { estadoEnlace: "USADO"; codigoCaso: string; denuncia?: VistaDenuncia; estadoCaso: string; remision: Remision | null; pago: Pago | null }
   | { estadoEnlace: "VENCIDO" | "REVOCADO"; codigoCaso: string; estadoCaso: string };
 export type Aceptacion = { idDenuncia: string; remision: Remision; reutilizada: boolean; pago: Pago };
-export type ConsultaPlantilla = { caso: { id: string; codigo: string; estado: string; usoPlaca?: string; placa?: string; regla?: string; descripcionHecho?: string | null } };
+export type ConsultaPlantilla = { caso: { id: string; codigo: string; estado: string; usoPlaca?: string; placa?: string; regla?: string; descripcionHecho?: string | null; montoBase?: number | null; capturadaEn?: string | null; latitud?: number | null; longitud?: number | null } };
 
 export class ViviApiError extends Error {
   constructor(message: string, public readonly status: number, public readonly codigo?: string, public readonly referencia?: string) { super(message); this.name = "ViviApiError"; }

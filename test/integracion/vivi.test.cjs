@@ -5,8 +5,24 @@ const root=path.resolve(__dirname,'../..');
 const load=require('./load-ts.cjs')(root);
 const api=load('src/lib/vivi/acciones.ts');
 const enlaces=load('src/lib/vivi/enlace-reporte.ts');
+const presentacion=load('src/lib/vivi/presentacion.ts');
 const originalFetch=global.fetch;
 test.afterEach(()=>{global.fetch=originalFetch;});
+test('ubicación muestra el punto correcto y descarta coordenadas ausentes o fuera de rango',()=>{
+ const url=new URL(presentacion.urlUbicacion(14.634915,-90.506882));
+ assert.equal(url.origin,'https://www.openstreetmap.org');
+ assert.equal(url.searchParams.get('mlat'),'14.634915');
+ assert.equal(url.searchParams.get('mlon'),'-90.506882');
+ assert.equal(url.hash,'#map=18/14.634915/-90.506882');
+ assert.ok(presentacion.urlUbicacion(0,0));
+ for(const [lat,lon] of [[null,null],[undefined,undefined],[91,0],[0,-181],[NaN,0],['14.6',-90.5]])assert.equal(presentacion.urlUbicacion(lat,lon),null);
+});
+test('monto base distingue cero de desconocido y se presenta en quetzales',()=>{
+ assert.equal(presentacion.formatoMontoBase(250),'Q 250.00');
+ assert.equal(presentacion.formatoMontoBase(0),'Q 0.00');
+ assert.equal(presentacion.formatoMontoBase(125.5),'Q 125.50');
+ for(const valor of [undefined,null,-1,NaN,Infinity,'250'])assert.equal(presentacion.formatoMontoBase(valor),'Por confirmar');
+});
 test('consultar usa POST local con token en el cuerpo y nunca emite una aceptación',async()=>{
  const calls=[];global.fetch=async(url,init)=>{calls.push({url,init});return Response.json({estadoEnlace:'VIGENTE'});};
  await api.consultarAceptacion('token-qa');assert.equal(calls.length,1);assert.equal(calls[0].url,'/api/vivi/aceptaciones/consulta');assert.equal(calls[0].init.method,'POST');assert.deepEqual(JSON.parse(calls[0].init.body),{token:'token-qa'});assert.equal(calls[0].init.cache,'no-store');

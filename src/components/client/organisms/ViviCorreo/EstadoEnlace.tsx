@@ -1,10 +1,16 @@
 import Link from 'next/link';
 import styles from './EstadoEnlace.module.scss';
+import { formatoMontoBase } from '@/lib/vivi/presentacion';
+import LugarDenuncia from '@/components/molecules/LugarDenuncia/LugarDenuncia';
 
-export default function EstadoEnlace({ tipo, numeroRemision, placa, pagoUrl, onConsultar, cargando = false }: {
+export default function EstadoEnlace({ tipo, numeroRemision, placa, montoBase, lugar, latitud, longitud, pagoUrl, onConsultar, cargando = false }: {
   tipo: 'aceptado' | 'vencido' | 'revocado' | 'defensa' | 'juzgado';
   numeroRemision?: string;
   placa?: string;
+  montoBase?: number | null;
+  lugar?: string;
+  latitud?: number | null;
+  longitud?: number | null;
   pagoUrl?: string | null;
   onConsultar?: () => void;
   cargando?: boolean;
@@ -27,7 +33,10 @@ export default function EstadoEnlace({ tipo, numeroRemision, placa, pagoUrl, onC
       {aceptado && <div className={styles.details}>
         <div><span className={styles.label}>Número de remisión</span><strong className={styles.value}>{numeroRemision || 'No disponible'}</strong></div>
         <div><span className={styles.label}>Placa</span><strong className={styles.value}>{placa || 'No disponible'}</strong></div>
+        <div><span className={styles.label}>Monto base</span><strong className={styles.value}>{formatoMontoBase(montoBase)}</strong></div>
+        {lugar && <div className={styles.locationDetail}><span className={styles.label}>Lugar</span><LugarDenuncia lugar={lugar} latitud={latitud} longitud={longitud} /></div>}
       </div>}
+      {aceptado && <p className={styles.description}>El importe final se confirma en el portal de pago institucional.</p>}
       <div className={styles.actions}>
         {aceptado && (pagoUrl ? <a className={styles.primary} href={pagoUrl} rel="noreferrer">Continuar al portal institucional</a>
           : <button className={styles.primary} onClick={onConsultar} disabled={cargando || !onConsultar}>{cargando ? 'Consultando…' : 'Consultar disponibilidad de pago'}</button>)}

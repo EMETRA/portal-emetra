@@ -4,6 +4,8 @@ import styles from "./DenunciaDetalleCard.module.scss";
 import { Text } from "@/components/atoms";
 import { Skeleton } from "@/components/atoms/Skeleton";
 import { Icon } from "@/components/server/atoms";
+import LugarDenuncia from '@/components/molecules/LugarDenuncia/LugarDenuncia';
+import { formatoMontoBase } from '@/lib/vivi/presentacion';
 
 export const DenunciaDetalleCard: React.FC <DenunciaDetalleCardProps> = ({
     denuncia,
@@ -16,7 +18,7 @@ export const DenunciaDetalleCard: React.FC <DenunciaDetalleCardProps> = ({
             { label: "Placa", value: denuncia.placa },
             { label: "Hecho denunciado", value: denuncia.denuncia.descripcion },
             { label: "Fecha y hora", value: denuncia.caseDate },
-            { label: "Lugar", value: denuncia.place },
+            { label: "Lugar", value: <LugarDenuncia lugar={denuncia.place} latitud={denuncia.latitud} longitud={denuncia.longitud} /> },
         ]
         : [];
 
@@ -57,14 +59,14 @@ export const DenunciaDetalleCard: React.FC <DenunciaDetalleCardProps> = ({
                     <div className={styles.amountContainer}>
                         <div className={styles.amountDescription}>
                             <span className={styles.amountTitle}>Monto base</span>
-                            <p>Se confirma en el portal institucional</p>
+                            <p>El importe final se confirma al pagar</p>
                         </div>
                         {loading || !denuncia ? (
                             <div className={styles.amount}>
                                 <Skeleton width="120px" height="34px"/>
                             </div>
                         ): (
-                            <span className={styles.amount}>Por confirmar</span>
+                            <span className={styles.amount}>{formatoMontoBase(denuncia.montoBase)}</span>
                         )}
                         
                     </div>

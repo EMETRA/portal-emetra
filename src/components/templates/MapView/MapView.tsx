@@ -71,7 +71,10 @@ export default function MapView({ routes }: MapViewProps) {
         zoom={12}
         style={{ height: "100%", width: "100%" }}
       >
-        <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
+        <TileLayer
+          url="https://tile.openstreetmap.org/{z}/{x}/{y}.png"
+          attribution={'&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'}
+        />
         {routes.map((r) => (
           <RouteLine
             key={r.id}

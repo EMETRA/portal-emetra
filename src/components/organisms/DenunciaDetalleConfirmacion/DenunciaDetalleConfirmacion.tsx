@@ -1,6 +1,8 @@
 import React from "react";
 import { DenunciaDetalleConfirmacionProps } from "./types";
 import styles from "./DenunciaDetalleConfirmacion.module.scss";
+import LugarDenuncia from '@/components/molecules/LugarDenuncia/LugarDenuncia';
+import { formatoMontoBase } from '@/lib/vivi/presentacion';
 
 export const DenunciaDetalleConfirmacion: React.FC<DenunciaDetalleConfirmacionProps> = ({
     denuncia,
@@ -54,7 +56,7 @@ export const DenunciaDetalleConfirmacion: React.FC<DenunciaDetalleConfirmacionPr
 
                     <div className={styles.fullDetail}>
                         <span className={styles.label}>Monto base</span>
-                        <p className={styles.value}>Por confirmar en el portal institucional</p>
+                        <p className={styles.value}>{formatoMontoBase(denuncia.montoBase)}</p>
                     </div>
 
                     <div className={styles.fullDetail}>
@@ -62,7 +64,7 @@ export const DenunciaDetalleConfirmacion: React.FC<DenunciaDetalleConfirmacionPr
                             Lugar
                         </span>
                         <p className={styles.value}>
-                            {denuncia.place}
+                            <LugarDenuncia lugar={denuncia.place} latitud={denuncia.latitud} longitud={denuncia.longitud} />
                         </p>
                     </div>
                 </section>

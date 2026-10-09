@@ -1,6 +1,7 @@
 import React from "react";
 import { DenunciaConfirmacionResultadoProps } from "./types";
 import styles from "./DenunciaConfirmacionResultado.module.scss";
+import { formatoMontoBase } from '@/lib/vivi/presentacion';
 
 export const DenunciaConfirmacionResultado: React.FC<DenunciaConfirmacionResultadoProps> = ({
     status,
@@ -103,7 +104,7 @@ export const DenunciaConfirmacionResultado: React.FC<DenunciaConfirmacionResulta
                         </span>
 
                         <p className={styles.value}>
-                            Por confirmar
+                            {formatoMontoBase(denuncia.montoBase)}
                         </p>
                     </div>
                 </div>

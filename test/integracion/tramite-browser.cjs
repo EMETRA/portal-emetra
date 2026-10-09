@@ -12,6 +12,8 @@ async function probar() {
   const codigoRevocado = 'QA-REVOCADO-8004', tokenRevocado = 'T'.repeat(43);
   const codigoCaduca = 'QA-CADUCA-8005', tokenCaduca = 'C'.repeat(43);
   const codigoDefensa = 'QA-DEFENSA-8006', tokenDefensa = 'D'.repeat(43);
+  const codigoError = 'QA-ERROR-8010', tokenError = 'F'.repeat(43), referenciaError = '12345678-1234-1234-1234-123456789abc';
+  let consultaFalla = true;
   const llamadas = [];
   let aceptada = false, fallaInstitucional = true, pdfFalla = true, caducado = false, pagoDisponible = false;
   const backend = http.createServer(async (req, res) => {
@@ -19,6 +21,9 @@ async function probar() {
     const datos = texto ? JSON.parse(texto) : {};
     llamadas.push({ metodo: req.method, ruta: req.url, datos });
     const json = (valor, estado = 200) => { res.writeHead(estado, { 'Content-Type': 'application/json', 'Cache-Control': 'private, no-store' }); res.end(JSON.stringify(valor)); };
+    if (req.url === '/vivi/aceptaciones/consulta' && datos.token === tokenError) return json(consultaFalla
+      ? { message: ['Error Interno de Servidor'], referencia: referenciaError }
+      : { estadoEnlace: 'VIGENTE', estadoCaso: 'NOTIFICADA', puedeAceptar: true, denuncia: { idDenuncia: '8010', codigoCaso: codigoError, estado: 'NOTIFICADA', usoPlaca: 'P', placa: '113BBB' }, evidencias: [] }, consultaFalla ? 500 : 200);
     if (req.url === '/vivi/aceptaciones/consulta' && [tokenVencido, tokenRevocado].includes(datos.token)) return json({ estadoEnlace: datos.token === tokenVencido ? 'VENCIDO' : 'REVOCADO', codigoCaso: datos.token === tokenVencido ? codigoVencido : codigoRevocado, estadoCaso: 'NOTIFICADA' });
     if (req.url === '/vivi/aceptaciones/consulta' && datos.token === tokenCaduca) return json(caducado
       ? { estadoEnlace: 'VENCIDO', codigoCaso: codigoCaduca, estadoCaso: 'NOTIFICADA' }
@@ -170,6 +175,19 @@ async function probar() {
     await page.getByRole('heading', { name: 'Esta denuncia tiene una defensa registrada' }).waitFor();
     await capturar({ path: path.join(out, 'portal-con-defensa.png'), fullPage: true });
     assert.equal(await page.getByRole('button', { name: 'Aceptar y pagar', exact: true }).count(), 0);
+    const escriturasAntesError = llamadas.filter(l => l.ruta === '/vivi/aceptaciones').length;
+    await page.goto(`http://127.0.0.1:3731/tramite-reporte/${codigoError}#accion=aceptar&aceptar=${tokenError}`);
+    await page.getByRole('heading', { name: 'No pudimos consultar la denuncia' }).waitFor();
+    await page.getByText(referenciaError, { exact: true }).waitFor();
+    assert.equal(await page.getByText('Error Interno de Servidor', { exact: true }).count(), 0);
+    await capturar({ path: path.join(out, 'portal-error-consulta.png'), fullPage: true });
+    await page.setViewportSize({ width: 390, height: 844 });
+    await capturar({ path: path.join(out, 'portal-error-consulta-movil.png'), fullPage: true });
+    assert.ok(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth), 'La referencia de error desborda en móvil');
+    consultaFalla = false;
+    await page.getByRole('button', { name: 'Reintentar consulta', exact: true }).click();
+    await page.getByText(codigoError, { exact: true }).waitFor();
+    assert.equal(llamadas.filter(l => l.ruta === '/vivi/aceptaciones').length, escriturasAntesError, 'Reintentar una consulta emitió una aceptación');
     const previas = llamadas.length;
     await page.goto(`http://127.0.0.1:3731/tramite-reporte/${codigo}`);
     await page.getByText('abre el enlace privado del correo recibido', { exact: false }).waitFor();

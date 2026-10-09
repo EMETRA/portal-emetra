@@ -15,6 +15,15 @@ test('aceptación y reintento conservan requestId y propagan el 503 real',async(
  const bodies=[];global.fetch=async(_,init)=>{bodies.push(JSON.parse(init.body));return Response.json({codigo:'FALLO_INSTITUCIONAL',message:['No se pudo emitir la multa']},{status:503});};
  for(let i=0;i<2;i++)await assert.rejects(()=>api.aceptarDenuncia('token-qa','web-idempotente'),e=>e.status===503&&e.codigo==='FALLO_INSTITUCIONAL');assert.deepEqual(bodies[0],bodies[1]);
 });
+test('el error conserva la referencia de atención sin aceptar cadenas arbitrarias',async()=>{
+ const referencia='12345678-1234-1234-1234-123456789abc';
+ global.fetch=async()=>Response.json({message:['Error Interno de Servidor'],referencia},{status:500});
+ await assert.rejects(()=>api.consultarAceptacion('token-qa'),e=>e.status===500&&e.referencia===referencia);
+ global.fetch=async()=>new Response('Bad Gateway',{status:502,headers:{'X-Request-Id':referencia}});
+ await assert.rejects(()=>api.consultarAceptacion('token-qa'),e=>e.status===502&&e.referencia===referencia);
+ global.fetch=async()=>Response.json({message:['Fallo'],referencia:'token-privado'},{status:500});
+ await assert.rejects(()=>api.consultarAceptacion('token-qa'),e=>e.referencia===undefined);
+});
 test('rechaza una respuesta 200 JSON que pretendiera ser una descarga PDF',async()=>{
  global.fetch=async()=>Response.json({error:'PDF no generado'});await assert.rejects(()=>api.descargarPlantilla('token-qa'),/PDF válido/);
 });

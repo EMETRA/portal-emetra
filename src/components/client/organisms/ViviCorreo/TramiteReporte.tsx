@@ -10,6 +10,7 @@ import { DenunciaConfirmacionCarga } from '@/components/organisms/DenunciaConfir
 import { DenunciaConfirmacionResultado } from '@/components/organisms/DenunciaConfirmacionResultado/DenunciaConfirmacionResultado';
 import ViviDefenseSent from '@/components/client/organisms/ViviDefenseSent/ViviDefenseSent';
 import EstadoEnlace from './EstadoEnlace';
+import ErrorConsulta from './ErrorConsulta';
 import { leerEnlaceReporte, comprobarCasoReporte, type EnlaceReporte } from '@/lib/vivi/enlace-reporte';
 import { aceptarDenuncia, consultarAceptacion, consultarPlantilla, crearRequestId, leerEvidencia, urlPagoSeguro, ViviApiError, type Aceptacion, type ConsultaAceptacion, type ConsultaPlantilla } from '@/lib/vivi/acciones';
 import type { Case, DefenseFile } from '@/lib/vivi/types';
@@ -40,6 +41,7 @@ function FlujoReporte({ codigoCaso, enlace, defensa }: { codigoCaso: string; enl
   const [vista, setVista] = useState<Vista>('resumen');
   const [cargando, setCargando] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [referenciaConsulta, setReferenciaConsulta] = useState<string | undefined>();
   const [avisoDefensa, setAvisoDefensa] = useState<string | null>(null);
   const [recarga, setRecarga] = useState(0);
   const [cerrado, setCerrado] = useState<'vencido' | 'revocado' | 'defensa' | 'juzgado' | null>(null);
@@ -64,7 +66,7 @@ function FlujoReporte({ codigoCaso, enlace, defensa }: { codigoCaso: string; enl
   useEffect(() => {
     const abort = new AbortController();
     const urls: string[] = [];
-    setCargando(true); setError(null); setCerrado(null); setAvisoDefensa(null); setConsulta(null); setPlantilla(null); setCaso(null);
+    setCargando(true); setError(null); setReferenciaConsulta(undefined); setCerrado(null); setAvisoDefensa(null); setConsulta(null); setPlantilla(null); setCaso(null);
     void (async () => {
       let aceptacion: ConsultaAceptacion | null = null;
       let pdf: ConsultaPlantilla | null = null;
@@ -107,7 +109,10 @@ function FlujoReporte({ codigoCaso, enlace, defensa }: { codigoCaso: string; enl
       } else { setVista('resumen'); }
     })().catch(e => { if (!abort.signal.aborted) {
       if (e instanceof ViviApiError && e.status === 410) setCerrado(e.codigo === 'ENLACE_VENCIDO' ? 'vencido' : 'revocado');
-      else setError(mensaje(e));
+      else {
+        setError(mensajeConsulta(e));
+        setReferenciaConsulta(e instanceof ViviApiError ? e.referencia : undefined);
+      }
       setCaso(null);
     } }).finally(() => { if (!abort.signal.aborted) setCargando(false); });
     return () => { abort.abort(); urls.forEach(url => URL.revokeObjectURL(url)); };
@@ -163,12 +168,13 @@ function FlujoReporte({ codigoCaso, enlace, defensa }: { codigoCaso: string; enl
   }
   const volver = () => router.push(`/tramite-reporte/${encodeURIComponent(codigoCaso)}${window.location.hash}`);
   if (cerrado && !cargando) return <main className={styles.main}><EstadoEnlace tipo={cerrado} /></main>;
+  if (!cargando && error && !caso) return <main className={styles.main}><ErrorConsulta mensaje={error} referencia={referenciaConsulta} onReintentar={reconsultar} /></main>;
   if (!cargando && !error && caso && resultado?.reutilizada && vista === 'resultado') return <main className={styles.main}><EstadoEnlace tipo="aceptado" numeroRemision={`${resultado.remision.ciudad}-${resultado.remision.serie}-${resultado.remision.numero}`} placa={caso.placa} pagoUrl={urlPagoSeguro(resultado.pago)} onConsultar={reconsultar} /></main>;
   if (defensa && plantilla && !cargando && !error) return <main className={styles.main}><ViviDefenseSent caseNumber={codigoCaso} token={enlace.refutar || undefined} onVolver={volver} /></main>;
   const titulo = vista === 'confirmacion' ? 'Confirma tu aceptación' : 'Denuncia de tránsito';
   return <main className={styles.main}>
     {(vista === 'resumen' || vista === 'confirmacion') && <SectionTitle className={styles.sectionTitle}>{titulo}</SectionTitle>}
-    {cargando ? <div className={styles.layout}><DenunciaDetalleCard loading /><DenunciaDetalleAcciones loading onAceptarPago={() => {}} onPresentarDefensa={() => {}} /></div> : error && !caso ? <div className={styles.notice} role="alert"><p>{error}</p><button onClick={() => setRecarga(n => n + 1)}>Reintentar consulta</button></div> : caso && <>
+    {cargando ? <div className={styles.layout}><DenunciaDetalleCard loading /><DenunciaDetalleAcciones loading onAceptarPago={() => {}} onPresentarDefensa={() => {}} /></div> : caso && <>
       {vista === 'resumen' && <>
         <p className={styles.notice}><strong>Abrir este enlace no genera una multa.</strong> Revisa la información de la denuncia y decide cómo continuar.</p>
         {!puedeAceptar && <p className={styles.notice}>{consulta?.estadoEnlace === 'VENCIDO' || consulta?.estadoEnlace === 'REVOCADO' ? 'El enlace de aceptación venció o fue revocado.' : `Este caso (${consulta?.estadoCaso || plantilla?.caso.estado}) ya no admite aceptación desde este enlace.`}</p>}
@@ -182,6 +188,12 @@ function FlujoReporte({ codigoCaso, enlace, defensa }: { codigoCaso: string; enl
       {(vista === 'resultado' || vista === 'error') && <div className={styles.confirmContainer}><DenunciaConfirmacionResultado status={vista === 'error' ? 'error' : 'success'} denuncia={caso} numeroRemision={resultado ? `${resultado.remision.ciudad}-${resultado.remision.serie}-${resultado.remision.numero}` : ''} pagoDisponible={!!urlPagoSeguro(resultado?.pago || null)} yaAceptada={!!resultado?.reutilizada} errorMessage={error || undefined} onContinuar={() => { const url = urlPagoSeguro(resultado?.pago || null); if (url) window.location.assign(url); }} onReintentar={vista === 'error' ? confirmar : reconsultar} onVolver={reconsultar} /></div>}
     </>}
   </main>;
+}
+
+function mensajeConsulta(error: unknown): string {
+  if (error instanceof ViviApiError && error.status === 429) return 'Estamos recibiendo muchas consultas. Espera unos momentos e intenta de nuevo.';
+  if (error instanceof TypeError || (error instanceof ViviApiError && error.status >= 500)) return 'El servicio no respondió correctamente. Intenta consultar de nuevo en unos momentos.';
+  return mensaje(error);
 }
 
 function cierreEnlace(consulta: ConsultaAceptacion | null): 'vencido' | 'revocado' | 'defensa' | 'juzgado' | null {

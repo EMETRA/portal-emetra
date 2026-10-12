@@ -30,15 +30,15 @@ export const DenunciaDetalleConfirmacion: React.FC<DenunciaDetalleConfirmacionPr
                                 Placa
                             </span>
                             <p className={styles.value}>
-                                {denuncia.placa}
+                                {[denuncia.usoPlaca, denuncia.placa].filter(Boolean).join(" ")}
                             </p>
                         </div>
                         <div className={styles.detailItem}>
                             <span className={styles.label}>
-                                Fecha y hora
+                                Estado
                             </span>
                             <p className={styles.value}>
-                                {denuncia.caseDate}
+                                {denuncia.estado}
                             </p>
                         </div>
                     </div>
@@ -48,16 +48,16 @@ export const DenunciaDetalleConfirmacion: React.FC<DenunciaDetalleConfirmacionPr
                             Hecho denunciado
                         </span>
                         <p className={styles.value}>
-                            {denuncia.denuncia.descripcion}
+                            {denuncia.descripcionHecho}
                         </p>
                     </div>
 
                     <div className={styles.fullDetail}>
                         <span className={styles.label}>
-                            Lugar
+                            Observaciones
                         </span>
                         <p className={styles.amount}>
-                            {denuncia.place}
+                            {denuncia.observaciones}
                         </p>
                     </div>
                 </section>

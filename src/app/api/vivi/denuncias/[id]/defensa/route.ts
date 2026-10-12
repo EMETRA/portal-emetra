@@ -1,19 +1,2 @@
-import { NextRequest } from "next/server";
-import {
-  backendPathWithRequestQuery,
-  proxyBackendRequest,
-} from "@/lib/backend/proxy";
-
-type RouteContext = {
-  params: Promise<{ id: string }>;
-};
-
-export async function POST(req: NextRequest, context: RouteContext) {
-  const { id } = await context.params;
-  return proxyBackendRequest(req, {
-    path: backendPathWithRequestQuery(
-      req,
-      `/vivi/denuncias/${encodeURIComponent(id)}/defensa`
-    ),
-  });
-}
+import { NextResponse } from 'next/server';
+export async function POST() { return NextResponse.json({ codigo: 'DEFENSA_WEB_DESHABILITADA', message: ['Abre el enlace Refutar del correo y descarga la plantilla para presentarla en el juzgado.'] }, { status: 410, headers: { 'Cache-Control': 'private, no-store' } }); }

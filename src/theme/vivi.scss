@@ -1,0 +1,40 @@
+$vivi-primary: #2d20b3;
+$vivi-title: #15147d;
+$vivi-text: #202039;
+$vivi-muted: #545575;
+$vivi-border: #e6e7f4;
+$vivi-background: #f4f5fa;
+$vivi-highlight: #eef0ff;
+$vivi-highlight-border: #c9ccf5;
+
+@mixin card {
+  min-width: 0;
+  background: #fff;
+  border: 1px solid $vivi-border;
+  border-radius: 12px;
+}
+
+@mixin button($outline: false) {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 56px;
+  padding: 14px 20px;
+  border: 2px solid $vivi-primary;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 700;
+  line-height: 1.4;
+  text-align: center;
+  text-decoration: none;
+  cursor: pointer;
+  background: $vivi-primary;
+  color: #fff;
+  @if $outline {
+    background: #fff;
+    color: $vivi-primary;
+  }
+  &:hover { filter: brightness(0.95); }
+  &:focus-visible { outline: 3px solid #92b9ff; outline-offset: 3px; }
+  &:disabled { opacity: 0.55; cursor: not-allowed; }
+}

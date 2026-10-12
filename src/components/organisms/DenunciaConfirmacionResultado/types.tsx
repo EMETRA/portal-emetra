@@ -10,4 +10,7 @@ export interface DenunciaConfirmacionResultadoProps {
     onReintentar: () => void;
     onVolver: () => void;
     loading?: boolean;
+    pagoDisponible?: boolean;
+    yaAceptada?: boolean;
+    errorMessage?: string;
 }

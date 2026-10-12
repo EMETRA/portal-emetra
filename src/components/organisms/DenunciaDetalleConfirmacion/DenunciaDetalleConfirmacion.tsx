@@ -1,6 +1,8 @@
 import React from "react";
 import { DenunciaDetalleConfirmacionProps } from "./types";
 import styles from "./DenunciaDetalleConfirmacion.module.scss";
+import LugarDenuncia from '@/components/molecules/LugarDenuncia/LugarDenuncia';
+import { formatoMontoBase } from '@/lib/vivi/presentacion';
 
 export const DenunciaDetalleConfirmacion: React.FC<DenunciaDetalleConfirmacionProps> = ({
     denuncia,
@@ -53,21 +55,26 @@ export const DenunciaDetalleConfirmacion: React.FC<DenunciaDetalleConfirmacionPr
                     </div>
 
                     <div className={styles.fullDetail}>
+                        <span className={styles.label}>Monto base</span>
+                        <p className={styles.value}>{formatoMontoBase(denuncia.montoBase)}</p>
+                    </div>
+
+                    <div className={styles.fullDetail}>
                         <span className={styles.label}>
                             Lugar
                         </span>
-                        <p className={styles.amount}>
-                            {denuncia.place}
+                        <p className={styles.value}>
+                            <LugarDenuncia lugar={denuncia.place} latitud={denuncia.latitud} longitud={denuncia.longitud} />
                         </p>
                     </div>
                 </section>
 
                 <section className={styles.nextSteps}>
                     <h3 className={styles.stepsTitle}>
-                        ¿Qué sucede después?
+                        Qué sucede después
                     </h3>
 
-                    <ul className={styles.stepList}>
+                    <ul className={styles.stepsList}>
                         <li>Se genera tu número de remisión.</li>
                         <li>Recibes las instrucciones de pago.</li>
                         <li>Continúas al portal institucional para iniciar sesión y pagar.</li>

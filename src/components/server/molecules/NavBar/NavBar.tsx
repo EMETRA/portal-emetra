@@ -10,7 +10,7 @@ import { useState, useEffect, useRef } from "react";
 const navItems: { name: string; icon: IconType; href: string }[] = [
   { name: "INICIO", icon: "DPI", href: "/" },
   { name: "REMISIONES", icon: "Multa", href: "https://especiales.muniguate.com/remisiones.htm" },
-  { name: "SERVICIOS5", icon: "Files", href: "/#servicios" },
+  { name: "SERVICIOS", icon: "Files", href: "/#servicios" },
   { name: "VIDEOS", icon: "DPI", href: "/videos" },
   { name: "FAQ", icon: "Info", href: "/#ayuda" },
   { name: "SÚMATE", icon: "User", href: "/sumate" },
@@ -105,7 +105,8 @@ const NavBar: React.FC = () => {
       >
         {itemsForRender.map((item) => {
           const isActive =
-            currentPath && normalize(currentPath) === normalize(item.href);
+            (item.name === "REMISIONES" && currentPath.startsWith("/tramite-reporte/")) ||
+            (currentPath && normalize(currentPath) === normalize(item.href));
           
           if (isSumate && item.name === "SÚMATE") {
             return (

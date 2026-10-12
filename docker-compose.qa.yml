@@ -1,0 +1,24 @@
+# Archivo independiente: no combinar con el Compose de producción.
+services:
+  portal:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: portal-emetra:qa
+    container_name: portal-vivi-qa
+    ports:
+      - "${FRONT_PORT:-4010}:3000"
+    env_file:
+      - .env
+    environment:
+      NODE_ENV: production
+      API_BASE_URL: "http://api-portal-vivi-qa:4001"
+      HOSTNAME: "0.0.0.0"
+      PORT: "3000"
+    restart: unless-stopped
+    init: true
+    networks:
+      - vivi-qa-cierre
+networks:
+  vivi-qa-cierre:
+    external: true

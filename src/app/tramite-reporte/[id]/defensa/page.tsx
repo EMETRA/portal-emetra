@@ -1,16 +1,8 @@
-"use client";
-
-import { Suspense } from "react";
-// import { ViviDefense } from "@/components/client/organisms/ViviDefense";
-import { useParams } from 'next/navigation';
-
-export default function DefensaPage() {
-  const params = useParams<{ id: string }>();
-  return (
-    <Suspense fallback={<div>Cargando...</div>}>
-      {/* <ViviDefense caseId={params.id} /> */}
-    </Suspense>
-  );
+import type { Metadata } from 'next';
+import TramiteReporte from '@/components/client/organisms/ViviCorreo/TramiteReporte';
+export const metadata: Metadata = { title: 'Plantilla de defensa | EMETRA', robots: { index: false, follow: false }, referrer: 'no-referrer' };
+export const dynamic = 'force-dynamic';
+export default async function DefensaPage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
+  return <TramiteReporte codigoCaso={id} defensa />;
 }
-
-

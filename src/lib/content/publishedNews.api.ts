@@ -14,10 +14,10 @@ import type {
 } from "@/lib/content/publishedNews.types";
 
 /**
- * true = usa los datos de desarrollo de publishedNews.dummy.ts en lugar de
- * api-portal. Debe quedar en false en lo que se sube.
+ * La API real es el valor por defecto. NEXT_PUBLIC_NEWS_DUMMY=true habilita
+ * datos de demostración únicamente cuando se solicitan de forma explícita.
  */
-export const USAR_DUMMY = true;
+export const USAR_DUMMY = process.env.NEXT_PUBLIC_NEWS_DUMMY === "true";
 
 /** Idioma del Portal. TODO [COM04-FLUJO]: si se agregan idiomas, tomarlo del sitio. */
 export const NEWS_IDIOMA = "es-GT";

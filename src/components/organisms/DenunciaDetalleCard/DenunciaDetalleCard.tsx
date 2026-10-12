@@ -13,10 +13,10 @@ export const DenunciaDetalleCard: React.FC <DenunciaDetalleCardProps> = ({
 
     const datos = denuncia
         ? [
-            { label: "Numero de denuncia", value: denuncia.codigo },
-            { label: "Placa", value: [denuncia.usoPlaca, denuncia.placa].filter(Boolean).join(" ") },
-            { label: "Hecho denunciado", value: denuncia.descripcionHecho },
-            { label: "Estado", value: denuncia.estado },
+            { label: "Numero de denuncia", value: denuncia.caseNumber },
+            { label: "Placa", value: denuncia.placa },
+            { label: "Hecho denunciado", value: denuncia.denuncia.descripcion },
+            { label: "Fecha y hora", value: denuncia.caseDate },
         ]
         : [];
 
@@ -58,10 +58,10 @@ export const DenunciaDetalleCard: React.FC <DenunciaDetalleCardProps> = ({
                     <div className={styles.amountContainer}>
                         <div className={styles.amountDescription}>
                             <Text className={styles.amountTitle}>
-                                Observaciones
+                                Lugar
                             </Text>
                             <Text>
-                                Detalle registrado en la denuncia
+                                Donde ocurrió el hecho
                             </Text>
                         </div>
                         {loading || !denuncia ? (
@@ -70,7 +70,7 @@ export const DenunciaDetalleCard: React.FC <DenunciaDetalleCardProps> = ({
                             </div>
                         ): (
                             <Text className={styles.amount}>
-                                {denuncia.observaciones}
+                                {denuncia.place}
                             </Text>
                         )}
                         

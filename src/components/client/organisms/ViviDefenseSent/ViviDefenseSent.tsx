@@ -12,15 +12,13 @@ import { DefenseSentProps } from "./types";
 
 import styles from "./ViviDefenseSent.module.scss";
 
-export default function ViviDefenseSent({ codigoCaso, idDefensa, documento }: DefenseSentProps) {
+export default function ViviDefenseSent({ caseNumber, idDefensa }: DefenseSentProps) {
     const isMobile = useMediaQuery('(max-width: 768px)');
 
     const [loadingPdf, setLoadingPdf] = useState(false);
-    const [errorPdf, setErrorPdf] = useState<{ message: string } | null>(
-        documento.estado === "ERROR_RECUPERABLE"
-            ? { message: "No pudimos generar tu PDF. Puedes intentar de nuevo." }
-            : null
-    );
+    const [errorPdf, setErrorPdf] = useState<{ message: string } | null>(null);
+    const [pdf, setPdf] = useState(false);
+
     const handleDowloadPdf = () => {
         setLoadingPdf(true);
         setErrorPdf(null);
@@ -28,6 +26,7 @@ export default function ViviDefenseSent({ codigoCaso, idDefensa, documento }: De
             if (Math.random() < 0.5) {
                 setErrorPdf({ message: "Error al generar tu PDF" });
             } else {
+                setPdf(true);
                 setLoadingPdf(false);
             }
             setLoadingPdf(false);
@@ -37,12 +36,6 @@ export default function ViviDefenseSent({ codigoCaso, idDefensa, documento }: De
                 "noopener,noreferrer"
             );
         }, 5000);
-        // setErrorPdf(null);
-        // window.open(
-        //     `/api/vivi/defensas/${encodeURIComponent(idDefensa)}/documento`,
-        //     "_blank",
-        //     "noopener,noreferrer"
-        // );
     }
 
     return (
@@ -50,11 +43,11 @@ export default function ViviDefenseSent({ codigoCaso, idDefensa, documento }: De
             <CardGeneral className={styles.infoCard} padding={isMobile ? "sm" : "md"}>
                 <div className={styles.infoHeader}>
                     <Icon name="Check" color="#1e7a46" width={60} height={60} />
-                    <Heading variant="Large" className={styles.title}>Formulario de defensa listo para descargar</Heading>
+                    <Heading variant="Large" className={styles.title}>Formulario de defensa listo paa descargar</Heading>
                     <Text variant="Medium" className={styles.description}>Guarda tu número de caso. Lo necesitarás para presentarte en el juzgado.</Text>
                     <div className={styles.caseNumberContainer}>
                         <Text variant="Medium" className={styles.caseNumberLabel}>Número de caso</Text>
-                        <Heading variant="Large" className={styles.caseNumber}>{codigoCaso}</Heading>
+                        <Heading variant="Large" className={styles.caseNumber}>{caseNumber}</Heading>
                     </div>
                 </div>
             </CardGeneral>
@@ -65,7 +58,7 @@ export default function ViviDefenseSent({ codigoCaso, idDefensa, documento }: De
                         <Icon name="File" color="#1e7a46" width={60} height={60} />
                         <div className={styles.loadingPdfContent}>
                             <Text variant="Medium" className={styles.loadingPdfTitle}><strong>Estamos generando tu PDF</strong></Text>
-                            <Text variant="Small" className={styles.loadingPdfDescription}>PDF en preparación. Puede tardar unos segundos.</Text>
+                            <Text variant="Small" className={styles.loadingPdfDescription}>Puede tardar unos segundos. Tu defensa quedó registrada</Text>
                         </div>
                     </div>
                 ) : errorPdf ? (
@@ -77,7 +70,7 @@ export default function ViviDefenseSent({ codigoCaso, idDefensa, documento }: De
                         </div>
                     </div>
                 ) : (
-                    <File className={styles.pdfFile} name={`defensa-${codigoCaso}.pdf`} id={`defensa-${codigoCaso}`} />
+                    <File className={styles.pdfFile} name={`defensa-${caseNumber}.pdf`} id={`defensa-${caseNumber}`} />
                 )}
                 <Button variant="default" className={styles.downloadButton} onClick={handleDowloadPdf} disabled={loadingPdf}>Descargar PDF</Button>
             </CardGeneral>

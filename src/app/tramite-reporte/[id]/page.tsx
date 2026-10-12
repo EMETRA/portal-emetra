@@ -16,63 +16,54 @@ import { CasilleroPopUp } from "@/components/client/molecules/CasilleroPopUp";
 
 // import type { Case, DefenseResponse } from "@/lib/vivi/types";
 // import type { Case } from "@/lib/vivi/types";
-import type { Case, ConsultaCasoResponse, DefenseResponse } from "@/lib/vivi/types";
+import type { Case, DefenseResponse } from "@/lib/vivi/types";
 // import { submitDefenseClient } from "@/lib/vivi/api";
 import { ViviDefenseSent } from "@/components/client/organisms/ViviDefenseSent";
 
 // import { fetchDenunciaByIdClient } from "@/lib/vivi/api";
-import { fetchConsultaCaso, PresentarDefensaError, submitDefenseClient } from "@/lib/vivi/api";
 
 const denuncias: Case[] = [
     {
-        id: "D-2026-000123",
-        codigo: "D-2026-000123",
-        usoPlaca: "P",
-        placa: "123ABC",
-        regla: "1",
-        descripcionHecho: "Estacionamiento en linea roja",
-        observaciones: "San Salvador",
-        estado: "NOTIFICADA",
+        caseNumber: "D-2026-000123",
+        caseDate: "14/09/2026 10:42",
+        place: "San Salvador",
+        title: "Estacionamiento en linea roja",
+        placa: "P 123ABC",
         denuncia: {
+            descripcion: "Estacionamiento en linea roja",
             evidencias: [],
         }
     },
     {
-        id: "D-2026-000124",
-        codigo: "D-2026-000124",
-        usoPlaca: "P",
-        placa: "123DEF",
-        regla: "1",
-        descripcionHecho: "Estacionamiento en linea roja",
-        observaciones: "San Miguel",
-        estado: "NOTIFICADA",
+        caseNumber: "D-2026-000124",
+        caseDate: "15/09/2026 10:42",
+        place: "San Miguel",
+        title: "Estacionado en linea roja",
+        placa: "P 123DEF",
         denuncia: {
+            descripcion: "Estacionamiento en linea roja",
             evidencias: [],
         }
     },
     {
-        id: "D-2026-000125",
-        codigo: "D-2026-000125",
-        usoPlaca: "P",
-        placa: "123GHI",
-        regla: "1",
-        descripcionHecho: "Estacionado en zona roja",
-        observaciones: "Guatemala City",
-        estado: "NOTIFICADA",
+        caseNumber: "D-2026-000125",
+        caseDate: "16/09/2026 10:42",
+        place: "Guatemala City",
+        title: "Estacionado en zona roja",
+        placa: "P 123GHI",
         denuncia: {
+            descripcion: "Estacionado en zona roja",
             evidencias: [],
         }
     },
     {
-        id: "D-2026-000126",
-        codigo: "D-2026-000126",
-        usoPlaca: "P",
-        placa: "123JKL",
-        regla: "1",
-        descripcionHecho: "Mal estacionamiento. Parqueado a media calle",
-        observaciones: "Mixco",
-        estado: "NOTIFICADA",
+        caseNumber: "D-2026-000126",
+        caseDate: "17/09/2026 10:42",
+        place: "Mixco",
+        title: "Mal estacionamiento",
+        placa: "P 123JKL",
         denuncia: {
+            descripcion: "Mal estacionamiento. Parqueado a media calle",
             evidencias: [],
         }
     },
@@ -83,7 +74,7 @@ const remision = "R-2026-004512";
 export default function DenunciaPage() {
     const params = useParams<{ id: string }>();
     // const router = useRouter();
-    const [denuncia, setDenuncia] = useState<ConsultaCasoResponse | undefined>();
+    const [denuncia, setDenuncia] = useState<Case | undefined>();
     const [loading, setLoading] = useState(true);
     const [presentandoDefensa, setPresentandoDefensa] = useState(false);
     const [defenseSent, setDefenseSent] = useState<DefenseResponse | undefined>();
@@ -99,15 +90,12 @@ export default function DenunciaPage() {
 
             try {
                 await new Promise((resolve) => setTimeout(resolve, 5000));
-                const data: Case | undefined = denuncias.find((item) => item.codigo === params.id);
+                const data: Case | undefined = denuncias.find((item) => item.caseNumber === params.id);
+
                 // data = (await fetchDenunciaByIdClient(params.id)) ?? undefined;
-                // const data = await fetchConsultaCaso();
 
                 if (!cancelled) {
-                    setDenuncia({
-                        caso: data,
-                        puedePresentarDefensa: true,
-                    } as ConsultaCasoResponse);
+                    setDenuncia(data);
                 }
             } catch (loadError) {
                 if (!cancelled) {
@@ -144,46 +132,26 @@ export default function DenunciaPage() {
         setPresentandoDefensa(true);
         setSubmitError(undefined);
         try {
+            // const response = await submitDefenseClient(params.id);
+            // if (!response?.idDefensa) {
+            //     throw new Error("No se pudo registrar la defensa.");
+            // }
+            // setDefenseSent(response);
             if (Math.random() > 0.5) {
                 throw new Error("No se pudo enviar la defensa.");
             }
             await new Promise((resolve) => setTimeout(resolve, 5000));
             setDefenseSent({
-                codigoCaso: params.id,
-                documento: {
-                    estado: "DISPONIBLE",
-                    idDefensa: "1234567890",
-                    numeroVersion: 1,
-                    versionPlantilla: "1.0.0",
-                    mime: "application/pdf",
-                    tamanoBytes: 1000,
-                    sha256: "1234567890",
-                    descargar: "https://www.google.com/pdf",
-                },
-                idDefensa: "1234567890",
-                idCaso: "1234567890",
-                numeroVersion: 1,
-                estado: "DEFENSA_WEB",
-                presentadaWebEn: "2026-01-01",
-                identidad: "DECLARADA_NO_ACREDITADA",
-                idempotente: true,
+                caseNumber: params.id,
+                pdfUrl: "https://www.google.com",
+                idDefensa: "1234567890"
             });
-            // if (denuncia && !denuncia.puedePresentarDefensa) {
-            //     throw new Error("Este caso no permite presentar defensa.");
-            // }
-            // const response = await submitDefenseClient();
-            // if (!response?.idDefensa) {
-            //     throw new PresentarDefensaError(0, "No se pudo presentar la defensa.");
-            // }
-            // setDefenseSent(response);
         } catch (submitErr) {
-            // const retryable = submitErr instanceof PresentarDefensaError && submitErr.retryable;
             setSubmitError({
                 message: submitErr instanceof Error && submitErr.message
                     ? submitErr.message
                     : "No se pudo enviar la defensa.",
                 isRetried: Math.random() > 0.5,
-                // isRetried: retryable,
             });
         } finally {
             setPresentandoDefensa(false);
@@ -223,7 +191,11 @@ export default function DenunciaPage() {
     if (defenseSent) {
         return (
             <div className={styles.main}>
-                <ViviDefenseSent {...defenseSent} />
+                <ViviDefenseSent
+                    caseNumber={defenseSent.caseNumber}
+                    pdfUrl={defenseSent.pdfUrl}
+                    idDefensa={defenseSent.idDefensa}
+                />
             </div>
         );
     }
@@ -258,7 +230,7 @@ export default function DenunciaPage() {
 
                     <div className={styles.layout}>
                         <DenunciaDetalleCard 
-                            denuncia={denuncia?.caso}
+                            denuncia={denuncia}
                             loading={loading}
                         />
                         <DenunciaDetalleAcciones
@@ -274,7 +246,7 @@ export default function DenunciaPage() {
                     <SectionTitle>Confirma tu aceptación</SectionTitle>
                     <div className={styles.confirmContainer}>
                         <DenunciaDetalleConfirmacion 
-                            denuncia={denuncia.caso}
+                            denuncia={denuncia}
                             onConfirmar={handleConfirmar}
                             onVolver={handleVolver}
                         />
@@ -306,7 +278,7 @@ export default function DenunciaPage() {
                         <DenunciaConfirmacionResultado 
                             status={result}
                             numeroRemision={remision}
-                            denuncia={denuncia.caso}
+                            denuncia={denuncia}
                             onContinuar={handleContinuar}
                             onReintentar={handleReintentar}
                             onVolver={handleVolver}

@@ -94,17 +94,17 @@ export const DenunciaConfirmacionResultado: React.FC<DenunciaConfirmacionResulta
                         </span>
 
                         <p className={styles.value}>
-                            {[denuncia.usoPlaca, denuncia.placa].filter(Boolean).join(" ")}
+                            {denuncia.placa}
                         </p>
                     </div>
 
                     <div className={styles.detailItem}>
                         <span className={styles.label}>
-                            Observaciones
+                            Lugar
                         </span>
 
                         <p className={styles.amount}>
-                            {denuncia.observaciones}
+                            {denuncia.place}
                         </p>
                     </div>
                 </div>

@@ -68,15 +68,13 @@ const toMediaGridItem = (file: DefenseFile): MediaGridItem => {
 
 const denuncias: Case[] = [
     {
-        id: "D-2026-000123",
-        codigo: "D-2026-000123",
-        usoPlaca: "P",
-        placa: "123ABC",
-        regla: "1",
-        descripcionHecho: "Estacionamiento en linea roja - defensa",
-        observaciones: "San Salvador - defensa",
-        estado: "NOTIFICADA",
+        caseNumber: "D-2026-000123",
+        caseDate: "14/09/2026 10:42",
+        place: "San Salvador - defensa",
+        title: "Estacionamiento en linea roja - defensa",
+        placa: "P 123ABC",
         denuncia: {
+            descripcion: "Estacionamiento en linea roja - defensa",
             evidencias: [
                 {
                     id: "1",
@@ -100,47 +98,41 @@ const denuncias: Case[] = [
         }
     },
     {
-        id: "D-2026-000124",
-        codigo: "D-2026-000124",
-        usoPlaca: "P",
-        placa: "123DEF",
-        regla: "1",
-        descripcionHecho: "Estacionamiento en linea roja - defensa",
-        observaciones: "San Miguel",
-        estado: "NOTIFICADA",
+        caseNumber: "D-2026-000124",
+        caseDate: "15/09/2026 10:42",
+        place: "San Miguel",
+        title: "Estacionado en linea roja",
+        placa: "P 123DEF",
         denuncia: {
+            descripcion: "Estacionamiento en linea roja - defensa",
             evidencias: [],
         }
     },
     {
-        id: "D-2026-000125",
-        codigo: "D-2026-000125",
-        usoPlaca: "P",
-        placa: "123GHI",
-        regla: "1",
-        descripcionHecho: "Estacionado en zona roja - defensa",
-        observaciones: "Guatemala City",
-        estado: "NOTIFICADA",
+        caseNumber: "D-2026-000125",
+        caseDate: "16/09/2026 10:42",
+        place: "Guatemala City",
+        title: "Estacionado en zona roja",
+        placa: "P 123GHI",
         denuncia: {
+            descripcion: "Estacionado en zona roja - defensa",
             evidencias: [],
         }
     },
     {
-        id: "D-2026-000126",
-        codigo: "D-2026-000126",
-        usoPlaca: "P",
-        placa: "123JKL",
-        regla: "1",
-        descripcionHecho: "Mal estacionamiento. Parqueado a media calle",
-        observaciones: "Mixco",
-        estado: "NOTIFICADA",
+        caseNumber: "D-2026-000126",
+        caseDate: "17/09/2026 10:42",
+        place: "Mixco",
+        title: "Mal estacionamiento",
+        placa: "P 123JKL",
         denuncia: {
+            descripcion: "Mal estacionamiento. Parqueado a media calle",
             evidencias: [],
         }
     },
 ]
 
-export default function ViviDefense({ caseId }: { caseId: Case["codigo"] }) {
+export default function ViviDefense({ caseId }: { caseId: Case["caseNumber"] }) {
     const [caseData, setCaseData] = useState<Case | undefined>();
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<{ message: string } | undefined>();
@@ -159,7 +151,7 @@ export default function ViviDefense({ caseId }: { caseId: Case["codigo"] }) {
                 if (Math.random() > 0.9) {
                     throw new Error();
                 }
-                const data: Case | undefined = denuncias.find((item) => item.codigo === caseId);
+                const data: Case | undefined = denuncias.find((item) => item.caseNumber === caseId);
 
                 // data = (await fetchDenunciaByIdClient(caseId)) ?? undefined;
 
@@ -291,10 +283,10 @@ export default function ViviDefense({ caseId }: { caseId: Case["codigo"] }) {
                         <Chip label="Solo lectura" backgroundColor="#E8E9F3" color="#000000"/>
                     </div>
                     <div className={styles.caseInfoItems}>
-                        {renderCaseInfo("Número de denuncia", caseData.codigo)}
-                        {renderCaseInfo("Placa", [caseData.usoPlaca, caseData.placa].filter(Boolean).join(" "))}
-                        {renderCaseInfo("Estado", caseData.estado)}
-                        {renderCaseInfo("Hecho denunciado", caseData.descripcionHecho)}
+                        {renderCaseInfo("Número de denuncia", caseData.caseNumber)}
+                        {renderCaseInfo("Placa", caseData.placa)}
+                        {renderCaseInfo("Fecha y hora", caseData.caseDate)}
+                        {renderCaseInfo("Hecho denunciado", caseData.denuncia.descripcion)}
                     </div>
                     <MediaGrid items={caseData.denuncia.evidencias.map(toMediaGridItem)} columns={isMobile ? 2 : 3} />
                 </CardGeneral>

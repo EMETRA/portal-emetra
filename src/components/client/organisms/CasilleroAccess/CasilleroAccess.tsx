@@ -127,6 +127,7 @@ export default function CasilleroAccess() {
               availableFactors={availableFactors}
               expiresAt={challengeExpiresAt}
               onSuccess={() => router.push("/casillero/dashboard")}
+              onRestart={() => changeView("login")}
             />
           )}
           

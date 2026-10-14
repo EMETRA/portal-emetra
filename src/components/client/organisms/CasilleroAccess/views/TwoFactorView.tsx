@@ -50,14 +50,12 @@ export default function TwoFactorView({ challengeId, availableFactors, expiresAt
     setMessage("");
 
     try {
+      // El token queda en la cookie httpOnly; aquí solo se guarda el vencimiento.
       const data = await verifyChallenge(challengeId, selectedFactor.type, code);
-      setSession(data.sessionToken, data.expiresAt);
+      setSession(data.expiresAt);
       onSuccess();
-    } catch {
-      // setMessage(err.message ?? "Código inválido. Intenta de nuevo.");
-      // MOCK STORE
-      setSession("mock-session-token", new Date(Date.now() + 30 * 60 * 1000).toISOString());
-      onSuccess();
+    } catch (err) {
+      setMessage(err instanceof Error ? err.message : "Código inválido. Intenta de nuevo.");
     } finally {
       setLoading(false);
     }

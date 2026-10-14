@@ -220,9 +220,13 @@ export interface LoginResponse {
   availableFactors: AvailableFactor[];
 }
 
+/**
+ * Respuesta del BFF al verificar el segundo factor. El backend devuelve sessionToken y
+ * expiresAt; el BFF guarda el token en la cookie httpOnly y al navegador solo le pasa
+ * el vencimiento.
+ */
 export interface VerifyResponse {
-  sessionToken: string;
-  expiresAt: string;
+  expiresAt: string | null;
 }
 
 export interface ResendResponse {

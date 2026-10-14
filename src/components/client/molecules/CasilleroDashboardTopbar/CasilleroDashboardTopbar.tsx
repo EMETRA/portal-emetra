@@ -19,7 +19,7 @@ type Props = {
 export default function CasilleroDashboardTopbar({ userName, onMenuClickAction }: Props) {
   const router = useRouter();
   const { mode, setMode } = useModeStore();
-  const { sessionToken, clearSession } = useSessionStore();
+  const { clearSession } = useSessionStore();
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
@@ -29,9 +29,8 @@ export default function CasilleroDashboardTopbar({ userName, onMenuClickAction }
   };
 
   const handleLogout = async () => {
-    if (sessionToken) {
-      await logout(sessionToken);
-    }
+    // El BFF borra la cookie aunque la sesión ya esté vencida; aquí se limpia lo local.
+    await logout();
     clearSession();
     router.push("/casillero");
   };

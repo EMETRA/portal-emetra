@@ -31,26 +31,10 @@ export default function LoginView({ notice, onSuccess, onRegister, onRecover, on
     try {
       const data = await login(email, password);
       onSuccess(data.challengeId, data.availableFactors, data.expiresAt);
-    } catch {
-      // TODO: quitar cuando el backend esté disponible
-      onSuccess("mock-challenge-id", [
-        {
-          id: "501",
-          type: "CORREO",
-          preferred: true,
-          destinationMasked: "p***@correo.com",
-        },
-        {
-          id: "502",
-          type: "TOTP",
-          preferred: false,
-        },
-        {
-          id: "503",
-          type: "RECUPERACION",
-          preferred: false,
-        },
-      ], new Date(Date.now() + 30 * 60 * 1000).toISOString());
+    } catch (err) {
+      // Sin backend: activar SIMULAR_AUTH (src/lib/casillero/auth.dummy.ts) en lugar de
+      // simular aquí, para que los errores reales (p. ej. contraseña incorrecta) se vean.
+      setMessage(err instanceof Error ? err.message : "No se pudo iniciar sesión. Intenta de nuevo.");
     } finally {
       setLoading(false);
     }

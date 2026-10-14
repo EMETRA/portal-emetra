@@ -17,14 +17,29 @@ export function getCasilleroCookieOptions(maxAge: number) {
   };
 }
 
+/**
+ * Segundos hasta `expiresAt` (ISO) de la sesión del backend. Sin fecha válida o ya
+ * vencida, usa la duración por defecto.
+ */
+function maxAgeHasta(expiresAt?: string | null): number {
+  if (!expiresAt) return COOKIE_MAX_AGE_SECONDS;
+  const segundos = Math.floor((new Date(expiresAt).getTime() - Date.now()) / 1000);
+  return Number.isFinite(segundos) && segundos > 0 ? segundos : COOKIE_MAX_AGE_SECONDS;
+}
+
+/**
+ * Guarda el token de sesión en la cookie httpOnly (el navegador no puede leerlo).
+ * `expiresAt` (opcional) hace que la cookie venza junto con la sesión del backend.
+ */
 export function setCasilleroAuthCookie(
   response: NextResponse,
-  token: string
+  token: string,
+  expiresAt?: string | null
 ): void {
   response.cookies.set({
     name: CASILLERO_AUTH_COOKIE_NAME,
     value: token,
-    ...getCasilleroCookieOptions(COOKIE_MAX_AGE_SECONDS),
+    ...getCasilleroCookieOptions(maxAgeHasta(expiresAt)),
   });
 }
 

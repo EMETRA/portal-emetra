@@ -75,16 +75,19 @@ export async function resendChallenge(
 }
 
 // ── LOGOUT ────────────────────────────────────────────────────────────────
-export async function logout(sessionToken: string): Promise<void> {
-    await fetch("/api/casillero/auth/logout", {
-        method: "POST",
-        headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${sessionToken}`,
-        },
-        cache: "no-store",
-    });
-    // siempre limpia local aunque falle o devuelva 401
+/**
+ * Cierra la sesión. El token viaja en la cookie httpOnly (el BFF lo envía como Bearer)
+ * y el BFF la borra siempre. Nunca lanza error: quien llama limpia su estado igual.
+ */
+export async function logout(): Promise<void> {
+    try {
+        await fetch("/api/casillero/auth/logout", {
+            method: "POST",
+            cache: "no-store",
+        });
+    } catch {
+        // Sin red: la sesión local se limpia de todos modos.
+    }
 }
 
 // ── PASSWORD RESET ────────────────────────────────────────────────────────

@@ -8,12 +8,19 @@ import {
 
 const PUBLIC_PATHS = ["/auth"];
 
-/** Public Casillero BFF auth/health endpoints (login page is exact `/casillero`). */
+/**
+ * Rutas del BFF de casillero que no exigen sesión (la página de acceso es exactamente
+ * `/casillero`). Deben coincidir con los route handlers que usan `requireAuth: false`.
+ * `logout` es pública para poder borrar la cookie aunque la sesión ya haya vencido.
+ */
 const CASILLERO_PUBLIC_API_PATHS = [
   "/api/casillero/auth/login",
-  "/api/casillero/auth/verify-2fa",
-  "/api/casillero/auth/register",
-  "/api/casillero/auth/recover",
+  "/api/casillero/auth/challenges",
+  "/api/casillero/auth/logout",
+  "/api/casillero/auth/password-resets",
+  "/api/casillero/auth/password",
+  "/api/casillero/registrations",
+  "/api/casillero/contact-verifications",
   "/api/casillero/health",
 ];
 

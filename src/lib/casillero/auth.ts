@@ -91,19 +91,37 @@ export async function logout(): Promise<void> {
 }
 
 // ── PASSWORD RESET ────────────────────────────────────────────────────────
+function errorFromPasswordResetRequestStatus(status: number): Error {
+    const message =
+        status === 400 ? "Revisa el correo ingresado"
+        : status === 429 ? "Demasiadas solicitudes. Intenta más tarde"
+        : "No se pudo enviar la solicitud. Intenta más tarde";
+    const error = new Error(message);
+    error.name = "ApiResponseError";
+    return error;
+}
+
+/**
+ * 202 = aceptado, exista o no la cuenta (el backend no lo revela). Solo lanza error si
+ * la solicitud misma falla (correo mal formado, demasiados intentos, servidor caído).
+ */
 export async function requestPasswordReset(email: string): Promise<void> {
-  // 202 = aceptado aunque el email no exista — nunca lanzar error visible
-    await fetch("/api/casillero/auth/password-resets", {
+    const response = await fetch("/api/casillero/auth/password-resets", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email }),
         cache: "no-store",
     });
+    if (!response.ok) {
+        throw errorFromPasswordResetRequestStatus(response.status);
+    }
 }
 
 function errorFromResetPasswordStatus(status: number): Error {
     const message =
-        status === 401 ? "Token inválido, vencido, consumido o revocado"
+        status === 400 ? "La contraseña no cumple los requisitos. Revisa e intenta de nuevo"
+        : status === 401 ? "El token es inválido o ya venció. Pide uno nuevo"
+        : status === 429 ? "Demasiados intentos. Intenta más tarde"
         : `HTTP ${status}`;
     const error = new Error(message);
     error.name = "ApiResponseError";

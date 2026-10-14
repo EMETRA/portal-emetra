@@ -5,6 +5,7 @@ import * as yup from "yup";
 import { Button } from "@/components/server/atoms";
 import { passwordSchema } from "@/schema/casillero";
 import { requestPasswordReset, resetPassword } from "@/lib/casillero/auth";
+import { useSessionStore } from "@/store/useSessionStore";
 import AccessField from "../fields/AccessField";
 import type { RecoverStep } from "../types";
 import styles from "../CasilleroAccess.module.scss";
@@ -18,10 +19,22 @@ const submitLabel: Record<RecoverStep, string> = {
   code: "Reestablecer",
 };
 
+// TODO [CASILLERO-FLUJO]: textos propuestos, confirmar con diseño/negocio.
+const SOLICITUD_ACEPTADA =
+  "Si el correo está registrado, te enviamos un token de recuperación. Revisa tu bandeja de entrada y la carpeta de Spam, y copia el token aquí.";
+const CONTRASENA_RESTABLECIDA =
+  "Contraseña restablecida. Por seguridad se cerraron las sesiones abiertas. Inicia sesión con tu nueva contraseña.";
+
 export default function RecoverView({ onLogin }: Props) {
+  const clearSession = useSessionStore((state) => state.clearSession);
   const [step, setStep] = useState<RecoverStep>("email");
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
+
+  const volverAPedirToken = () => {
+    setMessage("");
+    setStep("email");
+  };
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -31,15 +44,14 @@ export default function RecoverView({ onLogin }: Props) {
     const formData = new FormData(event.currentTarget);
 
     if (step === "email") {
-      const email = String(formData.get("recovery-email") ?? "");
+      const email = String(formData.get("recovery-email") ?? "").trim();
 
       try {
+        // El backend acepta igual exista o no la cuenta; solo falla si la solicitud falla.
         await requestPasswordReset(email);
-        // siempre avanza — el backend nunca revela si el email existe
         setStep("code");
-      } catch {
-        // igual avanza para no revelar si el email existe
-        setStep("code");
+      } catch (err) {
+        setMessage(err instanceof Error ? err.message : "No se pudo enviar la solicitud. Intenta más tarde");
       } finally {
         setLoading(false);
       }
@@ -47,7 +59,7 @@ export default function RecoverView({ onLogin }: Props) {
     }
 
     // step === "code" — token + nueva contraseña
-    const token = String(formData.get("recovery-token") ?? "");
+    const token = String(formData.get("recovery-token") ?? "").trim();
     const password = String(formData.get("recovery-password") ?? "");
     const confirmPassword = String(formData.get("recovery-confirm-password") ?? "");
 
@@ -69,7 +81,9 @@ export default function RecoverView({ onLogin }: Props) {
 
     try {
       await resetPassword(token, password);
-      onLogin("Contraseña restablecida. Inicia sesión con tu nueva contraseña.");
+      // El backend revoca las sesiones anteriores y el BFF borra la cookie de este navegador.
+      clearSession();
+      onLogin(CONTRASENA_RESTABLECIDA);
     } catch (err) {
       setMessage(err instanceof Error ? err.message : "Error al restablecer la contraseña.");
     } finally {
@@ -93,7 +107,7 @@ export default function RecoverView({ onLogin }: Props) {
       {step === "code" && (
         <>
           <p className={styles.formMessage} style={{ color: "#666" }}>
-            Revisa tu correo y copia el token que recibiste.
+            {SOLICITUD_ACEPTADA}
           </p>
           <AccessField
             id="recovery-token"
@@ -131,6 +145,16 @@ export default function RecoverView({ onLogin }: Props) {
         >
           {loading ? "Procesando..." : submitLabel[step]}
         </Button>
+        {step === "code" && (
+          <button
+            type="button"
+            className={styles.forgotPassword}
+            onClick={volverAPedirToken}
+            disabled={loading}
+          >
+            Pedir otro token
+          </button>
+        )}
         <button
           type="button"
           className={styles.forgotPassword}

@@ -6,9 +6,13 @@ import type { LoginResponse, ResendResponse } from "@/lib/casillero/types";
  * backend, y el segundo factor crea una sesión simulada (cookie httpOnly).
  * Debe quedar en false en lo que se sube: con true cualquiera entra al dashboard.
  *
- * En el segundo factor, el código "000000" simula un código inválido (401).
+ * En el segundo factor, el código "000000" simula un código inválido (401); en
+ * "olvidé mi contraseña", el token "000000" simula un token inválido (401).
  */
 export const SIMULAR_AUTH = false;
+
+/** Token de recuperación que en simulación responde "token inválido" (401). */
+export const TOKEN_RECUPERACION_INVALIDO_SIMULADO = "000000";
 
 /** Valor de la cookie de la sesión simulada. */
 export const TOKEN_SESION_SIMULADA = "sesion-simulada";

@@ -9,7 +9,7 @@ import type { LoginResponse, ResendResponse } from "@/lib/casillero/types";
  * En el segundo factor, el código "000000" simula un código inválido (401); en
  * "olvidé mi contraseña", el token "000000" simula un token inválido (401).
  */
-export const SIMULAR_AUTH = false;
+export const SIMULAR_AUTH = true;
 
 /** Token de recuperación que en simulación responde "token inválido" (401). */
 export const TOKEN_RECUPERACION_INVALIDO_SIMULADO = "000000";

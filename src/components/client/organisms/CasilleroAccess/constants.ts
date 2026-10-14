@@ -4,7 +4,6 @@ import type { TwoFactorType } from "@/lib/casillero/types";
 
 /**
  * Métodos del segundo factor. `hint` explica dónde encontrar el código.
- * TODO [CASILLERO-FLUJO]: textos de `hint` propuestos (no están en el diseño); los valida diseño.
  */
 export const twoFactorMethods: { id: TwoFactorType; icon: IconType; label: string; hint: string }[] = [
   {

@@ -111,7 +111,6 @@ export default function TwoFactorView({ challengeId, availableFactors, expiresAt
           </Text>
         )}
         {vencido ? (
-          // TODO [CASILLERO-FLUJO]: texto propuesto (no está en el diseño).
           <Text variant="Small">
             <strong>El código venció.</strong>{" "}
             {selectedFactor?.type === "CORREO"

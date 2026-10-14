@@ -16,10 +16,9 @@ type Props = {
 
 const submitLabel: Record<RecoverStep, string> = {
   email: "Enviar código",
-  code: "Reestablecer",
+  code: "Restablecer",
 };
 
-// TODO [CASILLERO-FLUJO]: textos propuestos, confirmar con diseño/negocio.
 const SOLICITUD_ACEPTADA =
   "Si el correo está registrado, te enviamos un token de recuperación. Revisa tu bandeja de entrada y la carpeta de Spam, y copia el token aquí.";
 const CONTRASENA_RESTABLECIDA =
@@ -106,9 +105,7 @@ export default function RecoverView({ onLogin }: Props) {
 
       {step === "code" && (
         <>
-          <p className={styles.formMessage} style={{ color: "#666" }}>
-            {SOLICITUD_ACEPTADA}
-          </p>
+          <p className={styles.recoveryIntro}>{SOLICITUD_ACEPTADA}</p>
           <AccessField
             id="recovery-token"
             label="Token de recuperación"
@@ -117,6 +114,14 @@ export default function RecoverView({ onLogin }: Props) {
             autoComplete="off"
             required
           />
+          <button
+            type="button"
+            className={`${styles.forgotPassword} ${styles.recoveryResend}`}
+            onClick={volverAPedirToken}
+            disabled={loading}
+          >
+            Pedir otro token
+          </button>
           <AccessField
             id="recovery-password"
             label="Nueva contraseña"
@@ -145,16 +150,6 @@ export default function RecoverView({ onLogin }: Props) {
         >
           {loading ? "Procesando..." : submitLabel[step]}
         </Button>
-        {step === "code" && (
-          <button
-            type="button"
-            className={styles.forgotPassword}
-            onClick={volverAPedirToken}
-            disabled={loading}
-          >
-            Pedir otro token
-          </button>
-        )}
         <button
           type="button"
           className={styles.forgotPassword}

@@ -140,6 +140,25 @@
   }
 }
 
+.card:has(.recoveryIntro) {
+  h2 {
+    margin-bottom: 18px;
+  }
+}
+
+.recoveryIntro {
+  margin: 0;
+  color: #666;
+  font-size: 0.78rem;
+  line-height: 1.4;
+  text-align: center;
+}
+
+.recoveryResend {
+  align-self: flex-end;
+  margin-top: -8px;
+}
+
 .recoveryActions {
   margin-top: auto;
   display: grid;
@@ -369,6 +388,12 @@
       max-width: 220px;
       margin: 0 auto 78px;
       font-size: 1.75rem;
+    }
+  }
+
+  .card:has(.recoveryIntro) {
+    h2 {
+      margin-bottom: 24px;
     }
   }
 

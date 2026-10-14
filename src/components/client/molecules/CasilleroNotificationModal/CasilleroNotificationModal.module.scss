@@ -53,6 +53,20 @@
     align-self: flex-end;
 }
 
+.documentActions {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: 12px;
+    align-self: flex-end;
+}
+
+.errorDocumento {
+    color: $rojo-1;
+    align-self: flex-end;
+    text-align: right;
+}
+
 .sinDocumento {
     color: $secondary-text;
     align-self: flex-start;

@@ -102,9 +102,6 @@ export default function CasilleroBuzon() {
   const [whatsAppModalTitle, setWhatsAppModalTitle] = useState("");
   const [whatsAppModalDescription, setWhatsAppModalDescription] = useState("");
 
-  const handleDownload = (id: string) => {
-    alert(`Descargando notificación ${id}`);
-  }
 
   const handleSuscriptionToggle = (checked: boolean) => {
     if (checked) {
@@ -201,7 +198,6 @@ export default function CasilleroBuzon() {
         isOpen={!!selectedNotification}
         id={selectedNotification ?? ''}
         onClose={() => setSelectedNotification(undefined)}
-        onDownload={handleDownload}
         onSesionVencida={irAlLoginPorSesionVencida}
       />
       <CasilleroPopUp

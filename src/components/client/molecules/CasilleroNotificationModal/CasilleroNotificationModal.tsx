@@ -8,6 +8,7 @@ import { Button } from "@/components/server/atoms";
 import {
     CasilleroNotificationError,
     fetchNotificationDetail,
+    fetchNotificationDocument,
     formatearFechaNotificacion,
     formatearHoraNotificacion,
     isSesionVencida,
@@ -15,17 +16,63 @@ import {
 import type { CasilleroNotificationDetail } from "@/lib/casillero/types";
 import styles from "./CasilleroNotificationModal.module.scss";
 
+/** Tiempo antes de liberar la URL temporal del PDF (la pestaña o la descarga ya la tomaron). */
+const LIBERAR_URL_MS = 60_000;
+
+type AccionDocumento = "ver" | "descargar";
+
 export const CasilleroNotificationModal = ({
     id,
     isOpen,
     onClose,
-    onDownload,
     onSesionVencida,
 }: CasilleroNotificationModalProps) => {
     const [notification, setNotification] = useState<CasilleroNotificationDetail | null>(null);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<{ message: string; noEncontrada: boolean } | null>(null);
     const [intento, setIntento] = useState(0);
+    const [cargandoDocumento, setCargandoDocumento] = useState<AccionDocumento | null>(null);
+    const [errorDocumento, setErrorDocumento] = useState("");
+
+    /**
+     * El PDF se pide al endpoint autenticado cada vez (no hay URL pública) y se usa como
+     * Blob en el navegador. Para "ver", la pestaña se abre antes de la petición: si se
+     * abre después de esperar, el navegador la bloquea como ventana emergente.
+     */
+    const abrirDocumento = async (accion: AccionDocumento) => {
+        if (cargandoDocumento) return;
+        setErrorDocumento("");
+        setCargandoDocumento(accion);
+        const pestana = accion === "ver" ? window.open("", "_blank") : null;
+        if (accion === "ver" && !pestana) {
+            setErrorDocumento("El navegador bloqueó la nueva pestaña. Permite las ventanas emergentes o descarga el documento.");
+            setCargandoDocumento(null);
+            return;
+        }
+
+        try {
+            const { blob, fileName } = await fetchNotificationDocument(id);
+            const url = URL.createObjectURL(blob);
+            if (pestana) {
+                pestana.location.href = url;
+            } else {
+                const enlace = document.createElement("a");
+                enlace.href = url;
+                enlace.download = fileName;
+                enlace.click();
+            }
+            window.setTimeout(() => URL.revokeObjectURL(url), LIBERAR_URL_MS);
+        } catch (err) {
+            pestana?.close();
+            if (isSesionVencida(err) && onSesionVencida) {
+                onSesionVencida();
+                return;
+            }
+            setErrorDocumento(err instanceof Error ? err.message : "No se pudo cargar el documento. Intenta más tarde");
+        } finally {
+            setCargandoDocumento(null);
+        }
+    };
 
     // El detalle se pide cada vez que se abre (el backend registra la apertura).
     useEffect(() => {
@@ -34,6 +81,7 @@ export const CasilleroNotificationModal = ({
         let cancelado = false;
         setNotification(null);
         setError(null);
+        setErrorDocumento("");
         setLoading(true);
 
         fetchNotificationDetail(id)
@@ -91,15 +139,30 @@ export const CasilleroNotificationModal = ({
                         </div>
 
                         {notification.hasDocument ? (
-                            onDownload && (
-                                <Button
-                                    variant="success"
-                                    className={styles.downloadButton}
-                                    onClick={() => onDownload?.(id)}
-                                >
-                                    Descargar Notificación
-                                </Button>
-                            )
+                            <>
+                                <div className={styles.documentActions}>
+                                    <Button
+                                        variant="success"
+                                        onClick={() => abrirDocumento("ver")}
+                                        disabled={cargandoDocumento !== null}
+                                    >
+                                        {cargandoDocumento === "ver" ? "Cargando..." : "Ver Notificación"}
+                                    </Button>
+                                    <Button
+                                        variant="success"
+                                        className={styles.downloadButton}
+                                        onClick={() => abrirDocumento("descargar")}
+                                        disabled={cargandoDocumento !== null}
+                                    >
+                                        {cargandoDocumento === "descargar" ? "Descargando..." : "Descargar Notificación"}
+                                    </Button>
+                                </div>
+                                {errorDocumento && (
+                                    <Text variant="Small" className={styles.errorDocumento}>
+                                        {errorDocumento}
+                                    </Text>
+                                )}
+                            </>
                         ) : (
                             <Text variant="Small" className={styles.sinDocumento}>
                                 Esta notificación no tiene un documento disponible.

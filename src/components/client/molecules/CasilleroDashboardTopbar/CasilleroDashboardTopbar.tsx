@@ -21,6 +21,7 @@ export default function CasilleroDashboardTopbar({ userName, onMenuClickAction }
   const { mode, setMode } = useModeStore();
   const { clearSession } = useSessionStore();
   const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [cerrandoSesion, setCerrandoSesion] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   const handleModeChange = (newMode: "personal" | "empresa") => {
@@ -29,10 +30,15 @@ export default function CasilleroDashboardTopbar({ userName, onMenuClickAction }
   };
 
   const handleLogout = async () => {
+    if (cerrandoSesion) return;
+    setCerrandoSesion(true);
+    setDropdownOpen(false);
     // El BFF borra la cookie aunque la sesión ya esté vencida; aquí se limpia lo local.
     await logout();
     clearSession();
-    router.push("/casillero");
+    // replace + refresh: "Atrás" no regresa al dashboard guardado en la caché del router.
+    router.replace("/casillero");
+    router.refresh();
   };
 
   // cierra el dropdown al hacer clic fuera
@@ -114,6 +120,7 @@ export default function CasilleroDashboardTopbar({ userName, onMenuClickAction }
                 type="button"
                 className={`${styles.dropdownItem} ${styles.dropdownItemDanger}`}
                 onClick={handleLogout}
+                disabled={cerrandoSesion}
               >
                 <Icon name="Logout" />
                 Cerrar sesión
@@ -173,6 +180,7 @@ export default function CasilleroDashboardTopbar({ userName, onMenuClickAction }
         type="button"
         className={styles.mobileLogoutButton}
         onClick={handleLogout}
+        disabled={cerrandoSesion}
         aria-label="Cerrar sesión"
       >
         <Icon name="Logout" />

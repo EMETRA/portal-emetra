@@ -200,3 +200,33 @@ export interface RegistrationStatusResponse {
   submittedAt: string;
   observations: RegistrationObservation[];
 }
+
+/*
+  Autenticación de usuario
+*/
+
+export type TwoFactorType = "CORREO" | "TOTP" | "RECUPERACION";
+
+export interface AvailableFactor {
+  id: string;
+  type: TwoFactorType;
+  preferred: boolean;
+  destinationMasked?: string; // solo en CORREO
+}
+
+export interface LoginResponse {
+  challengeId: string;
+  expiresAt: string;
+  availableFactors: AvailableFactor[];
+}
+
+export interface VerifyResponse {
+  sessionToken: string;
+  expiresAt: string;
+}
+
+export interface ResendResponse {
+  challengeId: string;
+  expiresAt: string;
+  destinationMasked: string;
+}

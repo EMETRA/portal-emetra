@@ -98,7 +98,7 @@ export default function TrackingView({ onLogin }: Props) {
         setLoading(true);
         const data = await getRegistrationStatus(code);
         setResult(data);
-        } catch (err: any) {
+        } catch {
             // setMessage(err.message ?? "Ocurrió un error al consultar. Intenta de nuevo.");
             // TODO: quitar esto cuando el backend esté disponible
             const random = MOCK_RESULTS[Math.floor(Math.random() * MOCK_RESULTS.length)];

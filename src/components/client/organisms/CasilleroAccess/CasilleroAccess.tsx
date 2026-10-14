@@ -11,6 +11,7 @@ import VerifyEmailView from "./views/VerifyEmailView";
 import type { AccessView } from "./types";
 import styles from "./CasilleroAccess.module.scss";
 import TrackingView from "./views/TrackingView";
+import { AvailableFactor } from "@/lib/casillero/types";
 
 const pageTitle: Record<AccessView, string> = {
   login: "Log In",
@@ -28,6 +29,20 @@ export default function CasilleroAccess() {
   const [verificationId, setVerificationId] = useState("");
   const [verificationEmail, setVerificationEmail] = useState("");
   const [verificationExpiresAt, setVerificationExpiresAt] = useState("");
+  const [challengeId, setChallengeId] = useState("");
+  const [availableFactors, setAvailableFactors] = useState<AvailableFactor[]>([]);
+  const [challengeExpiresAt, setChallengeExpiresAt] = useState("");
+
+  const handleLoginSuccess = (
+    newChallengeId: string,
+    factors: AvailableFactor[],
+    expiresAt: string
+  ) => {
+    setChallengeId(newChallengeId);
+    setAvailableFactors(factors);
+    setChallengeExpiresAt(expiresAt);
+    changeView("login-2fa");
+  };
 
   const handleRegisterSuccess = (
     newVerificationId: string,
@@ -99,14 +114,20 @@ export default function CasilleroAccess() {
           {view === "login" && (
             <LoginView
               notice={notice}
-              onSuccess={() => changeView("login-2fa")}
+              onSuccess={handleLoginSuccess}
+              // onSuccess={() => changeView("login-2fa")} 
               onRegister={() => changeView("register")}
               onRecover={() => changeView("recover")}
               onTracking={() => changeView("tracking")}
             />
           )}
           {view === "login-2fa" && (
-            <TwoFactorView onSuccess={() => router.push("/casillero/dashboard")} />
+            <TwoFactorView
+              challengeId={challengeId}
+              availableFactors={availableFactors}
+              expiresAt={challengeExpiresAt}
+              onSuccess={() => router.push("/casillero/dashboard")}
+            />
           )}
           
           {view === "register" && (

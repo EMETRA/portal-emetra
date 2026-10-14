@@ -45,3 +45,7 @@ storybook-static
 
 .cursor
 .idea
+# Claude Code
+CLAUDE.md
+CLAUDE.local.md
+.claude/

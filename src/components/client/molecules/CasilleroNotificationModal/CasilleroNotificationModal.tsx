@@ -5,70 +5,60 @@ import { LoadingSpinner } from "@/components/server/atoms/LoadingSpinner";
 import { Icon } from "@/components/server/atoms";
 import { Text } from "@/components/atoms/Text";
 import { Button } from "@/components/server/atoms";
+import {
+    CasilleroNotificationError,
+    fetchNotificationDetail,
+    formatearFechaNotificacion,
+    formatearHoraNotificacion,
+    isSesionVencida,
+} from "@/lib/casillero/notifications";
+import type { CasilleroNotificationDetail } from "@/lib/casillero/types";
 import styles from "./CasilleroNotificationModal.module.scss";
-
-const DUMMY_DATA = [
-    {
-      id: '1',
-      title: 'Notificación 1',
-      description: 'Descripción 1. Lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quos. Lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quos. Lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quos. Lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quos.',
-      date: '2026-06-22',
-      time: '10:00',
-    },
-    {
-      id: '2',
-      title: 'Notificación 2',
-      description: 'Descripción 2',
-      date: '2026-06-22',
-      time: '10:00',
-    },
-    {
-        id: '3',
-        title: 'Notificación 3',
-        description: 'Descripción 3',
-        date: '2026-06-22',
-        time: '10:00',
-    },
-    {
-        id: '4',
-        title: 'Notificación 4',
-        description: 'Descripción 4',
-        date: '2026-06-22',
-        time: '10:00',
-    },
-    
-    {
-        id: '5',
-        title: 'Notificación 5',
-        description: 'Descripción 5',
-        date: '2026-06-22',
-        time: '10:00',
-    },
-    {
-        id: '6',
-        title: 'Notificación 6',
-        description: 'Descripción 6',
-        date: '2026-06-22',
-        time: '10:00',
-    },
-]
 
 export const CasilleroNotificationModal = ({
     id,
     isOpen,
     onClose,
     onDownload,
+    onSesionVencida,
 }: CasilleroNotificationModalProps) => {
-    const notification = DUMMY_DATA.find(notification => notification.id === id);
+    const [notification, setNotification] = useState<CasilleroNotificationDetail | null>(null);
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState<{ message: string; noEncontrada: boolean } | null>(null);
+    const [intento, setIntento] = useState(0);
 
-    const [loading, setLoading] = useState(true);
-
-    // fingir una carga de data
+    // El detalle se pide cada vez que se abre (el backend registra la apertura).
     useEffect(() => {
-        setTimeout(() => {
-            setLoading(false);
-        }, 5000);
-    }, []);
+        if (!isOpen || !id) return;
+
+        let cancelado = false;
+        setNotification(null);
+        setError(null);
+        setLoading(true);
+
+        fetchNotificationDetail(id)
+            .then((detalle) => {
+                if (!cancelado) setNotification(detalle);
+            })
+            .catch((err) => {
+                if (cancelado) return;
+                if (isSesionVencida(err) && onSesionVencida) {
+                    onSesionVencida();
+                    return;
+                }
+                setError({
+                    message: err instanceof Error ? err.message : "No se pudo cargar la notificación. Intenta más tarde",
+                    noEncontrada: err instanceof CasilleroNotificationError && err.status === 404,
+                });
+            })
+            .finally(() => {
+                if (!cancelado) setLoading(false);
+            });
+
+        return () => {
+            cancelado = true;
+        };
+    }, [isOpen, id, intento, onSesionVencida]);
 
     return (
         <PopOver isOpen={isOpen} onClose={onClose} position="center">
@@ -78,15 +68,15 @@ export const CasilleroNotificationModal = ({
                         <div className={styles.header}>
                             <div className={styles.detailsWrapper}>
                                 <h2 className={styles.title}>
-                                    {notification.title}
+                                    {notification.subject}
                                 </h2>
                                 <div className={styles.dateTimeWrapper}>
                                     <Text variant="Small" className={styles.date}>
-                                        {notification.date}
+                                        {formatearFechaNotificacion(notification.issuedAt)}
                                     </Text>
                                     <span className={styles.separator}>•</span>
                                     <Text variant="Small" className={styles.time}>
-                                        {notification.time}
+                                        {formatearHoraNotificacion(notification.issuedAt)}
                                     </Text>
                                 </div>
                             </div>
@@ -96,28 +86,41 @@ export const CasilleroNotificationModal = ({
 
                         <div className={styles.descriptionWrapper}>
                             <Text variant="Medium" className={styles.description}>
-                                {notification.description}
+                                {notification.content || notification.summary}
                             </Text>
                         </div>
 
-                        {onDownload && (
-                            <Button 
-                                variant="success" 
-                                className={styles.downloadButton}
-                                onClick={() => onDownload?.(id)}
-                            >
-                                Descargar Notificación
-                            </Button>
+                        {notification.hasDocument ? (
+                            onDownload && (
+                                <Button
+                                    variant="success"
+                                    className={styles.downloadButton}
+                                    onClick={() => onDownload?.(id)}
+                                >
+                                    Descargar Notificación
+                                </Button>
+                            )
+                        ) : (
+                            <Text variant="Small" className={styles.sinDocumento}>
+                                Esta notificación no tiene un documento disponible.
+                            </Text>
                         )}
                     </>
-                ) : (
+                ) : error ? (
                     <>
                         <Text variant="Medium" className={styles.description}>
-                            No se encontró la notificación.
+                            {error.message}
                         </Text>
-                        <Button variant="success" onClick={() => onClose()}>Cerrar</Button>
+                        <div className={styles.errorActions}>
+                            {!error.noEncontrada && (
+                                <Button variant="success" onClick={() => setIntento((actual) => actual + 1)}>
+                                    Reintentar
+                                </Button>
+                            )}
+                            <Button variant="success" onClick={() => onClose()}>Cerrar</Button>
+                        </div>
                     </>
-                )}
+                ) : null}
             </div>
         </PopOver>
     );

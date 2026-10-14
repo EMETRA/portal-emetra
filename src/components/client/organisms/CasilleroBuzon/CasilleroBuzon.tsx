@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 import { useRouter } from "next/navigation";
 import {
     Table,
@@ -19,7 +19,12 @@ import { Switch } from "@/components/client/atoms/Switch";
 import PaginationArrows from "@/components/client/atoms/PaginationArrows/PaginationArrows";
 import { CasilleroNotification } from '@/components/client/molecules/CasilleroNotificationModal';
 import { CasilleroPopUp } from "@/components/client/molecules/CasilleroPopUp";
-import { fetchNotifications, isSesionVencida } from "@/lib/casillero/notifications";
+import {
+  fetchNotifications,
+  formatearFechaNotificacion,
+  formatearHoraNotificacion,
+  isSesionVencida,
+} from "@/lib/casillero/notifications";
 import type { CasilleroNotificationList } from "@/lib/casillero/types";
 import { useSessionStore } from "@/store/useSessionStore";
 import styles from "./CasilleroBuzon.module.scss";
@@ -28,20 +33,6 @@ const cellphoneMuck = "1234-5678"
 
 const NOTIFICACIONES_POR_PAGINA = 20;
 const COLUMNAS = 3;
-
-const formatearFecha = (iso: string) => {
-  const fecha = new Date(iso);
-  return Number.isNaN(fecha.getTime())
-    ? ""
-    : fecha.toLocaleDateString("es-GT", { day: "2-digit", month: "2-digit", year: "numeric" });
-};
-
-const formatearHora = (iso: string) => {
-  const fecha = new Date(iso);
-  return Number.isNaN(fecha.getTime())
-    ? ""
-    : fecha.toLocaleTimeString("es-GT", { hour: "2-digit", minute: "2-digit" });
-};
 
 export default function CasilleroBuzon() {
   const router = useRouter();
@@ -57,6 +48,12 @@ export default function CasilleroBuzon() {
   const [intento, setIntento] = useState(0);
   const cursorActual = cursores[pagina];
 
+  // 401 del backend: la sesión venció o fue revocada; se limpia y se vuelve al login.
+  const irAlLoginPorSesionVencida = useCallback(() => {
+    clearSession();
+    router.replace("/casillero");
+  }, [clearSession, router]);
+
   useEffect(() => {
     let cancelado = false;
     setCargando(true);
@@ -69,8 +66,7 @@ export default function CasilleroBuzon() {
       .catch((err) => {
         if (cancelado) return;
         if (isSesionVencida(err)) {
-          clearSession();
-          router.replace("/casillero");
+          irAlLoginPorSesionVencida();
           return;
         }
         setError(err instanceof Error ? err.message : "No se pudo cargar el buzón. Intenta más tarde");
@@ -82,7 +78,7 @@ export default function CasilleroBuzon() {
     return () => {
       cancelado = true;
     };
-  }, [cursorActual, intento, clearSession, router]);
+  }, [cursorActual, intento, irAlLoginPorSesionVencida]);
 
   const paginaSiguiente = () => {
     const siguiente = listado?.nextCursor;
@@ -183,9 +179,9 @@ export default function CasilleroBuzon() {
             ) : (
               listado.items.map((notification) => (
                 <TableRow key={notification.id} onClick={() => setSelectedNotification(notification.id)} className={styles.row}>
-                  <TableCell>{formatearFecha(notification.issuedAt)}</TableCell>
+                  <TableCell>{formatearFechaNotificacion(notification.issuedAt)}</TableCell>
                   <TableCell>{notification.subject}</TableCell>
-                  <TableCell>{formatearHora(notification.issuedAt)}</TableCell>
+                  <TableCell>{formatearHoraNotificacion(notification.issuedAt)}</TableCell>
                 </TableRow>
               ))
             )}
@@ -206,6 +202,7 @@ export default function CasilleroBuzon() {
         id={selectedNotification ?? ''}
         onClose={() => setSelectedNotification(undefined)}
         onDownload={handleDownload}
+        onSesionVencida={irAlLoginPorSesionVencida}
       />
       <CasilleroPopUp
         isOpen={isPopUpOpen}

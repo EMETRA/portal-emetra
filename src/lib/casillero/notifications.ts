@@ -20,6 +20,22 @@ const SESION_VENCIDA = "Tu sesión venció. Vuelve a iniciar sesión";
 export const isSesionVencida = (error: unknown): boolean =>
     error instanceof CasilleroNotificationError && error.status === 401;
 
+/** Fecha de emisión en formato local (dd/mm/aaaa); vacío si la fecha no es válida. */
+export function formatearFechaNotificacion(iso: string): string {
+    const fecha = new Date(iso);
+    return Number.isNaN(fecha.getTime())
+        ? ""
+        : fecha.toLocaleDateString("es-GT", { day: "2-digit", month: "2-digit", year: "numeric" });
+}
+
+/** Hora de emisión en formato local; vacío si la fecha no es válida. */
+export function formatearHoraNotificacion(iso: string): string {
+    const fecha = new Date(iso);
+    return Number.isNaN(fecha.getTime())
+        ? ""
+        : fecha.toLocaleTimeString("es-GT", { hour: "2-digit", minute: "2-digit" });
+}
+
 // ── LISTADO ───────────────────────────────────────────────────────────────
 function errorFromListStatus(status: number): Error {
     const message =

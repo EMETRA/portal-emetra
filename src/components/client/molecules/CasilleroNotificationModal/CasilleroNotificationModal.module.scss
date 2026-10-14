@@ -52,3 +52,13 @@
     width: fit-content;
     align-self: flex-end;
 }
+
+.sinDocumento {
+    color: $secondary-text;
+    align-self: flex-start;
+}
+
+.errorActions {
+    display: flex;
+    gap: 12px;
+}

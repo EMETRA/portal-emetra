@@ -2,6 +2,13 @@
 
 .wrapper {
   width: 100%;
+  // El layout del dashboard no deja espacio abajo en escritorio: sin esto el
+  // paginador queda pegado al borde.
+  padding-bottom: 2.5rem;
+}
+
+.fechaMovil {
+  display: none;
 }
 
 .layout {
@@ -56,6 +63,27 @@
 }
 
 @media (max-width: 520px) {
+  // Una sola columna: asunto y, debajo, fecha • hora. Solo en filas de notificación
+  // (.row); las filas de carga, error y vacío usan una celda con colSpan.
+  .listado {
+    thead th:nth-child(n + 2),
+    .row td:nth-child(1),
+    .row td:nth-child(3) {
+      display: none;
+    }
+  }
+
+  .asunto {
+    display: block;
+  }
+
+  .fechaMovil {
+    display: block;
+    margin-top: 4px;
+    color: $secondary-text;
+    font-size: 0.8rem;
+  }
+
   .suscriptionInfo {
     align-items: center;
   }

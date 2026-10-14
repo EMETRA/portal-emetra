@@ -1,14 +1,14 @@
 @use "../../../../theme/colors.scss" as *;
 
-
+// Mismo ancho máximo que CasilleroPopUp; contenido alineado a la izquierda.
 .modalCard {
-    max-width: 350px;
+    max-width: 500px;
     width: 90vw;
     display: flex;
     flex-direction: column;
-    align-items: center;
-    text-align: center;
-    padding: 20px;
+    align-items: stretch;
+    text-align: left;
+    padding: 24px;
     gap: 16px;
 }
 
@@ -16,14 +16,23 @@
     width: 100%;
     display: flex;
     justify-content: space-between;
-    align-items: center;
+    align-items: flex-start;
+    gap: 16px;
 }
 
 .detailsWrapper {
     display: flex;
     flex-direction: column;
     align-items: flex-start;
-    gap: 8px;
+    gap: 6px;
+    min-width: 0;
+}
+
+.title {
+    margin: 0;
+    font-size: 1.3rem;
+    line-height: 1.25;
+    overflow-wrap: anywhere;
 }
 
 .dateTimeWrapper {
@@ -33,46 +42,78 @@
     gap: 4px;
 }
 
-.date, .time {
+.date, .time, .separator {
     color: $secondary-text;
 }
 
 .mainIcon {
+    flex-shrink: 0;
     color: $secondary-text;
     cursor: pointer;
     transition: color 0.2s ease;
-    align-self: flex-start;
 
     &:hover {
         color: $primary-text;
     }
 }
 
-.downloadButton {
-    width: fit-content;
-    align-self: flex-end;
+.descriptionWrapper {
+    padding-top: 16px;
+    border-top: 1px solid $cuaternary-text;
 }
 
+// Más específico que el estilo propio de Text (que centra el texto).
+.modalCard .description {
+    line-height: 1.5;
+    white-space: pre-line;
+    text-align: left;
+}
+
+.modalCard .sinDocumento {
+    text-align: left;
+}
+
+// Ver (secundaria) y Descargar (principal) lado a lado; en móvil, uno debajo del otro.
 .documentActions {
     display: flex;
-    flex-wrap: wrap;
     justify-content: flex-end;
     gap: 12px;
-    align-self: flex-end;
+}
+
+.documentButton {
+    min-width: 180px;
 }
 
 .errorDocumento {
     color: $rojo-1;
-    align-self: flex-end;
     text-align: right;
 }
 
 .sinDocumento {
     color: $secondary-text;
-    align-self: flex-start;
 }
 
 .errorActions {
     display: flex;
+    justify-content: flex-end;
     gap: 12px;
+}
+
+@media (max-width: 480px) {
+    .modalCard {
+        padding: 20px;
+    }
+
+    .documentActions {
+        flex-direction: column-reverse;
+    }
+
+    .documentButton {
+        width: 100%;
+        min-width: 0;
+    }
+
+    .errorDocumento {
+        text-align: left;
+    }
 }

@@ -139,6 +139,7 @@ export default function CasilleroBuzon() {
             }}
           />
         </CardGeneral>
+        <div className={styles.listado}>
         <Table>
           <TableHead>
             <TableRow>
@@ -177,7 +178,13 @@ export default function CasilleroBuzon() {
               listado.items.map((notification) => (
                 <TableRow key={notification.id} onClick={() => setSelectedNotification(notification.id)} className={styles.row}>
                   <TableCell>{formatearFechaNotificacion(notification.issuedAt)}</TableCell>
-                  <TableCell>{notification.subject}</TableCell>
+                  <TableCell>
+                    <span className={styles.asunto}>{notification.subject}</span>
+                    {/* En móvil la fecha y la hora van bajo el asunto (una sola columna). */}
+                    <span className={styles.fechaMovil}>
+                      {formatearFechaNotificacion(notification.issuedAt)} • {formatearHoraNotificacion(notification.issuedAt)}
+                    </span>
+                  </TableCell>
                   <TableCell>{formatearHoraNotificacion(notification.issuedAt)}</TableCell>
                 </TableRow>
               ))
@@ -193,6 +200,7 @@ export default function CasilleroBuzon() {
             label={`Página ${pagina + 1}`}
           />
         )}
+        </div>
       </div>
       <CasilleroNotification
         isOpen={!!selectedNotification}

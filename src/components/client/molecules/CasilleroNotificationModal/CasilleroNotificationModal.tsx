@@ -142,7 +142,8 @@ export const CasilleroNotificationModal = ({
                             <>
                                 <div className={styles.documentActions}>
                                     <Button
-                                        variant="success"
+                                        variant="outline"
+                                        className={styles.documentButton}
                                         onClick={() => abrirDocumento("ver")}
                                         disabled={cargandoDocumento !== null}
                                     >
@@ -150,7 +151,7 @@ export const CasilleroNotificationModal = ({
                                     </Button>
                                     <Button
                                         variant="success"
-                                        className={styles.downloadButton}
+                                        className={styles.documentButton}
                                         onClick={() => abrirDocumento("descargar")}
                                         disabled={cargandoDocumento !== null}
                                     >

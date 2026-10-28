@@ -263,3 +263,68 @@ export type CasilleroNotificationList = {
 export type CasilleroNotificationDetail = CasilleroNotificationItem & {
   content: string;
 };
+
+/*
+  Cobros: vehículos del usuario y sus obligaciones pagables (CAS-132)
+  - Vehículos: ruta, parámetros y campos tomados del Swagger del backend; Daniel
+    confirmó (2026-10-28) que el cursor de la siguiente página viene en `nextCursor`.
+    TODO [CASILLERO-BACKEND]: modelo, color y año vendrán cuando backend integre SAT;
+    aún no hay nombres de campos.
+  - Obligaciones: TODO [CASILLERO-BACKEND]: formato provisional. El ticket solo nombra
+    concepto, monto, saldo, estado y vencimiento; los nombres (concept, amount, balance,
+    status, dueDate), los valores del estado, `category` y que el listado venga completo
+    (sin paginación) son supuestos. El id del vehículo en la ruta es su
+    `vehicleReference` (confirmado por Daniel, 2026-10-28).
+*/
+
+export type CasilleroVehicle = {
+  /** Id del vehículo para pedir sus obligaciones. */
+  vehicleReference: string;
+  /** Número sin el tipo, p. ej. "111BBB". */
+  plateNumber: string;
+  /** País ISO de la placa, p. ej. "GT". */
+  plateCountry: string;
+  /** Código público del tipo de placa, p. ej. "P". */
+  plateTypeCode: string;
+  foreignPlate: boolean;
+  associationStatus: string;
+  accessType: string;
+  ownershipType: string;
+  /** Fecha de asociación al usuario (ISO 8601). */
+  associatedAt: string;
+};
+
+/**
+ * GET /v1/vehicles?cursor&limit&plateCountry&plateTypeCode: vehículos con asociación
+ * activa del contexto actual (persona o empresa), paginados por cursor. En la primera
+ * página el cursor va vacío.
+ */
+export type CasilleroVehicleList = {
+  items: CasilleroVehicle[];
+  nextCursor?: string | null;
+};
+
+/** Valores provisionales del estado de una obligación. */
+export type CasilleroObligationStatus = "PENDIENTE" | "VENCIDA" | "EN_PROCESO" | "PAGADA";
+
+export type CasilleroObligation = {
+  id: string;
+  concept: string;
+  /** Monto original, en quetzales. */
+  amount: number;
+  /** Lo que falta por pagar, en quetzales. */
+  balance: number;
+  status: CasilleroObligationStatus;
+  /** Fecha límite de pago (ISO 8601). */
+  dueDate: string;
+  /** Opcional: si viene, la pantalla muestra los filtros por categoría. */
+  category?: string;
+};
+
+/** GET /v1/vehicles/{id}/obligations */
+export type CasilleroObligationList = {
+  items: CasilleroObligation[];
+};
+
+/** GET /v1/obligations/{id}: por ahora los mismos datos del listado. */
+export type CasilleroObligationDetail = CasilleroObligation;

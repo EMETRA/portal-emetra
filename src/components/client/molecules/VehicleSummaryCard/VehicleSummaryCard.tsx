@@ -3,21 +3,19 @@ import { FINE_CATEGORIES, FineCategory } from "@/types/fines";
 import styles from "./VehicleSummaryCard.module.scss";
 import CardGeneral from "../../atoms/CardGeneral/CardGeneral";
 import PendienteApi from "../../atoms/PendienteApi/PendienteApi";
+import { DATOS_DE_EJEMPLO } from "@/lib/casillero/datosDeEjemplo";
 
 interface VehicleSummaryCardProps {
-    /** Placa completa; se usa de título mientras no venga el modelo. */
-    plate?: string;
     model?: string;
     color?: string;
     year?: number;
     totalAmount: number;
     pendingCount: number;
-    /** Sin categorías (la API no las mandó) no se muestra el desglose. */
+    /** Sin categorías (la API no las mandó) el desglose queda con marcas de pendiente. */
     amountsByCategory?: Record<FineCategory, number>;
 }
 
 export default function VehicleSummaryCard({
-    plate,
     model,
     color,
     year,
@@ -28,42 +26,28 @@ export default function VehicleSummaryCard({
     return (
         <CardGeneral className={styles.card}>
         <h2 className={styles.title}>
-            {model ?? plate}
-            {!model && <PendienteApi campo="modelo" />}
+            {model ?? <PendienteApi campo="modelo" ejemplo={DATOS_DE_EJEMPLO.vehiculo.modelo} />}
         </h2>
 
-        {color && year ? (
-            <p className={styles.subtitle}>
-                {color} <span className={styles.dot}>•</span> {year}
-            </p>
-        ) : color || year ? (
-            <p className={styles.subtitle}>
-                {color ?? <PendienteApi campo="color" />} {year ?? <PendienteApi campo="año" />}
-            </p>
-        ) : (
-            // Sin párrafo vacío: las marcas no ocupan espacio.
-            <>
-                <PendienteApi campo="color" />
-                <PendienteApi campo="año" />
-            </>
-        )}
+        <p className={styles.subtitle}>
+            {color ?? <PendienteApi campo="color" ejemplo={DATOS_DE_EJEMPLO.vehiculo.color} />}{" "}
+            <span className={styles.dot}>•</span>{" "}
+            {year ?? <PendienteApi campo="año" ejemplo={DATOS_DE_EJEMPLO.vehiculo.anio} />}
+        </p>
 
         <p className={styles.totals}>
             {pendingCount} Multas pendientes <span className={styles.dot}>•</span> Total Q
             {totalAmount.toLocaleString("es-GT")}
         </p>
 
-        {amountsByCategory ? (
-            <div className={styles.breakdown}>
-                {FINE_CATEGORIES.map(({ value, label }) => (
-                <span key={value} className={styles.breakdownItem}>
-                    • {label}: Q{amountsByCategory[value] ?? 0}
-                </span>
-                ))}
-            </div>
-        ) : (
-            <PendienteApi campo="categoría" />
-        )}
+        <div className={styles.breakdown}>
+            {FINE_CATEGORIES.map(({ value, label }) => (
+            <span key={value} className={styles.breakdownItem}>
+                • {label}:{" "}
+                {amountsByCategory ? `Q${amountsByCategory[value] ?? 0}` : <PendienteApi campo="categoría" />}
+            </span>
+            ))}
+        </div>
         </CardGeneral>
     );
 }

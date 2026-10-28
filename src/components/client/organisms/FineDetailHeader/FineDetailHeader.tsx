@@ -8,6 +8,9 @@ import styles from "./FineDetailHeader.module.scss";
 import CardGeneral from "../../atoms/CardGeneral/CardGeneral";
 import CategoryBadge from "../../atoms/CategoryBadge/CategoryBadge";
 import PendienteApi from "../../atoms/PendienteApi/PendienteApi";
+import { DATOS_DE_EJEMPLO } from "@/lib/casillero/datosDeEjemplo";
+
+const EJEMPLO = DATOS_DE_EJEMPLO.multa;
 
 /**
  * Los datos opcionales son los que la API de Cobros todavía no manda; en su lugar queda
@@ -28,6 +31,8 @@ interface FineDetailHeaderProps {
     numeral?: string;
     /** Sin evidencia no se muestra el botón "Ver imagen". */
     onVerImagen?: () => void;
+    /** true = "Ver imagen" abre una imagen de ejemplo; se marca como pendiente. */
+    evidenciaDeEjemplo?: boolean;
     onPayThis: () => void;
     /** false = lo pagado o con pago en proceso: el botón de pagar queda deshabilitado. */
     canPay?: boolean;
@@ -46,6 +51,7 @@ export default function FineDetailHeader({
     article,
     numeral,
     onVerImagen,
+    evidenciaDeEjemplo,
     onPayThis,
     canPay = true,
 }: FineDetailHeaderProps) {
@@ -66,30 +72,32 @@ export default function FineDetailHeader({
         <span className={styles.original}>Monto original: Q{originalAmount}</span>
     );
 
-    const articulo =
-        article && numeral ? (
-            <p className={styles.article}>
-                Artículo {article} <span className={styles.dot}>•</span> Numeral {numeral}
-            </p>
-        ) : (
-            <PendienteApi campo="artículo y numeral" />
-        );
+    // El diseño se mantiene completo: donde falta un dato queda su marca de pendiente.
+    const articulo = (
+        <p className={styles.article}>
+            Artículo {article ?? <PendienteApi campo="artículo" ejemplo={EJEMPLO.articulo} />}{" "}
+            <span className={styles.dot}>•</span>{" "}
+            Numeral {numeral ?? <PendienteApi campo="numeral" ejemplo={EJEMPLO.numeral} />}
+        </p>
+    );
 
-    const verImagen = (className: string) =>
-        onVerImagen ? (
-            <button type="button" className={className} onClick={onVerImagen}>
-                Ver imagen
-            </button>
-        ) : (
-            <PendienteApi campo="evidencia (imagen)" />
-        );
+    // Sin evidencia el botón se ve, pero deshabilitado.
+    const verImagen = (className: string) => (
+        <>
+        <button type="button" className={className} onClick={onVerImagen} disabled={!onVerImagen}>
+            Ver imagen
+        </button>
+        {(!onVerImagen || evidenciaDeEjemplo) && <PendienteApi campo="evidencia (imagen)" />}
+        </>
+    );
 
     return (
         <CardGeneral padding="lg" className={styles.card}>
         {isMobile ? (
             <>
             <h2 className={styles.code}>
-                {series && number ? `Remisión: ${series}${number}` : <PendienteApi campo="serie y número" />}
+                Remisión:{" "}
+                {series && number ? `${series}${number}` : <PendienteApi campo="serie y número" ejemplo={EJEMPLO.codigo} />}
             </h2>
 
             <div className={styles.mobileBadgeRow}>
@@ -100,8 +108,8 @@ export default function FineDetailHeader({
 
             <div className={styles.mobileBody}>
                 <p className={styles.description}>{description}</p>
-                {date ? <p className={styles.meta}>{date}</p> : <PendienteApi campo="fecha" />}
-                {location ? <p className={styles.meta}>{location}</p> : <PendienteApi campo="lugar" />}
+                <p className={styles.meta}>{date ?? <PendienteApi campo="fecha" ejemplo={EJEMPLO.fechaLarga} />}</p>
+                <p className={styles.meta}>{location ?? <PendienteApi campo="lugar" ejemplo={EJEMPLO.lugar} />}</p>
                 {articulo}
                 {verImagen(styles.verImagenButtonMobile)}
                 <button type="button" className={styles.payButtonMobile} onClick={onPayThis} disabled={!canPay}>
@@ -112,33 +120,19 @@ export default function FineDetailHeader({
         ) : (
             <div className={styles.topGrid}>
             <div className={styles.leftCol}>
-                {/* Sin ningún dato, solo las marcas: no queda una fila vacía ocupando espacio. */}
-                {series || number ? (
-                    <div className={styles.codeRow}>
-                    {series ? <h2 className={styles.code}>Serie: {series}</h2> : <PendienteApi campo="serie" />}
-                    {number ? <h2 className={styles.code}>Número: {number}</h2> : <PendienteApi campo="número" />}
-                    </div>
-                ) : (
-                    <PendienteApi campo="serie y número" />
-                )}
+                <div className={styles.codeRow}>
+                <h2 className={styles.code}>Serie: {series ?? <PendienteApi campo="serie" ejemplo={EJEMPLO.serie} />}</h2>
+                <h2 className={styles.code}>Número: {number ?? <PendienteApi campo="número" ejemplo={EJEMPLO.numero} />}</h2>
+                </div>
 
                 {badges}
 
                 <p className={styles.description}>{description}</p>
-                {date && location ? (
-                    <p className={styles.meta}>
-                    {date} <span className={styles.dot}>•</span> {location}
-                    </p>
-                ) : date || location ? (
-                    <p className={styles.meta}>
-                    {date ?? <PendienteApi campo="fecha" />} {location ?? <PendienteApi campo="lugar" />}
-                    </p>
-                ) : (
-                    <>
-                    <PendienteApi campo="fecha" />
-                    <PendienteApi campo="lugar" />
-                    </>
-                )}
+                <p className={styles.meta}>
+                {date ?? <PendienteApi campo="fecha" ejemplo={EJEMPLO.fechaLarga} />}{" "}
+                <span className={styles.dot}>•</span>{" "}
+                {location ?? <PendienteApi campo="lugar" ejemplo={EJEMPLO.lugar} />}
+                </p>
                 {articulo}
             </div>
 

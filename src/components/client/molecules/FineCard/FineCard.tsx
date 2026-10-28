@@ -2,6 +2,7 @@
 
 import CategoryBadge from "@/components/client/atoms/CategoryBadge/CategoryBadge";
 import PendienteApi from "@/components/client/atoms/PendienteApi/PendienteApi";
+import { DATOS_DE_EJEMPLO } from "@/lib/casillero/datosDeEjemplo";
 import { Fine } from "@/types/fines";
 import { ETIQUETA_ESTADO_COBRO, esCobroPagable, formatearFechaCobro } from "@/lib/casillero/obligations";
 import styles from "./FineCard.module.scss";
@@ -51,7 +52,7 @@ export default function FineCard({ fine, onViewDetail }: FineCardProps) {
         {/* Content right column */}
         <div className={styles.content}>
             <header className={styles.header}>
-            <span className={styles.code}>{fine.code ?? <PendienteApi campo="código" />}</span>
+            <span className={styles.code}>{fine.code ?? <PendienteApi campo="código" ejemplo={DATOS_DE_EJEMPLO.multa.codigo} />}</span>
             <span className={styles.amount}>Q{fine.amount}</span>
             </header>
 
@@ -71,8 +72,8 @@ export default function FineCard({ fine, onViewDetail }: FineCardProps) {
             <p className={styles.description}>{fine.description}</p>
 
             <div className={styles.meta}>
-            {fine.location ? <p>{fine.location}</p> : <PendienteApi campo="lugar" />}
-            {fine.date ? <p>{fine.date}</p> : <PendienteApi campo="fecha" />}
+            <p>{fine.location ?? <PendienteApi campo="lugar" ejemplo={DATOS_DE_EJEMPLO.multa.lugar} />}</p>
+            <p>{fine.date ?? <PendienteApi campo="fecha" ejemplo={DATOS_DE_EJEMPLO.multa.fecha} />}</p>
             {fine.dueDate && <p>Vence: {formatearFechaCobro(fine.dueDate)}</p>}
             </div>
 

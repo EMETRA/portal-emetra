@@ -128,7 +128,7 @@ export default function ConsultaMultasPage() {
         setConsultado(vehiculo);
     };
 
-    // TODO [CASILLERO-BACKEND]: si la API no manda categorías, no hay filtros ni desglose.
+    // TODO [CASILLERO-BACKEND]: si la API no manda categorías, filtros y desglose quedan con marca.
     // Sin cobros no se sabe, así que se muestra el desglose en Q0.
     const hayCategorias = fines.length === 0 || fines.some((f) => f.category);
 
@@ -215,7 +215,6 @@ return (
 
             {/* TODO [CASILLERO-BACKEND]: modelo, color y año llegarán con la integración de SAT. */}
             <VehicleSummaryCard
-                plate={placaCompleta(consultado)}
                 totalAmount={totalAmount}
                 pendingCount={pendientes.length}
                 amountsByCategory={hayCategorias ? amountsByCategory : undefined}
@@ -242,11 +241,8 @@ return (
             ) : (
                 <>
                     <div className={styles.tabsRow}>
-                        {hayCategorias ? (
-                            <FineFilterTabs value={filter} onChange={setFilter} />
-                        ) : (
-                            <PendienteApi campo="categoría (filtros)" />
-                        )}
+                        <FineFilterTabs value={filter} onChange={setFilter} />
+                        {!hayCategorias && <PendienteApi campo="categoría (los filtros no funcionan sin ella)" />}
                     </div>
 
                     {isMobile && (

@@ -1,4 +1,6 @@
 // PagoMultasPage.module.scss
+@use "../../../../theme/colors.scss" as *;
+
 .wrapper {
     display: flex;
     flex-direction: column;
@@ -25,6 +27,14 @@
     color: #1b2a6b;
     white-space: nowrap;
     margin: 0;
+}
+
+.error {
+    padding: 0.75rem 1rem;
+    border-radius: 0.75rem;
+    border: 1px solid $rojo-1;
+    background: #fff;
+    color: $rojo-1;
 }
 
 .content {

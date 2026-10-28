@@ -328,3 +328,43 @@ export type CasilleroObligationList = {
 
 /** GET /v1/obligations/{id}: por ahora los mismos datos del listado. */
 export type CasilleroObligationDetail = CasilleroObligation;
+
+/*
+  Órdenes de pago (CAS-132)
+  TODO [CASILLERO-BACKEND]: formato provisional. El ticket solo nombra los endpoints y que la
+  pantalla distinga orden creada, pago en proceso, pago confirmado y "esperar o volver a
+  consultar". Los nombres de los campos, los valores del estado y que una orden pueda llevar
+  varios cobros son supuestos (lo de varios cobros lo está viendo Jenny).
+*/
+
+/**
+ * - CREADA: la orden existe, falta pagarla (checkout).
+ * - EN_PROCESO: el pago se está aplicando. Aunque Neonet ya haya autorizado, sigue aquí
+ *   hasta que la aplicación interna termine.
+ * - CONFIRMADA: pago aplicado; es el único estado que se muestra como éxito.
+ * - RECHAZADA / VENCIDA: no se pagó.
+ */
+export type CasilleroPaymentOrderStatus =
+  | "CREADA"
+  | "EN_PROCESO"
+  | "CONFIRMADA"
+  | "RECHAZADA"
+  | "VENCIDA";
+
+/** POST /v1/payment-orders */
+export type CasilleroCreatePaymentOrderRequest = {
+  obligationIds: string[];
+};
+
+/** Respuesta de POST /v1/payment-orders y GET /v1/payment-orders/{id}. */
+export type CasilleroPaymentOrder = {
+  id: string;
+  status: CasilleroPaymentOrderStatus;
+  /** Total a pagar, en quetzales. */
+  totalAmount: number;
+  obligationIds: string[];
+  /** ISO 8601 */
+  createdAt: string;
+  /** Hasta cuándo se puede pagar la orden (ISO 8601). */
+  expiresAt?: string;
+};

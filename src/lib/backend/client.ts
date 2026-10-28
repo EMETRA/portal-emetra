@@ -52,6 +52,8 @@ const UPSTREAM_ALLOW_HEADERS = new Set([
   "if-modified-since",
   "if-unmodified-since",
   "cache-control",
+  // Evita operaciones duplicadas por doble envío (registro, órdenes de pago).
+  "idempotency-key",
 ]);
 
 export function pickForwardRequestHeaders(incoming: Headers): Headers {

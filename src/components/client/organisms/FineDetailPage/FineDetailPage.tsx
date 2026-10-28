@@ -7,6 +7,8 @@ import FineDetailHeader from "@/components/client/organisms/FineDetailHeader/Fin
 import InfoCard from "@/components/client/molecules/InfoCard/InfoCard";
 import InfoField from "../../atoms/InfoField/InfoField";
 import PendienteApi from "../../atoms/PendienteApi/PendienteApi";
+import EvidenceModal from "@/components/client/organisms/EvidenceModal/EvidenceModal";
+import { DATOS_DE_EJEMPLO } from "@/lib/casillero/datosDeEjemplo";
 import { Button } from "@/components/server/atoms";
 import { LoadingSpinner } from "@/components/server/atoms/LoadingSpinner";
 import { Text } from "@/components/atoms/Text";
@@ -27,8 +29,9 @@ import { useSelectedFinesStore } from "@/store/useSelectedFineStore";
   TODO [CASILLERO-BACKEND]: el detalle de la API de Cobros solo trae concepto, monto, saldo,
   estado, vencimiento y categoría. Serie, número, fecha, lugar, artículo, numeral,
   evidencia, conductor, licencia, persona notificada, impugnación y descripción larga
-  quedan como pendientes (PendienteApi) hasta saber si vendrán y con qué nombres.
+  se muestran con datos de ejemplo (PendienteApi) hasta saber si vendrán y con qué nombres.
 */
+const EJEMPLO = DATOS_DE_EJEMPLO.multa;
 export default function FineDetailPage({ fineId }: { fineId: string }) {
     const router = useRouter();
     const { addOne } = useSelectedFinesStore();
@@ -37,6 +40,7 @@ export default function FineDetailPage({ fineId }: { fineId: string }) {
     const [detalle, setDetalle] = useState<CasilleroObligationDetail | null>(null);
     const [error, setError] = useState<{ mensaje: string; noEncontrado: boolean } | null>(null);
     const [intento, setIntento] = useState(0);
+    const [isModalOpen, setIsModalOpen] = useState(false);
 
     // 401 del backend: la sesión venció o fue revocada; se limpia y se vuelve al login.
     const irAlLoginPorSesionVencida = useCallback(() => {
@@ -117,18 +121,37 @@ export default function FineDetailPage({ fineId }: { fineId: string }) {
             description={fine.description}
             onPayThis={handlePayThis}
             canPay={pagable}
+            onVerImagen={() => setIsModalOpen(true)}
+            evidenciaDeEjemplo
         />
 
-        {/* Información adicional: la API no manda ninguno de sus datos, así que solo queda la marca. */}
-        <PendienteApi campo="información adicional (conductor, licencia, tipo de licencia)" />
+        <div className={styles.infoGrid}>
+            <InfoCard title="Información Adicional" icon="idCard">
+            <InfoField label="Conductor" value={<PendienteApi campo="conductor" ejemplo={EJEMPLO.conductor} />} />
+            <InfoField label="Licencia" value={<PendienteApi campo="licencia" ejemplo={EJEMPLO.licencia} />} />
+            <InfoField label="Tipo de licencia" value={<PendienteApi campo="tipo de licencia" ejemplo={EJEMPLO.tipoLicencia} />} />
+            </InfoCard>
 
-        <InfoCard title="Información Legal" icon="legal" className={styles.legalCard}>
-            <PendienteApi campo="persona notificada" />
-            <PendienteApi campo="fecha de impugnación" />
+            <InfoCard title="Información Legal" icon="legal">
+            <InfoField label="Persona notificada" value={<PendienteApi campo="persona notificada" ejemplo={EJEMPLO.personaNotificada} />} />
+            <InfoField label="Fecha de impugnación" value={<PendienteApi campo="fecha de impugnación" ejemplo={EJEMPLO.fechaImpugnacion} />} />
             <InfoField label="Última fecha de pago" value={formatearFechaCobro(detalle.dueDate)} />
+            </InfoCard>
+        </div>
+
+        <InfoCard title="Descripción" icon="document" className={styles.descriptionCard}>
+            <p className={styles.descriptionText}><PendienteApi campo="descripción" ejemplo={EJEMPLO.descripcion} /></p>
         </InfoCard>
 
-        <PendienteApi campo="descripción larga" />
+        {/* TODO [CASILLERO-BACKEND]: imagen y descargas de ejemplo hasta que la API mande la evidencia. */}
+        <EvidenceModal
+            isOpen={isModalOpen}
+            onClose={() => setIsModalOpen(false)}
+            imageUrl={EJEMPLO.evidenciaUrl}
+            onDownloadImage={() => {}}
+            onDownloadNotificacion={() => {}}
+            onDownloadRemisionPdf={() => {}}
+        />
         </>
     );
 }

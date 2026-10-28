@@ -2,7 +2,8 @@ import styles from "./InfoField.module.scss";
 
 interface InfoFieldProps {
     label: string;
-    value: string;
+    /** Texto, o una marca de dato pendiente (PendienteApi). */
+    value: React.ReactNode;
 }
 
 export default function InfoField({ label, value }: InfoFieldProps) {

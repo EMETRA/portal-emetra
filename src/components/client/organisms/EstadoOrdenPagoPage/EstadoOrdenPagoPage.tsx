@@ -13,6 +13,7 @@ import {
     SEGUNDOS_ENTRE_CONSULTAS,
     estadoVisualOrden,
     fetchPaymentOrder,
+    fetchPaymentReceipt,
     isSesionVencidaOrden,
 } from "@/lib/casillero/paymentOrders";
 import { formatearFechaCobro } from "@/lib/casillero/obligations";
@@ -20,6 +21,10 @@ import { useSessionStore } from "@/store/useSessionStore";
 import styles from "./EstadoOrdenPagoPage.module.scss";
 
 const MULTAS = "/casillero/dashboard/multas";
+/** Tiempo antes de liberar la URL del PDF (la pestaña o la descarga ya la usaron). */
+const LIBERAR_URL_MS = 60_000;
+
+type AccionComprobante = "ver" | "descargar";
 
 /**
  * Estado de una orden de pago. Mientras el pago está en proceso se vuelve a consultar
@@ -36,6 +41,8 @@ export default function EstadoOrdenPagoPage({ orderId }: { orderId: string }) {
     // Consultas hechas desde la última vez que el usuario pidió consultar.
     const [consultas, setConsultas] = useState(0);
     const [intento, setIntento] = useState(0);
+    const [cargandoComprobante, setCargandoComprobante] = useState<AccionComprobante | null>(null);
+    const [errorComprobante, setErrorComprobante] = useState("");
 
     // 401 del backend: la sesión venció o fue revocada; se limpia y se vuelve al login.
     const irAlLoginPorSesionVencida = useCallback(() => {
@@ -82,6 +89,46 @@ export default function EstadoOrdenPagoPage({ orderId }: { orderId: string }) {
         const id = setTimeout(() => setIntento((actual) => actual + 1), SEGUNDOS_ENTRE_CONSULTAS * 1000);
         return () => clearTimeout(id);
     }, [estado, consultando, error]);
+
+    /**
+     * El PDF se pide al endpoint autenticado cada vez y se usa como Blob. Para "ver", la
+     * pestaña se abre antes de la petición: si se abre después de esperar, el navegador la
+     * bloquea como ventana emergente.
+     */
+    const abrirComprobante = async (accion: AccionComprobante) => {
+        if (cargandoComprobante) return;
+        setErrorComprobante("");
+        setCargandoComprobante(accion);
+        const pestana = accion === "ver" ? window.open("", "_blank") : null;
+        if (accion === "ver" && !pestana) {
+            setErrorComprobante("El navegador bloqueó la nueva pestaña. Permite las ventanas emergentes o descarga el comprobante.");
+            setCargandoComprobante(null);
+            return;
+        }
+
+        try {
+            const { blob, fileName } = await fetchPaymentReceipt(orderId);
+            const url = URL.createObjectURL(blob);
+            if (pestana) {
+                pestana.location.href = url;
+            } else {
+                const enlace = document.createElement("a");
+                enlace.href = url;
+                enlace.download = fileName;
+                enlace.click();
+            }
+            window.setTimeout(() => URL.revokeObjectURL(url), LIBERAR_URL_MS);
+        } catch (err) {
+            pestana?.close();
+            if (isSesionVencidaOrden(err)) {
+                irAlLoginPorSesionVencida();
+                return;
+            }
+            setErrorComprobante(err instanceof Error ? err.message : "No se pudo cargar el comprobante. Intenta más tarde");
+        } finally {
+            setCargandoComprobante(null);
+        }
+    };
 
     const consultarDeNuevo = () => {
         setConsultas(0);
@@ -160,7 +207,15 @@ export default function EstadoOrdenPagoPage({ orderId }: { orderId: string }) {
                     <>
                     <h2 className={styles.titulo}>Pago confirmado</h2>
                     {resumen}
-                    {/* TODO [CASILLERO-BACKEND] (pieza G): descargar el comprobante. */}
+                    <div className={styles.acciones}>
+                        <Button variant="outline" onClick={() => abrirComprobante("ver")} disabled={cargandoComprobante !== null}>
+                            {cargandoComprobante === "ver" ? "Cargando..." : "Ver comprobante"}
+                        </Button>
+                        <Button variant="success" onClick={() => abrirComprobante("descargar")} disabled={cargandoComprobante !== null}>
+                            {cargandoComprobante === "descargar" ? "Descargando..." : "Descargar comprobante"}
+                        </Button>
+                    </div>
+                    {errorComprobante && <Text variant="Medium">{errorComprobante}</Text>}
                     {volverAMultas}
                     </>
                 );

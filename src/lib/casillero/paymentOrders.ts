@@ -1,4 +1,5 @@
 import { getCasilleroJson } from "./api";
+import { fileNameFromContentDisposition } from "./notifications";
 import type {
     CasilleroCreatePaymentOrderRequest,
     CasilleroPaymentOrder,
@@ -75,6 +76,49 @@ export async function fetchPaymentOrder(id: string): Promise<CasilleroPaymentOrd
         `/api/casillero/payment-orders/${encodeURIComponent(id)}`,
         errorFromOrderStatus
     );
+}
+
+// ── COMPROBANTE ───────────────────────────────────────────────────────────
+function errorFromReceiptStatus(status: number): Error {
+    const message =
+        status === 401 ? SESION_VENCIDA
+        : status === 404 ? "El comprobante no está disponible"
+        : status === 409 ? "El comprobante estará disponible cuando se confirme el pago"
+        : "No se pudo cargar el comprobante. Intenta más tarde";
+    return new CasilleroPaymentOrderError(message, status);
+}
+
+export type CasilleroPaymentReceipt = {
+    blob: Blob;
+    fileName: string;
+};
+
+/**
+ * Pide el PDF del comprobante al endpoint autenticado (cada vez; no hay URL pública).
+ * Devuelve el Blob para mostrarlo o descargarlo desde el navegador.
+ */
+export async function fetchPaymentReceipt(id: string): Promise<CasilleroPaymentReceipt> {
+    const response = await fetch(
+        `/api/casillero/payment-orders/${encodeURIComponent(id)}/receipt`,
+        { method: "GET", headers: { Accept: "application/pdf" }, cache: "no-store" }
+    );
+
+    if (!response.ok) {
+        throw errorFromReceiptStatus(response.status);
+    }
+
+    const contentType = response.headers.get("content-type") ?? "";
+    if (!contentType.toLowerCase().includes("application/pdf")) {
+        throw new CasilleroPaymentOrderError("El comprobante recibido no es un PDF válido", response.status);
+    }
+
+    return {
+        blob: await response.blob(),
+        fileName: fileNameFromContentDisposition(
+            response.headers.get("content-disposition"),
+            `comprobante-${id}.pdf`
+        ),
+    };
 }
 
 // ── CÓMO SE MUESTRA EL ESTADO ─────────────────────────────────────────────

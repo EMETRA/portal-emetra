@@ -90,8 +90,12 @@ export function detalleSimulado(id: string): CasilleroNotificationDetail | null 
 export function documentoSimulado(id: string): Uint8Array | null {
   const notificacion = detalleSimulado(id);
   if (!notificacion?.hasDocument) return null;
+  return pdfSimulado(`Documento simulado - ${notificacion.id}`);
+}
 
-  const texto = `Documento simulado - ${notificacion.id}`.replace(/[()\\]/g, "");
+/** PDF mínimo válido de una página con una línea de texto ASCII. */
+export function pdfSimulado(linea: string): Uint8Array {
+  const texto = linea.replace(/[()\\]/g, "");
   const flujo = `BT /F1 18 Tf 72 720 Td (${texto}) Tj ET`;
   const objetos = [
     "<< /Type /Catalog /Pages 2 0 R >>",

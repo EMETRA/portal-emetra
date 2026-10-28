@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { obligacionSimulada } from "@/lib/casillero/obligations.dummy";
+import { pdfSimulado } from "@/lib/casillero/notifications.dummy";
 import type { CasilleroPaymentOrder, CasilleroPaymentOrderStatus } from "@/lib/casillero/types";
 
 /*
@@ -79,4 +80,15 @@ export function crearOrdenSimulada(body: unknown): NextResponse {
 export function ordenSimulada(id: string): CasilleroPaymentOrder | null {
   const orden = ordenes.get(id);
   return orden ? publica(orden) : null;
+}
+
+/**
+ * GET /v1/payment-orders/{id}/receipt simulado: el PDF solo existe si el pago está
+ * confirmado. "no_confirmada" = 409; null = la orden no existe (404).
+ */
+export function comprobanteSimulado(id: string): Uint8Array | "no_confirmada" | null {
+  const orden = ordenSimulada(id);
+  if (!orden) return null;
+  if (orden.status !== "CONFIRMADA") return "no_confirmada";
+  return pdfSimulado(`Comprobante simulado - ${orden.id} - Q${orden.totalAmount}`);
 }

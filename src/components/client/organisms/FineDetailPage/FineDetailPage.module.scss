@@ -11,6 +11,19 @@
     }
 }
 
+.legalCard {
+    margin-bottom: 1.5rem;
+}
+
+.estado {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+    padding: 1.5rem 0;
+    text-align: center;
+}
+
 .descriptionCard {
     margin-bottom: 1.5rem;
 }

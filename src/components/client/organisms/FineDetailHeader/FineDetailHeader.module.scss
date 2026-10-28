@@ -1,5 +1,41 @@
+@use "../../../../theme/colors.scss" as *;
+
 .card {
     margin-bottom: 1.5rem;
+}
+
+.badges {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+}
+
+.status {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.25rem 0.75rem;
+    border-radius: 999px;
+    border: 1px solid #1b2a6b;
+    color: #1b2a6b;
+    font-size: 0.75rem;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.status_VENCIDA {
+    border-color: $rojo-1;
+    color: $rojo-1;
+}
+
+.status_EN_PROCESO,
+.status_PAGADA {
+    border-color: #6b6b6b;
+    color: #6b6b6b;
+}
+
+.original {
+    color: #6b6b6b;
+    font-size: 0.85rem;
 }
 
 .topGrid {
@@ -118,6 +154,11 @@
     &:hover {
         opacity: 0.9;
     }
+
+    &:disabled {
+        cursor: not-allowed;
+        opacity: 0.4;
+    }
 }
 
 .payButtonMobile {
@@ -133,5 +174,10 @@
 
     &:hover {
         opacity: 0.9;
+    }
+
+    &:disabled {
+        cursor: not-allowed;
+        opacity: 0.4;
     }
 }

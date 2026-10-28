@@ -1,57 +1,107 @@
 "use client";
 
-import { useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { SectionTitle } from "@/components/server/molecules/SectionTitle";
 import FineDetailHeader from "@/components/client/organisms/FineDetailHeader/FineDetailHeader";
 import InfoCard from "@/components/client/molecules/InfoCard/InfoCard";
-import EvidenceModal from "@/components/client/organisms/EvidenceModal/EvidenceModal";
 import InfoField from "../../atoms/InfoField/InfoField";
+import PendienteApi from "../../atoms/PendienteApi/PendienteApi";
+import { Button } from "@/components/server/atoms";
+import { LoadingSpinner } from "@/components/server/atoms/LoadingSpinner";
+import { Text } from "@/components/atoms/Text";
 import styles from "./FineDetailPage.module.scss";
-import { FineDetail } from "@/types/fynesDetail";
+import type { CasilleroObligationDetail } from "@/lib/casillero/types";
+import {
+    CasilleroCobrosError,
+    esCobroPagable,
+    fetchObligationDetail,
+    formatearFechaCobro,
+    isSesionVencidaCobros,
+    obligacionAMulta,
+} from "@/lib/casillero/obligations";
+import { useSessionStore } from "@/store/useSessionStore";
 import { useSelectedFinesStore } from "@/store/useSelectedFineStore";
 
-const fine: FineDetail = {
-    series: "N",
-    number: "456123",
-    category: "transito",
-    totalAmount: 500,
-    description: "Exceso de Velocidad",
-    date: "21 mayo 2026",
-    location: "Calzada Roosevelt",
-    article: "45",
-    numeral: "12",
-    evidenceImageUrl: "/images/banner.jpg",
-    additionalInfo: {
-        conductor: "Daniel Esteban Morales Urizar",
-        licencia: "1234567891234",
-        tipoLicencia: "C",
-    },
-    legalInfo: {
-        personaNotificada: "Daniel Esteban Morales Urizar",
-        fechaImpugnacion: "No registrada",
-        ultimaFechaPago: "30 mayo 2026",
-    },
-    longDescription:
-        "El vehículo fue detectado excediendo el límite permitido de velocidad sobre la Calzada Roosevelt en dirección norte, a la altura de la 14 avenida, según registro realizado por agente municipal de tránsito.",
-};
-
+/*
+  TODO [CASILLERO-BACKEND]: el detalle de la API de Cobros solo trae concepto, monto, saldo,
+  estado, vencimiento y categoría. Serie, número, fecha, lugar, artículo, numeral,
+  evidencia, conductor, licencia, persona notificada, impugnación y descripción larga
+  quedan como pendientes (PendienteApi) hasta saber si vendrán y con qué nombres.
+*/
 export default function FineDetailPage({ fineId }: { fineId: string }) {
-    console.log("Fine ID:", fineId);
     const router = useRouter();
     const { addOne } = useSelectedFinesStore();
-    const [isModalOpen, setIsModalOpen] = useState(false);
+    const clearSession = useSessionStore((state) => state.clearSession);
+
+    const [detalle, setDetalle] = useState<CasilleroObligationDetail | null>(null);
+    const [error, setError] = useState<{ mensaje: string; noEncontrado: boolean } | null>(null);
+    const [intento, setIntento] = useState(0);
+
+    // 401 del backend: la sesión venció o fue revocada; se limpia y se vuelve al login.
+    const irAlLoginPorSesionVencida = useCallback(() => {
+        clearSession();
+        router.replace("/casillero");
+    }, [clearSession, router]);
+
+    useEffect(() => {
+        let cancelado = false;
+        setDetalle(null);
+        setError(null);
+
+        fetchObligationDetail(fineId)
+            .then((respuesta) => {
+                if (!cancelado) setDetalle(respuesta);
+            })
+            .catch((err) => {
+                if (cancelado) return;
+                if (isSesionVencidaCobros(err)) {
+                    irAlLoginPorSesionVencida();
+                    return;
+                }
+                setError({
+                    mensaje: err instanceof Error ? err.message : "No se pudo cargar el cobro. Intenta más tarde",
+                    noEncontrado: err instanceof CasilleroCobrosError && err.status === 404,
+                });
+            });
+
+        return () => {
+            cancelado = true;
+        };
+    }, [fineId, intento, irAlLoginPorSesionVencida]);
+
+    if (!detalle) {
+        return (
+            <>
+            <SectionTitle>Detalle de Multa</SectionTitle>
+            <div className={styles.estado}>
+                {error ? (
+                    <>
+                    <Text variant="Medium">{error.mensaje}</Text>
+                    {error.noEncontrado ? (
+                        <Button variant="success" onClick={() => router.push("/casillero/dashboard/multas")}>
+                            Volver a Multas
+                        </Button>
+                    ) : (
+                        <Button variant="success" onClick={() => setIntento((actual) => actual + 1)}>
+                            Reintentar
+                        </Button>
+                    )}
+                    </>
+                ) : (
+                    <LoadingSpinner variant="inline" />
+                )}
+            </div>
+            </>
+        );
+    }
+
+    const fine = obligacionAMulta(detalle);
+    const pagable = esCobroPagable(fine.status, fine.amount);
 
     const handlePayThis = () => {
-        addOne({
-        id: fineId,
-        code: `${fine.series}${fine.number}`,
-        category: fine.category,
-        amount: fine.totalAmount,
-        description: fine.description,
-        location: fine.location,
-        date: fine.date,
-        });
+        if (!pagable) return;
+        addOne(fine);
         router.push("/casillero/dashboard/multas/pagar");
     };
 
@@ -60,45 +110,25 @@ export default function FineDetailPage({ fineId }: { fineId: string }) {
         <SectionTitle>Detalle de Multa</SectionTitle>
 
         <FineDetailHeader
-            series={fine.series}
-            number={fine.number}
             category={fine.category}
-            totalAmount={fine.totalAmount}
+            totalAmount={fine.amount}
+            originalAmount={fine.originalAmount}
+            status={fine.status}
             description={fine.description}
-            date={fine.date}
-            location={fine.location}
-            article={fine.article}
-            numeral={fine.numeral}
-            onVerImagen={() => setIsModalOpen(true)}
             onPayThis={handlePayThis}
+            canPay={pagable}
         />
 
-        <div className={styles.infoGrid}>
-            <InfoCard title="Información Adicional" icon="idCard">
-            <InfoField label="Conductor" value={fine.additionalInfo.conductor} />
-            <InfoField label="Licencia" value={fine.additionalInfo.licencia} />
-            <InfoField label="Tipo de licencia" value={fine.additionalInfo.tipoLicencia} />
-            </InfoCard>
+        {/* Información adicional: la API no manda ninguno de sus datos, así que solo queda la marca. */}
+        <PendienteApi campo="información adicional (conductor, licencia, tipo de licencia)" />
 
-            <InfoCard title="Información Legal" icon="legal">
-            <InfoField label="Persona notificada" value={fine.legalInfo.personaNotificada} />
-            <InfoField label="Fecha de impugnación" value={fine.legalInfo.fechaImpugnacion} />
-            <InfoField label="Última fecha de pago" value={fine.legalInfo.ultimaFechaPago} />
-            </InfoCard>
-        </div>
-
-        <InfoCard title="Descripción" icon="document" className={styles.descriptionCard}>
-            <p className={styles.descriptionText}>{fine.longDescription}</p>
+        <InfoCard title="Información Legal" icon="legal" className={styles.legalCard}>
+            <PendienteApi campo="persona notificada" />
+            <PendienteApi campo="fecha de impugnación" />
+            <InfoField label="Última fecha de pago" value={formatearFechaCobro(detalle.dueDate)} />
         </InfoCard>
 
-        <EvidenceModal
-            isOpen={isModalOpen}
-            onClose={() => setIsModalOpen(false)}
-            imageUrl={fine.evidenceImageUrl}
-            onDownloadImage={() => {}}
-            onDownloadNotificacion={() => {}}
-            onDownloadRemisionPdf={() => {}}
-        />
+        <PendienteApi campo="descripción larga" />
         </>
     );
 }

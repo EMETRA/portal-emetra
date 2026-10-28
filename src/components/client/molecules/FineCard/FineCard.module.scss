@@ -1,3 +1,5 @@
+@use "../../../../theme/colors.scss" as *;
+
 .card {
     background: #fff;
     border-radius: 0.75rem;
@@ -13,6 +15,11 @@
 
 .cardSelected {
     border-color: #6dbf6c;
+}
+
+.cardNoPagable .checkboxCol {
+    cursor: not-allowed;
+    opacity: 0.4;
 }
 
 .checkboxCol {
@@ -77,6 +84,42 @@
 .amount {
     font-weight: 700;
     color: #1b2a6b;
+}
+
+.partial {
+    margin: -0.35rem 0 0;
+    align-self: flex-end;
+    color: #6b6b6b;
+    font-size: 0.8rem;
+}
+
+.badges {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+}
+
+.status {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.2rem 0.65rem;
+    border-radius: 999px;
+    border: 1px solid #1b2a6b;
+    color: #1b2a6b;
+    font-size: 0.75rem;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.status_VENCIDA {
+    border-color: $rojo-1;
+    color: $rojo-1;
+}
+
+.status_EN_PROCESO,
+.status_PAGADA {
+    border-color: #6b6b6b;
+    color: #6b6b6b;
 }
 
 .description {

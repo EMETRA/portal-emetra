@@ -28,7 +28,7 @@ export default function FinesSummaryCard({ fines, total }: FinesSummaryCardProps
             <div key={fine.id} className={styles.fineRow}>
                 <div className={styles.fineLeft}>
                 <span className={styles.fineCode}>{fine.code}</span>
-                <CategoryBadge category={fine.category} />
+                {fine.category && <CategoryBadge category={fine.category} />}
                 </div>
                 <span className={styles.fineAmount}>Q{fine.amount.toFixed(2)}</span>
             </div>

@@ -1,7 +1,10 @@
 import { getCasilleroJson } from "./api";
+import { FINE_CATEGORIES, type Fine, type FineCategory } from "@/types/fines";
 import type {
+    CasilleroObligation,
     CasilleroObligationDetail,
     CasilleroObligationList,
+    CasilleroObligationStatus,
     CasilleroVehicle,
     CasilleroVehicleList,
 } from "./types";
@@ -25,6 +28,45 @@ export const isSesionVencidaCobros = (error: unknown): boolean =>
 /** Placa como se muestra en pantalla: tipo + número, p. ej. "P" + "111BBB" = "P111BBB". */
 export const placaCompleta = (vehiculo: CasilleroVehicle): string =>
     `${vehiculo.plateTypeCode}${vehiculo.plateNumber}`;
+
+export const ETIQUETA_ESTADO_COBRO: Record<CasilleroObligationStatus, string> = {
+    PENDIENTE: "Pendiente",
+    VENCIDA: "Vencida",
+    EN_PROCESO: "Pago en proceso",
+    PAGADA: "Pagada",
+};
+
+/** Solo se puede seleccionar para pagar lo pendiente o vencido que tenga saldo. */
+export const esCobroPagable = (status: CasilleroObligationStatus | undefined, saldo: number): boolean =>
+    (status === undefined || status === "PENDIENTE" || status === "VENCIDA") && saldo > 0;
+
+/** Fecha en formato local (dd/mm/aaaa); vacío si la fecha no es válida. */
+export function formatearFechaCobro(iso: string): string {
+    const fecha = new Date(iso);
+    return Number.isNaN(fecha.getTime())
+        ? ""
+        : fecha.toLocaleDateString("es-GT", { day: "2-digit", month: "2-digit", year: "numeric" });
+}
+
+const esCategoriaConocida = (valor: string | undefined): valor is FineCategory =>
+    FINE_CATEGORIES.some((categoria) => categoria.value === valor);
+
+/**
+ * Convierte una obligación de la API en la multa que muestran las tarjetas. Lo que se
+ * paga es el saldo; el monto original solo se guarda si hubo pago parcial. Una categoría
+ * que la pantalla no conoce se trata como si no viniera.
+ */
+export function obligacionAMulta(obligacion: CasilleroObligation): Fine {
+    return {
+        id: obligacion.id,
+        category: esCategoriaConocida(obligacion.category) ? obligacion.category : undefined,
+        amount: obligacion.balance,
+        originalAmount: obligacion.amount > obligacion.balance ? obligacion.amount : undefined,
+        description: obligacion.concept,
+        status: obligacion.status,
+        dueDate: obligacion.dueDate,
+    };
+}
 
 // ── VEHÍCULOS ─────────────────────────────────────────────────────────────
 function errorFromVehiclesStatus(status: number): Error {

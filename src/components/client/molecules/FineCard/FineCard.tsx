@@ -1,7 +1,9 @@
 "use client";
 
 import CategoryBadge from "@/components/client/atoms/CategoryBadge/CategoryBadge";
+import PendienteApi from "@/components/client/atoms/PendienteApi/PendienteApi";
 import { Fine } from "@/types/fines";
+import { ETIQUETA_ESTADO_COBRO, esCobroPagable, formatearFechaCobro } from "@/lib/casillero/obligations";
 import styles from "./FineCard.module.scss";
 import { useSelectedFinesStore } from "@/store/useSelectedFineStore";
 
@@ -13,19 +15,22 @@ interface FineCardProps {
 export default function FineCard({ fine, onViewDetail }: FineCardProps) {
     const { toggle, isSelected } = useSelectedFinesStore();
     const selected = isSelected(fine.id);
+    // Lo pagado o con pago en proceso se muestra, pero no se puede seleccionar.
+    const pagable = esCobroPagable(fine.status, fine.amount);
 
     return (
-        <article className={`${styles.card} ${selected ? styles.cardSelected : ""}`}>
+        <article className={`${styles.card} ${selected ? styles.cardSelected : ""} ${pagable ? "" : styles.cardNoPagable}`}>
         {/* Checkbox left column */}
             <label
             className={styles.checkboxCol}
             onClick={(e) => e.stopPropagation()}
-            aria-label={`Seleccionar multa ${fine.code}`}
+            aria-label={`Seleccionar multa ${fine.code ?? fine.description}`}
             >
             <input
                 type="checkbox"
                 className={styles.checkbox}
                 checked={selected}
+                disabled={!pagable}
                 onChange={() => toggle(fine)}
             />
             <div className={`${styles.checkboxCustom} ${selected ? styles.checkboxCustomChecked : ""}`}>
@@ -46,17 +51,29 @@ export default function FineCard({ fine, onViewDetail }: FineCardProps) {
         {/* Content right column */}
         <div className={styles.content}>
             <header className={styles.header}>
-            <span className={styles.code}>{fine.code}</span>
+            <span className={styles.code}>{fine.code ?? <PendienteApi campo="código" />}</span>
             <span className={styles.amount}>Q{fine.amount}</span>
             </header>
 
-            <CategoryBadge category={fine.category} />
+            {fine.originalAmount !== undefined && (
+            <p className={styles.partial}>Monto original: Q{fine.originalAmount}</p>
+            )}
+
+            <div className={styles.badges}>
+            {fine.category ? <CategoryBadge category={fine.category} /> : <PendienteApi campo="categoría" />}
+            {fine.status && (
+                <span className={`${styles.status} ${styles[`status_${fine.status}`] ?? ""}`}>
+                {ETIQUETA_ESTADO_COBRO[fine.status]}
+                </span>
+            )}
+            </div>
 
             <p className={styles.description}>{fine.description}</p>
 
             <div className={styles.meta}>
-            <p>{fine.location}</p>
-            <p>{fine.date}</p>
+            {fine.location ? <p>{fine.location}</p> : <PendienteApi campo="lugar" />}
+            {fine.date ? <p>{fine.date}</p> : <PendienteApi campo="fecha" />}
+            {fine.dueDate && <p>Vence: {formatearFechaCobro(fine.dueDate)}</p>}
             </div>
 
             <button

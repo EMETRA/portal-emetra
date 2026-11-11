@@ -9,6 +9,7 @@ import { Icon } from "@/components/server/atoms";
 import CasilleroSearchBox from "@/components/client/molecules/CasilleroSearchBox/CasilleroSearchBox";
 import { useMediaQuery } from "@/hooks/useMediaQuery";
 import { useModeStore } from "@/store/useModeStore";
+import { companyMenuItems, useCompanyAccess } from "@/lib/casillero/company";
 import styles from "./CasilleroDashboardSidebar.module.scss";
 
 type Props = {
@@ -24,21 +25,13 @@ const PERSONAL_ITEMS = [
     { label: "Mis solicitudes", href: "/casillero/dashboard/solicitudes" },
 ];
 
-const COMPANY_ITEMS = [
-    { label: "Listado de placas", href: "/casillero/dashboard/placas" },
-    { label: "Mis remisiones", href: "/casillero/dashboard/multas" },
-    { label: "Historial", href: "/casillero/dashboard/historial" },
-    { label: "Buzón", href: "/casillero/buzon" },
-    { label: "Mis solicitudes", href: "/casillero/dashboard/solicitudes" },
-    { label: "Gestión de empleados", href: "/casillero/employee-management" },
-];
-
 export default function CasilleroDashboardSidebar({ open, onClose }: Props) {
     const pathname = usePathname();
     const isMobile = useMediaQuery("(max-width: 520px)");
     const { mode } = useModeStore();
+    const { status, access, errorMessage, load } = useCompanyAccess();
 
-    const items = mode === "empresa" ? COMPANY_ITEMS : PERSONAL_ITEMS;
+    const items = mode === "empresa" ? companyMenuItems(access) : PERSONAL_ITEMS;
 
     useEffect(() => {
         if (isMobile && open) {
@@ -54,8 +47,17 @@ export default function CasilleroDashboardSidebar({ open, onClose }: Props) {
             </div>
 
             <nav className={styles.nav} aria-label="Menú de Casillero">
-                {items.map(({ label, href }) => {
-                    const isActive = pathname === href || pathname.startsWith(`${href}/`);
+                {mode === "empresa" && (status === "idle" || status === "loading") ? (
+                    <p className={styles.menuMessage} role="status">Cargando menú...</p>
+                ) : mode === "empresa" && status === "error" ? (
+                    <div className={styles.menuMessage}>
+                        <p role="alert">{errorMessage}</p>
+                        <button type="button" onClick={() => void load()}>Reintentar</button>
+                    </div>
+                ) : items.map(({ label, href }) => {
+                    const isActive = href === "/casillero/empresa"
+                        ? pathname === href
+                        : pathname === href || pathname.startsWith(`${href}/`);
                     return (
                         <Link href={href} key={label} className={classNames({ [styles.active]: isActive })}>
                             <span>{label}</span>

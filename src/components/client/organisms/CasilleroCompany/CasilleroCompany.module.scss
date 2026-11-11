@@ -1,0 +1,226 @@
+@use "../../../../theme/colors.scss" as *;
+
+.wrapper {
+  width: 100%;
+}
+
+.card {
+  width: min(920px, 100%);
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.layout {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.field {
+  display: grid;
+  gap: 0.5rem;
+  width: min(100%, 520px);
+}
+
+.label {
+  color: $secondary-text;
+  font-size: 0.9rem;
+  font-weight: 700;
+  text-align: left;
+}
+
+.input,
+.select,
+.fileInput {
+  font-family: inherit;
+  box-sizing: border-box;
+  width: 100%;
+  border: none;
+  border-radius: 8px;
+  background: $input-background;
+  color: $secondary-text;
+  font-weight: 700;
+  padding: 0.9rem 1rem;
+}
+
+.fileInput {
+  font-weight: 500;
+}
+
+.hint {
+  margin: 0;
+  color: $sub-text;
+  font-size: 0.85rem;
+  text-align: left;
+}
+
+.actions {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.submit {
+  width: 100%;
+}
+
+.flexEnd {
+  align-self: flex-end !important;
+}
+
+.message {
+  margin: 0;
+  text-align: left;
+  font-weight: 700;
+}
+
+.error {
+  color: #b42318;
+}
+
+.success {
+  color: $verde-oscuro-1;
+}
+
+.status {
+  margin: 0;
+  text-align: center;
+}
+
+.details {
+  display: grid;
+  gap: 1rem;
+}
+
+.detail dt {
+  color: $secondary-text;
+  font-size: 0.9rem;
+  font-weight: 700;
+}
+
+.detail dd {
+  margin: 0.25rem 0 0;
+}
+
+.invitation {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid $sub-text;
+}
+
+.invitation:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.invitationActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.title {
+  margin: 0;
+  text-align: center;
+}
+
+.list,
+.memberList {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.memberItem {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.memberHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.75rem;
+  background-color: $sub-text;
+  padding: 0.5rem;
+  border-radius: 0.5rem;
+}
+
+.memberInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.roleEditor {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.tableWrap {
+  display: none;
+}
+
+.paginationFooter {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.paginationSummary {
+  margin: 0;
+  color: $sub-text;
+  font-size: 0.85rem;
+  text-align: center;
+}
+
+@media (min-width: 426px) {
+  .field,
+  .submit {
+    width: min(320px, 100%);
+  }
+
+  .submit {
+    align-self: center;
+  }
+
+  .roleEditor {
+    flex-direction: row;
+    align-items: center;
+  }
+}
+
+@media (min-width: 769px) {
+  .formGrid {
+    display: grid;
+    grid-template-columns: 2fr 2fr 1fr;
+    gap: 1.5rem;
+    align-items: end;
+  }
+
+  .formGrid .field,
+  .formGrid .submit {
+    width: 100%;
+  }
+
+  .tableWrap {
+    display: block;
+  }
+
+  .memberList {
+    display: none;
+  }
+}

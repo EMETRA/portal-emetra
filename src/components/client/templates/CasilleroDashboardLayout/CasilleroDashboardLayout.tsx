@@ -4,6 +4,7 @@ import { useState } from "react";
 import Image from "next/image";
 import CasilleroDashboardSidebar from "@/components/client/organisms/CasilleroDashboardSidebar/CasilleroDashboardSidebar";
 import CasilleroDashboardTopbar from "@/components/client/molecules/CasilleroDashboardTopbar/CasilleroDashboardTopbar";
+import { useCompanyAccess } from "@/lib/casillero/company";
 import styles from "./CasilleroDashboardLayout.module.scss";
 
 const dummyUser = {
@@ -16,6 +17,7 @@ type Props = {
 
 export default function CasilleroDashboardLayout({ children }: Props) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  useCompanyAccess();
 
   return (
     <main className={styles.shell}>

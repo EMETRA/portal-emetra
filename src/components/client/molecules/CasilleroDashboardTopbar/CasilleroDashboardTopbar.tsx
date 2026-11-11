@@ -9,6 +9,7 @@ import classNames from "classnames";
 import { useModeStore } from "@/store/useModeStore";
 import { useSessionStore } from "@/store/useSessionStore";
 import { logout } from "@/lib/casillero/auth";
+import { companyHomePath, useCompanyAccessStore } from "@/lib/casillero/company";
 
 type Props = {
   userName: string;
@@ -24,9 +25,19 @@ export default function CasilleroDashboardTopbar({ userName, onMenuClickAction }
   const [cerrandoSesion, setCerrandoSesion] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
-  const handleModeChange = (newMode: "personal" | "empresa") => {
+  const handleModeChange = async (newMode: "personal" | "empresa") => {
     setMode(newMode);
-    router.push("/casillero/dashboard");
+    if (newMode === "personal") {
+      router.push("/casillero/dashboard");
+      return;
+    }
+
+    try {
+      const access = await useCompanyAccessStore.getState().load();
+      router.push(companyHomePath(access));
+    } catch {
+      router.push("/casillero/empresa/solicitud");
+    }
   };
 
   const handleLogout = async () => {

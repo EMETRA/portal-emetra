@@ -1,32 +1,41 @@
-import type { CasilleroObligationStatus } from "@/lib/casillero/types";
+/**
+ * Tipo de cobro tal como lo manda la API (`chargeType`, texto libre sin catálogo). Las
+ * etiquetas y colores salen de lib/casillero/categorias.ts.
+ */
+export type FineCategory = string;
 
-export const FINE_CATEGORIES = [
-    { value: "transito", label: "Tránsito" },
-    { value: "administrativo", label: "Administrativo" },
-    { value: "cepo", label: "Cepo" },
-    { value: "convenio", label: "Convenio" },
-    { value: "tasas", label: "Tasas" },
-] as const;
-
-export type FineCategory = (typeof FINE_CATEGORIES)[number]["value"];
+/** Desglose del monto en quetzales: total = base + recargo − descuento. */
+export interface FineBreakdown {
+    base: number;
+    surcharge: number;
+    discount: number;
+}
 
 /**
- * Multa o cobro que muestran las tarjetas. Los datos opcionales son los que la API de
- * Cobros todavía no manda (código, lugar, fecha, categoría) o los que solo manda ella
- * (saldo, estado, vencimiento).
+ * Multa o cobro que muestran las tarjetas. Son opcionales los que la API de Cobros puede
+ * mandar vacíos (código = serie + número, tipo, fecha), el que todavía no manda (lugar) y
+ * los que solo aplican a veces (desglose, si se puede pagar y por qué no).
  */
 export interface Fine {
     id: string;
     code?: string;
     category?: FineCategory;
-    /** Lo que se paga: con la API de Cobros es el saldo pendiente. */
+    /** Lo que se paga, en quetzales (el `totalAmount` de la API). */
     amount: number;
-    /** Monto original, cuando es mayor que lo que falta por pagar (pago parcial). */
-    originalAmount?: number;
+    /** Moneda ISO; sin ella se asume GTQ. */
+    currency?: string;
+    breakdown?: FineBreakdown;
     description: string;
     location?: string;
+    /** Fecha ya formateada para mostrar (dd/mm/aaaa). */
     date?: string;
-    status?: CasilleroObligationStatus;
-    /** Fecha límite de pago (ISO 8601). */
-    dueDate?: string;
+    /** false = la API dice que no se puede pagar. Sin dato se considera pagable. */
+    payable?: boolean;
+    /** Motivo que da la API cuando no se puede pagar. */
+    unavailableReason?: string;
+    /**
+     * Hasta cuándo vale el monto calculado (ISO 8601). No es la fecha límite legal para
+     * pagar. Sin dato = sin vencimiento explícito.
+     */
+    validUntil?: string;
 }

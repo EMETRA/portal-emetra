@@ -1,4 +1,5 @@
 import styles from "./FineListSummaryBar.module.scss";
+import { formatearQuetzales } from "@/lib/casillero/montos";
 
 interface FineListSummaryBarProps {
     count: number;
@@ -9,7 +10,7 @@ export default function FineListSummaryBar({ count, total }: FineListSummaryBarP
     return (
         <div className={styles.bar}>
         <span>{count} Multas totales</span>
-        <span>Total: Q{total.toLocaleString("es-GT")}</span>
+        <span>Total: {formatearQuetzales(total)}</span>
         </div>
     );
 }

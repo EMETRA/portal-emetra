@@ -1,9 +1,8 @@
 "use client";
 
 import { useMediaQuery } from "@/hooks/useMediaQuery";
-import { FineCategory } from "@/types/fines";
-import type { CasilleroObligationStatus } from "@/lib/casillero/types";
-import { ETIQUETA_ESTADO_COBRO } from "@/lib/casillero/obligations";
+import type { FineBreakdown, FineCategory } from "@/types/fines";
+import { formatearQuetzales } from "@/lib/casillero/montos";
 import styles from "./FineDetailHeader.module.scss";
 import CardGeneral from "../../atoms/CardGeneral/CardGeneral";
 import CategoryBadge from "../../atoms/CategoryBadge/CategoryBadge";
@@ -13,17 +12,25 @@ import { DATOS_DE_EJEMPLO } from "@/lib/casillero/datosDeEjemplo";
 const EJEMPLO = DATOS_DE_EJEMPLO.multa;
 
 /**
- * Los datos opcionales son los que la API de Cobros todavía no manda; en su lugar queda
- * una marca de pendiente (TODO [CASILLERO-BACKEND]).
+ * Serie, número, categoría y fecha vienen de la API; si llegan vacíos se muestra el dato
+ * de ejemplo, sin marca de pendiente.
+ * Lugar, artículo, numeral y evidencia la API todavía no los manda: en su lugar queda una
+ * marca de pendiente (TODO [CASILLERO-BACKEND]).
  */
 interface FineDetailHeaderProps {
     series?: string;
     number?: string;
     category?: FineCategory;
+    /** Total a pagar, en quetzales. */
     totalAmount: number;
-    /** Monto original, cuando es mayor que lo que falta por pagar (pago parcial). */
-    originalAmount?: number;
-    status?: CasilleroObligationStatus;
+    /** Moneda ISO; sin ella se asume GTQ. */
+    currency?: string;
+    /** Solo si hay recargo o descuento: se muestra bajo el total. */
+    breakdown?: FineBreakdown;
+    /** Fecha y hora ya formateadas hasta las que vale el monto (validUntil de la API). */
+    validUntil?: string;
+    /** Motivo de la API cuando no se puede pagar (se muestra con canPay = false). */
+    unavailableReason?: string;
     description: string;
     date?: string;
     location?: string;
@@ -34,7 +41,7 @@ interface FineDetailHeaderProps {
     /** true = "Ver imagen" abre una imagen de ejemplo; se marca como pendiente. */
     evidenciaDeEjemplo?: boolean;
     onPayThis: () => void;
-    /** false = lo pagado o con pago en proceso: el botón de pagar queda deshabilitado. */
+    /** false = la API dice que no se puede pagar: el botón de pagar queda deshabilitado. */
     canPay?: boolean;
 }
 
@@ -43,8 +50,10 @@ export default function FineDetailHeader({
     number,
     category,
     totalAmount,
-    originalAmount,
-    status,
+    currency,
+    breakdown,
+    validUntil,
+    unavailableReason,
     description,
     date,
     location,
@@ -59,17 +68,41 @@ export default function FineDetailHeader({
 
     const badges = (
         <div className={styles.badges}>
-            {category ? <CategoryBadge category={category} /> : <PendienteApi campo="categoría" />}
-            {status && (
-                <span className={`${styles.status} ${styles[`status_${status}`] ?? ""}`}>
-                    {ETIQUETA_ESTADO_COBRO[status]}
-                </span>
-            )}
+            {category && <CategoryBadge category={category} />}
+            {!canPay && <span className={styles.status}>No disponible para pago</span>}
         </div>
     );
 
-    const montoOriginal = originalAmount !== undefined && (
-        <span className={styles.original}>Monto original: Q{originalAmount}</span>
+    const total = formatearQuetzales(totalAmount, currency);
+
+    // Desglose bajo el total como mini tabla (solo si hay recargo o descuento): un concepto
+    // por fila, montos uno debajo del otro. En escritorio y tablet va a la derecha; en
+    // celular, a todo el ancho bajo el monto. Debajo, el motivo si no se puede pagar.
+    const montoOriginal = (
+        <>
+        {breakdown && (
+            <dl className={isMobile ? styles.desgloseMobile : styles.desglose} aria-label="Desglose del monto">
+                <div className={styles.desgloseFila}>
+                    <dt>Base</dt>
+                    <dd>{formatearQuetzales(breakdown.base, currency)}</dd>
+                </div>
+                {breakdown.surcharge > 0 && (
+                    <div className={styles.desgloseFila}>
+                        <dt>Recargo</dt>
+                        <dd>+{formatearQuetzales(breakdown.surcharge, currency)}</dd>
+                    </div>
+                )}
+                {breakdown.discount > 0 && (
+                    <div className={styles.desgloseFila}>
+                        <dt>Descuento</dt>
+                        <dd>−{formatearQuetzales(breakdown.discount, currency)}</dd>
+                    </div>
+                )}
+            </dl>
+        )}
+        {canPay && validUntil && <span className={styles.original}>Monto válido hasta el {validUntil}</span>}
+        {!canPay && unavailableReason && <span className={styles.original}>{unavailableReason}</span>}
+        </>
     );
 
     // El diseño se mantiene completo: donde falta un dato queda su marca de pendiente.
@@ -97,18 +130,18 @@ export default function FineDetailHeader({
             <>
             <h2 className={styles.code}>
                 Remisión:{" "}
-                {series && number ? `${series}${number}` : <PendienteApi campo="serie y número" ejemplo={EJEMPLO.codigo} />}
+                {series || number ? `${series ?? ""}${number ?? ""}` : EJEMPLO.codigo}
             </h2>
 
             <div className={styles.mobileBadgeRow}>
                 {badges}
-                <span className={styles.amount}>Q{totalAmount}</span>
+                <span className={styles.amount}>{total}</span>
             </div>
             {montoOriginal}
 
             <div className={styles.mobileBody}>
                 <p className={styles.description}>{description}</p>
-                <p className={styles.meta}>{date ?? <PendienteApi campo="fecha" ejemplo={EJEMPLO.fechaLarga} />}</p>
+                <p className={styles.meta}>{date ?? EJEMPLO.fechaLarga}</p>
                 <p className={styles.meta}>{location ?? <PendienteApi campo="lugar" ejemplo={EJEMPLO.lugar} />}</p>
                 {articulo}
                 {verImagen(styles.verImagenButtonMobile)}
@@ -121,15 +154,15 @@ export default function FineDetailHeader({
             <div className={styles.topGrid}>
             <div className={styles.leftCol}>
                 <div className={styles.codeRow}>
-                <h2 className={styles.code}>Serie: {series ?? <PendienteApi campo="serie" ejemplo={EJEMPLO.serie} />}</h2>
-                <h2 className={styles.code}>Número: {number ?? <PendienteApi campo="número" ejemplo={EJEMPLO.numero} />}</h2>
+                <h2 className={styles.code}>Serie: {series ?? EJEMPLO.serie}</h2>
+                <h2 className={styles.code}>Número: {number ?? EJEMPLO.numero}</h2>
                 </div>
 
                 {badges}
 
                 <p className={styles.description}>{description}</p>
                 <p className={styles.meta}>
-                {date ?? <PendienteApi campo="fecha" ejemplo={EJEMPLO.fechaLarga} />}{" "}
+                {date ?? EJEMPLO.fechaLarga}{" "}
                 <span className={styles.dot}>•</span>{" "}
                 {location ?? <PendienteApi campo="lugar" ejemplo={EJEMPLO.lugar} />}
                 </p>
@@ -137,8 +170,11 @@ export default function FineDetailHeader({
             </div>
 
             <div className={styles.rightCol}>
-                <span className={styles.totalLabel}>Total: Q{totalAmount}</span>
+                {/* Total y desglose van juntos; los botones quedan aparte, con su espacio. */}
+                <div className={styles.totalBlock}>
+                <span className={styles.totalLabel}>Total: {total}</span>
                 {montoOriginal}
+                </div>
                 <div className={styles.buttonCol}>
                 {verImagen(styles.verImagenButton)}
                 <button type="button" className={styles.payButton} onClick={onPayThis} disabled={!canPay}>

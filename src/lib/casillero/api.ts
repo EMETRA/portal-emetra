@@ -47,14 +47,17 @@ export async function postCasilleroJson<T>(
   return response.json() as Promise<T>;
 }
 
+/** `signal` (opcional) corta la petición si la pantalla ya no necesita la respuesta. */
 export async function getCasilleroJson<T>(
   path: string,
-  errorFromStatus: (status: number) => Error
+  errorFromStatus: (status: number) => Error,
+  signal?: AbortSignal
 ): Promise<T> {
   const response = await fetch(path, {
     method: "GET",
     headers: { Accept: "application/json" },
     cache: "no-store",
+    signal,
   });
 
   if (!response.ok) {

@@ -3,6 +3,7 @@
 import { useRouter } from "next/navigation";
 import styles from "./FineSelectionBar.module.scss";
 import { useSelectedFinesStore } from "@/store/useSelectedFineStore";
+import { formatearQuetzales } from "@/lib/casillero/montos";
 
 export default function FineSelectionBar() {
     const router = useRouter();
@@ -20,7 +21,7 @@ export default function FineSelectionBar() {
             <span className={styles.count}>
             {selected.length} multa{selected.length !== 1 ? "s" : ""} seleccionada{selected.length !== 1 ? "s" : ""}
             </span>
-            <span className={styles.total}>Total: Q{total().toLocaleString("es-GT")}</span>
+            <span className={styles.total}>Total: {formatearQuetzales(total())}</span>
         </div>
 
         <div className={styles.actions}>

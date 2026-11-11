@@ -4,7 +4,8 @@ import CategoryBadge from "@/components/client/atoms/CategoryBadge/CategoryBadge
 import PendienteApi from "@/components/client/atoms/PendienteApi/PendienteApi";
 import { DATOS_DE_EJEMPLO } from "@/lib/casillero/datosDeEjemplo";
 import { Fine } from "@/types/fines";
-import { ETIQUETA_ESTADO_COBRO, esCobroPagable, formatearFechaCobro } from "@/lib/casillero/obligations";
+import { esCobroPagable } from "@/lib/casillero/obligations";
+import { formatearQuetzales } from "@/lib/casillero/montos";
 import styles from "./FineCard.module.scss";
 import { useSelectedFinesStore } from "@/store/useSelectedFineStore";
 
@@ -16,8 +17,8 @@ interface FineCardProps {
 export default function FineCard({ fine, onViewDetail }: FineCardProps) {
     const { toggle, isSelected } = useSelectedFinesStore();
     const selected = isSelected(fine.id);
-    // Lo pagado o con pago en proceso se muestra, pero no se puede seleccionar.
-    const pagable = esCobroPagable(fine.status, fine.amount);
+    // Lo que la API marca como no pagable se muestra con su motivo, pero no se puede seleccionar.
+    const pagable = esCobroPagable(fine);
 
     return (
         <article className={`${styles.card} ${selected ? styles.cardSelected : ""} ${pagable ? "" : styles.cardNoPagable}`}>
@@ -52,29 +53,21 @@ export default function FineCard({ fine, onViewDetail }: FineCardProps) {
         {/* Content right column */}
         <div className={styles.content}>
             <header className={styles.header}>
-            <span className={styles.code}>{fine.code ?? <PendienteApi campo="código" ejemplo={DATOS_DE_EJEMPLO.multa.codigo} />}</span>
-            <span className={styles.amount}>Q{fine.amount}</span>
+            <span className={styles.code}>{fine.code ?? DATOS_DE_EJEMPLO.multa.codigo}</span>
+            <span className={styles.amount}>{formatearQuetzales(fine.amount, fine.currency)}</span>
             </header>
 
-            {fine.originalAmount !== undefined && (
-            <p className={styles.partial}>Monto original: Q{fine.originalAmount}</p>
-            )}
 
             <div className={styles.badges}>
-            {fine.category ? <CategoryBadge category={fine.category} /> : <PendienteApi campo="categoría" />}
-            {fine.status && (
-                <span className={`${styles.status} ${styles[`status_${fine.status}`] ?? ""}`}>
-                {ETIQUETA_ESTADO_COBRO[fine.status]}
-                </span>
-            )}
+            {fine.category && <CategoryBadge category={fine.category} />}
+            {!pagable && <span className={styles.status}>No disponible para pago</span>}
             </div>
 
             <p className={styles.description}>{fine.description}</p>
 
             <div className={styles.meta}>
             <p>{fine.location ?? <PendienteApi campo="lugar" ejemplo={DATOS_DE_EJEMPLO.multa.lugar} />}</p>
-            <p>{fine.date ?? <PendienteApi campo="fecha" ejemplo={DATOS_DE_EJEMPLO.multa.fecha} />}</p>
-            {fine.dueDate && <p>Vence: {formatearFechaCobro(fine.dueDate)}</p>}
+            <p>{fine.date ?? DATOS_DE_EJEMPLO.multa.fecha}</p>
             </div>
 
             <button

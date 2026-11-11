@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { obligacionSimulada } from "@/lib/casillero/obligations.dummy";
+import { montoACentavos } from "@/lib/casillero/montos";
 import { pdfSimulado } from "@/lib/casillero/notifications.dummy";
 import type { CasilleroPaymentOrder, CasilleroPaymentOrderStatus } from "@/lib/casillero/types";
 
@@ -10,10 +11,10 @@ import type { CasilleroPaymentOrder, CasilleroPaymentOrderStatus } from "@/lib/c
   Como el checkout (Neonet) todavía no existe, el estado de la orden depende de los cobros
   que lleve, para poder ver cada caso en pantalla:
   - con obl-1004 (convenio): se queda CREADA (falta pagar).
-  - con obl-1003 (cepo): se queda EN_PROCESO (para ver "volver a consultar").
-  - con obl-1002 (vencida): RECHAZADA.
+  - con obl-1003 (con descuento): se queda EN_PROCESO (para ver "volver a consultar").
+  - con obl-1002 (con recargo): RECHAZADA.
   - cualquier otra: EN_PROCESO los primeros segundos y luego CONFIRMADA.
-  Con un cobro pagado o con pago en proceso (obl-1005, obl-1006) o inexistente: 409.
+  Con un cobro no pagable (obl-1005, obl-1006) o inexistente: 409.
 */
 
 const SEGUNDOS_EN_PROCESO = 6;
@@ -53,9 +54,7 @@ export function crearOrdenSimulada(body: unknown): NextResponse {
   }
 
   const obligaciones = ids.map(obligacionSimulada);
-  const pagables = obligaciones.every(
-    (o) => o && (o.status === "PENDIENTE" || o.status === "VENCIDA") && o.balance > 0
-  );
+  const pagables = obligaciones.every((o) => o?.payable);
   if (!pagables) {
     return NextResponse.json(
       { error: "Algún cobro ya no se puede pagar", code: "CONFLICT" },
@@ -67,7 +66,8 @@ export function crearOrdenSimulada(body: unknown): NextResponse {
   const orden: OrdenSimulada = {
     id: `ord-${ahora.toString(36)}`,
     status: "CREADA",
-    totalAmount: obligaciones.reduce((suma, o) => suma + (o?.balance ?? 0), 0),
+    totalAmount:
+      obligaciones.reduce((suma, o) => suma + (o ? montoACentavos(o.totalAmount) ?? 0 : 0), 0) / 100,
     obligationIds: ids,
     createdAt: new Date(ahora).toISOString(),
     expiresAt: new Date(ahora + MINUTOS_PARA_PAGAR * 60 * 1000).toISOString(),

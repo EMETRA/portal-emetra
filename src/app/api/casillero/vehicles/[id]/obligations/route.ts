@@ -6,6 +6,7 @@ import {
   noEncontradoSimulado,
   obligacionesSimuladas,
   sinSesionSimulada,
+  solicitudInvalidaSimulada,
 } from "@/lib/casillero/obligations.dummy";
 
 type RouteContext = {
@@ -13,8 +14,9 @@ type RouteContext = {
 };
 
 /**
- * GET /v1/vehicles/{id}/obligations: obligaciones pagables del vehículo (concepto, monto,
- * saldo, estado y vencimiento). Exige la sesión del usuario.
+ * GET /v1/vehicles/{id}/obligations?limit&cursor: obligaciones del vehículo (también las
+ * no pagables), paginadas por cursor. El id es el `vehicleReference`. El proxy reenvía la
+ * query tal cual. Exige la sesión del usuario.
  */
 export async function GET(req: NextRequest, context: RouteContext) {
   const { id } = await context.params;
@@ -22,7 +24,8 @@ export async function GET(req: NextRequest, context: RouteContext) {
   if (SIMULAR_COBROS) {
     const sinSesion = sinSesionSimulada(req);
     if (sinSesion) return sinSesion;
-    const listado = obligacionesSimuladas(id);
+    const listado = obligacionesSimuladas(id, req.nextUrl.searchParams);
+    if (listado === "invalido") return solicitudInvalidaSimulada();
     return listado ? NextResponse.json(listado) : noEncontradoSimulado();
   }
 

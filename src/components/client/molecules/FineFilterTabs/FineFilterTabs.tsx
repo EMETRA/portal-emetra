@@ -1,14 +1,17 @@
-import { FINE_CATEGORIES, FineCategory } from "@/types/fines";
+import type { CategoriaCobro } from "@/lib/casillero/categorias";
 import styles from "./FineFilterTabs.module.scss";
 
-type FilterValue = "todas" | FineCategory;
+/** "todas" o el tipo de cobro (texto libre de la API). */
+export type FineFilterValue = string;
 
 interface FineFilterTabsProps {
-    value: FilterValue;
-    onChange: (value: FilterValue) => void;
+    value: FineFilterValue;
+    onChange: (value: FineFilterValue) => void;
+    /** Categorías que traen los cobros; se arma un filtro por cada una. */
+    categories: CategoriaCobro[];
 }
 
-export default function FineFilterTabs({ value, onChange }: FineFilterTabsProps) {
+export default function FineFilterTabs({ value, onChange, categories }: FineFilterTabsProps) {
     return (
         <div className={styles.tabsWrapper}>
             <div className={styles.tabs}>
@@ -20,7 +23,7 @@ export default function FineFilterTabs({ value, onChange }: FineFilterTabsProps)
                 Todas
             </button>
 
-            {FINE_CATEGORIES.map(({ value: catValue, label }) => (
+            {categories.map(({ value: catValue, label }) => (
                 <button
                 key={catValue}
                 type="button"

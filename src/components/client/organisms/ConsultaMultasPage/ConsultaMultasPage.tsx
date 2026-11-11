@@ -1,25 +1,29 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { SectionTitle } from "@/components/server/molecules/SectionTitle";
 import PlateSearchCard from "@/components/client/molecules/PlateSearchCard/PlateSearchCard";
 import VehicleSummaryCard from "@/components/client/molecules/VehicleSummaryCard/VehicleSummaryCard";
 import FineFilterTabs from "@/components/client/molecules/FineFilterTabs/FineFilterTabs";
 import FineCardCarousel from "@/components/client/organisms/FineCardCarousel/FineCardCarousel";
-import PendienteApi from "@/components/client/atoms/PendienteApi/PendienteApi";
 import { Button } from "@/components/server/atoms";
 import { LoadingSpinner } from "@/components/server/atoms/LoadingSpinner";
 import { Text } from "@/components/atoms/Text";
-import { Fine, FineCategory, FINE_CATEGORIES } from "@/types/fines";
-import type { CasilleroVehicle } from "@/lib/casillero/types";
+import { Fine } from "@/types/fines";
+import { categoriasDe } from "@/lib/casillero/categorias";
+import type { CasilleroVehicle, CasilleroVehicleDetail } from "@/lib/casillero/types";
 import {
     esCobroPagable,
+    fetchAllObligations,
     fetchAllVehicles,
-    fetchObligations,
+    fetchVehicleDetail,
+    isPeticionCancelada,
     isSesionVencidaCobros,
+    msHastaPrimerVencimiento,
     obligacionAMulta,
     placaCompleta,
 } from "@/lib/casillero/obligations";
+import { sumarQuetzales } from "@/lib/casillero/montos";
 import { useSessionStore } from "@/store/useSessionStore";
 import { useSelectedFinesStore } from "@/store/useSelectedFineStore";
 import styles from "./ConsultaMultasPage.module.scss";
@@ -36,8 +40,10 @@ export default function ConsultaMultasPage() {
     const preselectedPlate = searchParams.get("plate");
     const clearSession = useSessionStore((state) => state.clearSession);
     const clearSelectedFines = useSelectedFinesStore((state) => state.clear);
+    const syncSelectedFines = useSelectedFinesStore((state) => state.sync);
 
-    const [filter, setFilter] = useState<"todas" | FineCategory>("todas");
+    // "todas" o un tipo de cobro (texto libre de la API).
+    const [filter, setFilter] = useState<string>("todas");
 
     // Vehículos del usuario: el selector usa el vehicleReference como valor.
     const [vehiculos, setVehiculos] = useState<CasilleroVehicle[] | null>(null);
@@ -58,13 +64,15 @@ export default function ConsultaMultasPage() {
         router.replace("/casillero");
     }, [clearSession, router]);
 
+    // Cada efecto cancela su petición al salir de la pantalla o al volver a pedir; así una
+    // respuesta vieja nunca pisa a la nueva y no se siguen pidiendo páginas que ya no sirven.
     useEffect(() => {
-        let cancelado = false;
+        const control = new AbortController();
         setErrorVehiculos("");
 
-        fetchAllVehicles()
+        fetchAllVehicles({}, control.signal)
             .then((lista) => {
-                if (cancelado) return;
+                if (control.signal.aborted) return;
                 setVehiculos(lista);
                 // ?plate= preselecciona ese vehículo; si no está, el primero.
                 const inicial =
@@ -73,7 +81,7 @@ export default function ConsultaMultasPage() {
                 setConsultado(inicial);
             })
             .catch((err) => {
-                if (cancelado) return;
+                if (control.signal.aborted || isPeticionCancelada(err)) return;
                 if (isSesionVencidaCobros(err)) {
                     irAlLoginPorSesionVencida();
                     return;
@@ -81,38 +89,80 @@ export default function ConsultaMultasPage() {
                 setErrorVehiculos(err instanceof Error ? err.message : "No se pudieron cargar tus vehículos. Intenta más tarde");
             });
 
-        return () => {
-            cancelado = true;
-        };
+        return () => control.abort();
     }, [preselectedPlate, intentoVehiculos, irAlLoginPorSesionVencida]);
+
+    // Marca, modelo, color y año del vehículo consultado. Si falla, la tarjeta muestra la
+    // placa y la pantalla sigue (no es necesario para ver ni pagar los cobros).
+    const [detalleVehiculo, setDetalleVehiculo] = useState<CasilleroVehicleDetail | null>(null);
+
+    useEffect(() => {
+        setDetalleVehiculo(null);
+        if (!consultado) return;
+        const control = new AbortController();
+
+        fetchVehicleDetail(consultado.vehicleReference, control.signal)
+            .then((detalle) => {
+                if (!control.signal.aborted) setDetalleVehiculo(detalle);
+            })
+            .catch((err) => {
+                if (control.signal.aborted || isPeticionCancelada(err)) return;
+                if (isSesionVencidaCobros(err)) irAlLoginPorSesionVencida();
+            });
+
+        return () => control.abort();
+    }, [consultado, irAlLoginPorSesionVencida]);
+
+    // true = la próxima consulta de cobros es la automática por vencimiento del monto: no
+    // muestra la carga y, si falla, deja los cobros que ya se ven.
+    const consultaSilenciosa = useRef(false);
 
     useEffect(() => {
         if (!consultado) return;
-        let cancelado = false;
-        setCargandoCobros(true);
-        setErrorCobros("");
+        const control = new AbortController();
+        const silenciosa = consultaSilenciosa.current;
+        consultaSilenciosa.current = false;
+        if (!silenciosa) {
+            setCargandoCobros(true);
+            setErrorCobros("");
+        }
 
-        fetchObligations(consultado.vehicleReference)
-            .then((respuesta) => {
-                if (!cancelado) setFines(respuesta.items.map(obligacionAMulta));
+        fetchAllObligations(consultado.vehicleReference, control.signal)
+            .then((obligaciones) => {
+                if (control.signal.aborted) return;
+                const nuevas = obligaciones.map(obligacionAMulta);
+                setFines(nuevas);
+                // Lo ya seleccionado se actualiza: fuera lo que dejó de ser pagable, monto nuevo.
+                syncSelectedFines(nuevas);
             })
             .catch((err) => {
-                if (cancelado) return;
+                if (control.signal.aborted || isPeticionCancelada(err)) return;
                 if (isSesionVencidaCobros(err)) {
                     irAlLoginPorSesionVencida();
                     return;
                 }
+                if (silenciosa) return;
                 setFines([]);
                 setErrorCobros(err instanceof Error ? err.message : "No se pudieron cargar los cobros. Intenta más tarde");
             })
             .finally(() => {
-                if (!cancelado) setCargandoCobros(false);
+                if (!control.signal.aborted && !silenciosa) setCargandoCobros(false);
             });
 
-        return () => {
-            cancelado = true;
-        };
-    }, [consultado, intentoCobros, irAlLoginPorSesionVencida]);
+        return () => control.abort();
+    }, [consultado, intentoCobros, irAlLoginPorSesionVencida, syncSelectedFines]);
+
+    // Cuando vence el monto de algún cobro (validUntil), se vuelve a consultar solo para
+    // mostrar y seleccionar el monto vigente.
+    useEffect(() => {
+        const ms = msHastaPrimerVencimiento(fines);
+        if (ms === null) return;
+        const timer = setTimeout(() => {
+            consultaSilenciosa.current = true;
+            setIntentoCobros((actual) => actual + 1);
+        }, ms);
+        return () => clearTimeout(timer);
+    }, [fines]);
 
     const handleConsultar = () => {
         const vehiculo = vehiculos?.find((v) => v.vehicleReference === selectedPlate);
@@ -128,9 +178,8 @@ export default function ConsultaMultasPage() {
         setConsultado(vehiculo);
     };
 
-    // TODO [CASILLERO-BACKEND]: si la API no manda categorías, filtros y desglose quedan con marca.
-    // Sin cobros no se sabe, así que se muestra el desglose en Q0.
-    const hayCategorias = fines.length === 0 || fines.some((f) => f.category);
+    // Filtros: uno por cada tipo de cobro que traen los cobros (texto libre de la API).
+    const categorias = useMemo(() => categoriasDe(fines), [fines]);
 
     const filteredFines = useMemo(
         () => (filter === "todas" ? fines : fines.filter((f) => f.category === filter)),
@@ -139,32 +188,32 @@ export default function ConsultaMultasPage() {
 
     // Barra de móvil: igual que el resumen, solo cuenta y suma lo que se puede pagar.
     const filteredPayable = useMemo(
-        () => filteredFines.filter((f) => esCobroPagable(f.status, f.amount)),
+        () => filteredFines.filter((f) => esCobroPagable(f)),
         [filteredFines]
     );
 
+    // Las sumas pasan por centavos (sumarQuetzales) para no arrastrar errores de decimales.
     const filteredTotal = useMemo(
-        () => filteredPayable.reduce((sum, f) => sum + f.amount, 0),
+        () => sumarQuetzales(filteredPayable.map((f) => f.amount)),
         [filteredPayable]
     );
 
-    // Pendientes = lo que se puede pagar (sin lo pagado ni lo que ya está en proceso).
-    const pendientes = useMemo(
-        () => fines.filter((f) => esCobroPagable(f.status, f.amount)),
-        [fines]
+    // Pendientes = lo que la API marca como pagable.
+    const pendientes = useMemo(() => fines.filter((f) => esCobroPagable(f)), [fines]);
+
+    // Desglose de la tarjeta del vehículo: total pendiente por cada tipo de cobro presente.
+    const amountsByCategory = useMemo(
+        () =>
+            categoriasDe(pendientes).map((categoria) => ({
+                ...categoria,
+                amount: sumarQuetzales(
+                    pendientes.filter((f) => f.category === categoria.value).map((f) => f.amount)
+                ),
+            })),
+        [pendientes]
     );
 
-    const amountsByCategory = useMemo(() => {
-        const totals = Object.fromEntries(
-        FINE_CATEGORIES.map((c) => [c.value, 0])
-        ) as Record<FineCategory, number>;
-        pendientes.forEach((f) => {
-        if (f.category) totals[f.category] += f.amount;
-        });
-        return totals;
-    }, [pendientes]);
-
-    const totalAmount = pendientes.reduce((sum, f) => sum + f.amount, 0);
+    const totalAmount = useMemo(() => sumarQuetzales(pendientes.map((f) => f.amount)), [pendientes]);
 
     const handleViewDetail = (fineId: string) => {
         router.push(`/casillero/dashboard/multas/${encodeURIComponent(fineId)}`);
@@ -213,11 +262,13 @@ return (
                 onConsultar={handleConsultar}
             />
 
-            {/* TODO [CASILLERO-BACKEND]: modelo, color y año llegarán con la integración de SAT. */}
             <VehicleSummaryCard
+                model={[detalleVehiculo?.make, detalleVehiculo?.model].filter(Boolean).join(" ") || undefined}
+                color={detalleVehiculo?.color ?? undefined}
+                year={detalleVehiculo?.year ?? undefined}
                 totalAmount={totalAmount}
                 pendingCount={pendientes.length}
-                amountsByCategory={hayCategorias ? amountsByCategory : undefined}
+                amountsByCategory={amountsByCategory}
             />
         </div>
 
@@ -241,8 +292,7 @@ return (
             ) : (
                 <>
                     <div className={styles.tabsRow}>
-                        <FineFilterTabs value={filter} onChange={setFilter} />
-                        {!hayCategorias && <PendienteApi campo="categoría (los filtros no funcionan sin ella)" />}
+                        <FineFilterTabs value={filter} onChange={setFilter} categories={categorias} />
                     </div>
 
                     {isMobile && (

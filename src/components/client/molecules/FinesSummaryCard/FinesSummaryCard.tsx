@@ -1,5 +1,4 @@
 import CategoryBadge from "@/components/client/atoms/CategoryBadge/CategoryBadge";
-import PendienteApi from "@/components/client/atoms/PendienteApi/PendienteApi";
 import { DATOS_DE_EJEMPLO } from "@/lib/casillero/datosDeEjemplo";
 import { Fine } from "@/types/fines";
 import styles from "./FinesSummaryCard.module.scss";
@@ -29,8 +28,8 @@ export default function FinesSummaryCard({ fines, total }: FinesSummaryCardProps
             {fines.map((fine) => (
             <div key={fine.id} className={styles.fineRow}>
                 <div className={styles.fineLeft}>
-                <span className={styles.fineCode}>{fine.code ?? <PendienteApi campo="serie-remisión" ejemplo={DATOS_DE_EJEMPLO.multa.codigo} />}</span>
-                {fine.category ? <CategoryBadge category={fine.category} /> : <PendienteApi campo="categoría" />}
+                <span className={styles.fineCode}>{fine.code ?? DATOS_DE_EJEMPLO.multa.codigo}</span>
+                {fine.category && <CategoryBadge category={fine.category} />}
                 </div>
                 <span className={styles.fineAmount}>Q{fine.amount.toFixed(2)}</span>
             </div>

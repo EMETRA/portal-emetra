@@ -268,23 +268,29 @@ export type CasilleroNotificationDetail = CasilleroNotificationItem & {
   Cobros: vehículos del usuario y sus obligaciones pagables (CAS-132)
   - Vehículos: ruta, parámetros y campos tomados del Swagger del backend; Daniel
     confirmó (2026-10-28) que el cursor de la siguiente página viene en `nextCursor`.
-    TODO [CASILLERO-BACKEND]: modelo, color y año vendrán cuando backend integre SAT;
-    aún no hay nombres de campos.
-  - Obligaciones: TODO [CASILLERO-BACKEND]: formato provisional. El ticket solo nombra
-    concepto, monto, saldo, estado y vencimiento; los nombres (concept, amount, balance,
-    status, dueDate), los valores del estado, `category` y que el listado venga completo
-    (sin paginación) son supuestos. El id del vehículo en la ruta es su
-    `vehicleReference` (confirmado por Daniel, 2026-10-28).
+    `plateNumber` ya trae el tipo ("P123ABC") y `plateTypeCode` es el nombre del tipo
+    ("PARTICULAR"); la placa se muestra tal cual viene en `plateNumber`.
+    Marca, modelo, color y año vienen en el detalle: GET /v1/vehicles/{reference}.
+  - Obligaciones: ruta, parámetros y campos tomados del Swagger del backend (Daniel,
+    2026-11). El id del vehículo en la ruta es su `vehicleReference` (confirmado por
+    Daniel, 2026-10-28). El header opcional de empresa (x-portal-company-subject-id) no se
+    manda: el modo empresa lo trabaja Elías; sin él la API usa el contexto personal.
+    Confirmado por Daniel (2026-11-11):
+      · el listado responde `nextCursor` cuando hay otra página; si no viene, terminó;
+      · chargeType, referenceStatus y sourceStatus no tienen catálogo (texto libre);
+      · unavailableReason tiene valores fijos (CasilleroUnavailableReason) o null;
+      · validUntil es hasta cuándo vale el monto calculado, no la fecha límite legal para
+        pagar; puede venir null.
 */
 
 export type CasilleroVehicle = {
   /** Id del vehículo para pedir sus obligaciones. */
   vehicleReference: string;
-  /** Número sin el tipo, p. ej. "111BBB". */
+  /** Placa completa, ya con el tipo, p. ej. "P123ABC". Se muestra tal cual. */
   plateNumber: string;
   /** País ISO de la placa, p. ej. "GT". */
   plateCountry: string;
-  /** Código público del tipo de placa, p. ej. "P". */
+  /** Tipo de placa con nombre, p. ej. "PARTICULAR" (no la letra). */
   plateTypeCode: string;
   foreignPlate: boolean;
   associationStatus: string;
@@ -304,29 +310,105 @@ export type CasilleroVehicleList = {
   nextCursor?: string | null;
 };
 
-/** Valores provisionales del estado de una obligación. */
-export type CasilleroObligationStatus = "PENDIENTE" | "VENCIDA" | "EN_PROCESO" | "PAGADA";
+/** Vigencia de la asociación o de la propiedad en el detalle del vehículo. */
+export type CasilleroVehicleVigencia = {
+  validFrom: string | null;
+  validUntil: string | null;
+};
+
+/**
+ * GET /v1/vehicles/{reference}: detalle de un vehículo accesible (Swagger, 2026-11-11).
+ * Inexistente, ajeno o con relación vencida = 404. Los datos del vehículo (marca, modelo,
+ * color, año, VIN) se tipan como opcionales por si alguno no viene.
+ */
+export type CasilleroVehicleDetail = {
+  vehicleReference: string;
+  plateNumber: string;
+  plateCountry: string;
+  plateTypeCode: string;
+  foreignPlate: boolean;
+  vin?: string | null;
+  make?: string | null;
+  model?: string | null;
+  color?: string | null;
+  year?: number | null;
+  association?: (CasilleroVehicleVigencia & { status: string; accessType: string }) | null;
+  ownership?: (CasilleroVehicleVigencia & { type: string }) | null;
+};
+
+/**
+ * Monto decimal exacto como texto, p. ej. "100" o "125.50". La API los manda como texto
+ * para no perder centavos; se convierten con `montoACentavos` (lib/casillero/obligations).
+ */
+export type CasilleroMonto = string;
+
+/** Por qué no se puede pagar una obligación (valores fijos de la API). */
+export type CasilleroUnavailableReason =
+  | "PAID"
+  | "NO_PROJECTION"
+  | "TYPE_DISABLED"
+  | "SOURCE_NOT_PAYABLE"
+  | "EXPIRED"
+  | "NO_AMOUNT_DUE";
 
 export type CasilleroObligation = {
   id: string;
+  vehicleReference: string;
   concept: string;
-  /** Monto original, en quetzales. */
-  amount: number;
-  /** Lo que falta por pagar, en quetzales. */
-  balance: number;
-  status: CasilleroObligationStatus;
-  /** Fecha límite de pago (ISO 8601). */
-  dueDate: string;
-  /** Opcional: si viene, la pantalla muestra los filtros por categoría. */
-  category?: string;
+  /** Tipo de cobro, p. ej. "REMISION". Texto libre, sin catálogo. */
+  chargeType: string;
+  /** Referencia en el sistema de origen, p. ej. "1:N:456123". */
+  sourceReference?: string | null;
+  /** Serie de la remisión, p. ej. "N". */
+  series?: string | null;
+  /** Número de la remisión, p. ej. "456123". */
+  number?: string | null;
+  /** Estado de la referencia, p. ej. "ACTIVA". Texto libre, sin catálogo. */
+  referenceStatus: string;
+  /** Estado en el sistema de origen, p. ej. "ACTIVA". Texto libre, sin catálogo. */
+  sourceStatus: string;
+  /** Moneda ISO, p. ej. "GTQ". */
+  currency: string;
+  baseAmount: CasilleroMonto;
+  surcharge: CasilleroMonto;
+  discount: CasilleroMonto;
+  /** Lo que se paga: base + recargo − descuento. */
+  totalAmount: CasilleroMonto;
+  /**
+   * TODO [CASILLERO-BACKEND]: campo nuevo del Swagger (2026-11-11), sin explicación. En el
+   * ejemplo vale lo mismo que totalAmount. Mientras Daniel aclara qué es, no se usa: se
+   * muestra y se paga totalAmount.
+   */
+  saldo?: CasilleroMonto | null;
+  /** Fecha de emisión (ISO 8601). */
+  issuedAt: string;
+  /** Cuándo se calculó el monto (ISO 8601). */
+  consultedAt: string;
+  /**
+   * Hasta cuándo vale el monto calculado (ISO 8601). No es la fecha límite legal para
+   * pagar la multa. null = sin vencimiento explícito.
+   */
+  validUntil: string | null;
+  /** La API decide si se puede pagar; no se deduce en el front. */
+  payable: boolean;
+  /**
+   * Motivo cuando `payable` es false; null si se puede pagar. Se tipa también como string
+   * para no romper la pantalla si backend agrega un código nuevo.
+   */
+  unavailableReason: CasilleroUnavailableReason | (string & {}) | null;
 };
 
-/** GET /v1/vehicles/{id}/obligations */
+/**
+ * GET /v1/vehicles/{vehicleReference}/obligations?limit&cursor: incluye las no pagables,
+ * en orden ascendente por id.
+ */
 export type CasilleroObligationList = {
   items: CasilleroObligation[];
+  /** Cursor de la siguiente página; si no viene, terminó el listado. */
+  nextCursor?: string | null;
 };
 
-/** GET /v1/obligations/{id}: por ahora los mismos datos del listado. */
+/** GET /v1/obligations/{id}: mismos campos que el listado. Ajena o inexistente = 404. */
 export type CasilleroObligationDetail = CasilleroObligation;
 
 /*

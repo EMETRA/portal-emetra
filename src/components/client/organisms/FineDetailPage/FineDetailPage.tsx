@@ -18,18 +18,24 @@ import {
     CasilleroCobrosError,
     esCobroPagable,
     fetchObligationDetail,
-    formatearFechaCobro,
+    formatearFechaHoraCobro,
+    formatearFechaLargaCobro,
+    isPeticionCancelada,
     isSesionVencidaCobros,
+    msHastaVencerMonto,
     obligacionAMulta,
 } from "@/lib/casillero/obligations";
 import { useSessionStore } from "@/store/useSessionStore";
 import { useSelectedFinesStore } from "@/store/useSelectedFineStore";
 
 /*
-  TODO [CASILLERO-BACKEND]: el detalle de la API de Cobros solo trae concepto, monto, saldo,
-  estado, vencimiento y categoría. Serie, número, fecha, lugar, artículo, numeral,
-  evidencia, conductor, licencia, persona notificada, impugnación y descripción larga
-  se muestran con datos de ejemplo (PendienteApi) hasta saber si vendrán y con qué nombres.
+  TODO [CASILLERO-BACKEND]: el detalle de la API de Cobros trae concepto, tipo de cobro,
+  montos (base, recargo, descuento, total), fechas (emisión, consulta, validUntil) y si se
+  puede pagar, además de serie y número. Lugar, artículo, numeral, evidencia, conductor, licencia,
+  persona notificada, impugnación, última fecha de pago y descripción larga se muestran con
+  datos de ejemplo (PendienteApi) hasta saber si vendrán y con qué nombres.
+  `validUntil` NO es la última fecha de pago: es hasta cuándo vale el monto calculado
+  (Daniel, 2026-11-11), por eso no se usa en ese campo.
 */
 const EJEMPLO = DATOS_DE_EJEMPLO.multa;
 export default function FineDetailPage({ fineId }: { fineId: string }) {
@@ -48,17 +54,19 @@ export default function FineDetailPage({ fineId }: { fineId: string }) {
         router.replace("/casillero");
     }, [clearSession, router]);
 
+    // Siempre se pide al abrir (sin caché): la API vuelve a validar el vehículo y los montos
+    // pueden cambiar. Al salir o reintentar se cancela la petición anterior.
     useEffect(() => {
-        let cancelado = false;
+        const control = new AbortController();
         setDetalle(null);
         setError(null);
 
-        fetchObligationDetail(fineId)
+        fetchObligationDetail(fineId, control.signal)
             .then((respuesta) => {
-                if (!cancelado) setDetalle(respuesta);
+                if (!control.signal.aborted) setDetalle(respuesta);
             })
             .catch((err) => {
-                if (cancelado) return;
+                if (control.signal.aborted || isPeticionCancelada(err)) return;
                 if (isSesionVencidaCobros(err)) {
                     irAlLoginPorSesionVencida();
                     return;
@@ -69,10 +77,29 @@ export default function FineDetailPage({ fineId }: { fineId: string }) {
                 });
             });
 
-        return () => {
-            cancelado = true;
-        };
+        return () => control.abort();
     }, [fineId, intento, irAlLoginPorSesionVencida]);
+
+    // Cuando vence el monto (validUntil) se vuelve a pedir el detalle sin mostrar la carga;
+    // si esa consulta falla, se queda lo que ya se ve (salvo sesión vencida).
+    useEffect(() => {
+        const ms = msHastaVencerMonto(detalle?.validUntil);
+        if (ms === null) return;
+        const control = new AbortController();
+        const timer = setTimeout(() => {
+            fetchObligationDetail(fineId, control.signal)
+                .then((respuesta) => {
+                    if (!control.signal.aborted) setDetalle(respuesta);
+                })
+                .catch((err) => {
+                    if (!control.signal.aborted && isSesionVencidaCobros(err)) irAlLoginPorSesionVencida();
+                });
+        }, ms);
+        return () => {
+            clearTimeout(timer);
+            control.abort();
+        };
+    }, [detalle?.validUntil, fineId, irAlLoginPorSesionVencida]);
 
     if (!detalle) {
         return (
@@ -101,7 +128,7 @@ export default function FineDetailPage({ fineId }: { fineId: string }) {
     }
 
     const fine = obligacionAMulta(detalle);
-    const pagable = esCobroPagable(fine.status, fine.amount);
+    const pagable = esCobroPagable(fine);
 
     const handlePayThis = () => {
         if (!pagable) return;
@@ -114,11 +141,21 @@ export default function FineDetailPage({ fineId }: { fineId: string }) {
         <SectionTitle>Detalle de Multa</SectionTitle>
 
         <FineDetailHeader
+            series={detalle.series?.trim() || undefined}
+            number={detalle.number?.trim() || undefined}
             category={fine.category}
             totalAmount={fine.amount}
-            originalAmount={fine.originalAmount}
-            status={fine.status}
+            currency={fine.currency}
+            breakdown={fine.breakdown}
+            validUntil={
+                // Solo si todavía no venció; al vencer se vuelve a consultar (efecto de arriba).
+                msHastaVencerMonto(fine.validUntil) !== null && fine.validUntil
+                    ? formatearFechaHoraCobro(fine.validUntil) || undefined
+                    : undefined
+            }
+            unavailableReason={fine.unavailableReason}
             description={fine.description}
+            date={formatearFechaLargaCobro(detalle.issuedAt) || undefined}
             onPayThis={handlePayThis}
             canPay={pagable}
             onVerImagen={() => setIsModalOpen(true)}
@@ -135,7 +172,7 @@ export default function FineDetailPage({ fineId }: { fineId: string }) {
             <InfoCard title="Información Legal" icon="legal">
             <InfoField label="Persona notificada" value={<PendienteApi campo="persona notificada" ejemplo={EJEMPLO.personaNotificada} />} />
             <InfoField label="Fecha de impugnación" value={<PendienteApi campo="fecha de impugnación" ejemplo={EJEMPLO.fechaImpugnacion} />} />
-            <InfoField label="Última fecha de pago" value={formatearFechaCobro(detalle.dueDate)} />
+            <InfoField label="Última fecha de pago" value={<PendienteApi campo="última fecha de pago" ejemplo={EJEMPLO.ultimaFechaPago} />} />
             </InfoCard>
         </div>
 

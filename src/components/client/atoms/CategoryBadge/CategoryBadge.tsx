@@ -1,13 +1,16 @@
-
-import { FINE_CATEGORIES, FineCategory } from "@/types/fines";
+import { colorCategoria, etiquetaCategoria } from "@/lib/casillero/categorias";
 import styles from "./CategoryBadge.module.scss";
 
 interface CategoryBadgeProps {
-    category: FineCategory;
+    /** Tipo de cobro tal como lo manda la API (texto libre, p. ej. "REMISION_TRANSITO"). */
+    category: string;
 }
 
+/** Muestra cualquier tipo de cobro: texto legible y un color del diseño. */
 export default function CategoryBadge({ category }: CategoryBadgeProps) {
-    const label = FINE_CATEGORIES.find((c) => c.value === category)?.label ?? category;
-
-    return <span className={`${styles.badge} ${styles[category]}`}>{label}</span>;
+    return (
+        <span className={`${styles.badge} ${styles[colorCategoria(category)]}`}>
+            {etiquetaCategoria(category)}
+        </span>
+    );
 }

@@ -15,28 +15,60 @@
     align-items: center;
     padding: 0.25rem 0.75rem;
     border-radius: 999px;
-    border: 1px solid #1b2a6b;
-    color: #1b2a6b;
+    border: 1px solid #6b6b6b;
+    color: #6b6b6b;
     font-size: 0.75rem;
     font-weight: 600;
     white-space: nowrap;
-}
-
-.status_VENCIDA {
-    border-color: $rojo-1;
-    color: $rojo-1;
-}
-
-.status_EN_PROCESO,
-.status_PAGADA {
-    border-color: #6b6b6b;
-    color: #6b6b6b;
 }
 
 .original {
     color: #6b6b6b;
     font-size: 0.85rem;
 }
+
+/*
+  Desglose del total como mini tabla: concepto a la izquierda, monto a la derecha, con
+  cifras del mismo ancho para que queden alineadas una debajo de la otra.
+*/
+.desglose,
+.desgloseMobile {
+    display: grid;
+    margin: 0;
+    color: #6b6b6b;
+    font-size: 0.85rem;
+
+    dt,
+    dd {
+        margin: 0;
+    }
+
+    dd {
+        text-align: right;
+        font-variant-numeric: tabular-nums;
+    }
+}
+
+.desgloseFila {
+    display: contents;
+}
+
+/* Escritorio y tablet: bajo el total, a la derecha. */
+.desglose {
+    grid-template-columns: auto auto;
+    column-gap: 1.5rem;
+    row-gap: 0.15rem;
+}
+
+/* Celular: a todo el ancho bajo el monto, separada de la descripción por una línea. */
+.desgloseMobile {
+    grid-template-columns: 1fr auto;
+    row-gap: 0.2rem;
+    padding-bottom: 0.75rem;
+    margin-bottom: 0.75rem;
+    border-bottom: 1px solid #e5e5e5;
+}
+
 
 .topGrid {
     display: grid;
@@ -68,7 +100,17 @@
     flex-direction: column;
     align-items: flex-end;
     justify-content: space-between;
+    gap: 1.25rem;
     min-height: 8rem;
+}
+
+/* Total con su desglose (base, recargo, descuento) o el motivo si no se puede pagar. */
+.totalBlock {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 0.2rem;
+    text-align: right;
 }
 
 .totalLabel {

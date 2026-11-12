@@ -12,6 +12,7 @@ interface AssociatePlateCardProps {
     onPlateTypeChange: (value: string) => void;
     onPlateNumberChange: (value: string) => void;
     onAsociar: () => void;
+    isSubmitting?: boolean;
 }
 
 export default function AssociatePlateCard({
@@ -21,6 +22,7 @@ export default function AssociatePlateCard({
     onPlateTypeChange,
     onPlateNumberChange,
     onAsociar,
+    isSubmitting = false,
     }: AssociatePlateCardProps) {
     return (
         <CardGeneral className={styles.card}>
@@ -47,8 +49,13 @@ export default function AssociatePlateCard({
             <p className={styles.nit}>
                 <strong>NIT asociado:</strong> {nit}
             </p>
-            <button type="button" className={styles.asociarButton} onClick={onAsociar}>
-                Asociar
+            <button
+                type="button"
+                className={styles.asociarButton}
+                onClick={onAsociar}
+                disabled={isSubmitting}
+            >
+                {isSubmitting ? "Asociando..." : "Asociar"}
             </button>
             </div>
         </div>

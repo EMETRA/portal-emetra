@@ -140,6 +140,35 @@
     margin: 0;
 }
 
+.fileList {
+    width: 100%;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.fileItem {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    color: #1b2a6b;
+    font-size: 0.85rem;
+    font-weight: 600;
+    overflow-wrap: anywhere;
+}
+
+.removeFile {
+    border: none;
+    background: transparent;
+    color: #c62828;
+    font-weight: 700;
+    cursor: pointer;
+}
+
 .sendButton {
     background: #6dbf6c;
     color: #fff;
@@ -152,4 +181,5 @@
     max-width: 220px;
 
     &:hover { opacity: 0.9; }
+    &:disabled { cursor: not-allowed; opacity: 0.65; }
 }

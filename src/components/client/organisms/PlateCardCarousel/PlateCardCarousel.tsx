@@ -8,7 +8,7 @@ import { Plate } from "@/types/plates";
 
 interface PlateCardCarouselProps {
     plates: Plate[];
-    onDelete: (plate: Plate) => void;
+    onDelete?: (plate: Plate) => void;
     onViewDetail: (plate: Plate) => void;
     }
 
@@ -66,7 +66,7 @@ interface PlateCardCarouselProps {
                     number={plate.number}
                     remisiones={plate.remisiones}
                     showDetail={false}
-                    onDelete={() => onDelete(plate)}
+                    onDelete={onDelete ? () => onDelete(plate) : undefined}
                     onViewDetail={() => onViewDetail(plate)}
                 />
                 ))}
@@ -86,7 +86,7 @@ interface PlateCardCarouselProps {
                             type={plate.type}
                             number={plate.number}
                             remisiones={plate.remisiones}
-                            onDelete={() => onDelete(plate)}
+                            onDelete={onDelete ? () => onDelete(plate) : undefined}
                             onViewDetail={() => onViewDetail(plate)}
                         />
                         ))}

@@ -1,6 +1,7 @@
 // store/useSessionStore.ts
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
+import { useCasilleroProfileStore } from "./useCasilleroProfileStore";
 
 /**
  * Estado de la sesión de casillero en el navegador. El token NO se guarda aquí: vive en
@@ -19,9 +20,15 @@ export const useSessionStore = create<SessionStore>()(
         (set, get) => ({
         expiresAt: null,
 
-        setSession: (expiresAt) => set({ expiresAt }),
+        setSession: (expiresAt) => {
+            useCasilleroProfileStore.getState().clear();
+            set({ expiresAt });
+        },
 
-        clearSession: () => set({ expiresAt: null }),
+        clearSession: () => {
+            useCasilleroProfileStore.getState().clear();
+            set({ expiresAt: null });
+        },
 
         isAuthenticated: () => {
             const { expiresAt } = get();

@@ -76,7 +76,7 @@ export type CasilleroUserContext = {
   companySubjectId: string;
   membershipId: string;
   companyName: string;
-  nit: string;
+  nit?: string;
 };
 
 export type CasilleroUserSession = {

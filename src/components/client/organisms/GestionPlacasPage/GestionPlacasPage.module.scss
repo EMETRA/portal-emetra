@@ -1,10 +1,39 @@
 // GestionPlacasPage.module.scss
+.wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
 .listCard {
     background: #fff;
     border-radius: 1.25rem;
     padding: 1.75rem;
     box-shadow: 0 0 12px rgba(27, 42, 107, 0.12);
     margin-bottom: 1.5rem;
+}
+
+.successMessage,
+.errorMessage,
+.emptyState {
+    margin: 0;
+    padding: 0.85rem 1rem;
+    border-radius: 0.65rem;
+}
+
+.successMessage {
+    color: #185b2c;
+    background: #edf8f0;
+}
+
+.errorMessage {
+    color: #9f1d2d;
+    background: #fff0f1;
+}
+
+.emptyState {
+    color: #555;
+    text-align: center;
 }
 
 .tabsRow {

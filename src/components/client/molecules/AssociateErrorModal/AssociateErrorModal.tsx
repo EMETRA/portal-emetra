@@ -1,22 +1,29 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { ChangeEvent, DragEvent, useEffect, useRef, useState } from "react";
 import styles from "./AssociateErrorModal.module.scss";
+
+const MAX_FILES = 5;
+const MAX_FILE_SIZE = 10 * 1024 * 1024;
+const ACCEPTED_TYPES = new Set(["application/pdf", "image/jpeg", "image/png"]);
 
 interface AssociateErrorModalProps {
     isOpen: boolean;
+    description?: string;
     onClose: () => void;
-    onSend: (message: string, file: File | null) => void;
+    onSend: (message: string, documents: File[]) => Promise<void>;
 }
 
 export default function AssociateErrorModal({
     isOpen,
+    description,
     onClose,
     onSend,
     }: AssociateErrorModalProps) {
     const [message, setMessage] = useState("");
-    const [file, setFile] = useState<File | null>(null);
-    const [isDragging, setIsDragging] = useState(false);
+    const [documents, setDocuments] = useState<File[]>([]);
+    const [error, setError] = useState("");
+    const [isSending, setIsSending] = useState(false);
     const fileInputRef = useRef<HTMLInputElement>(null);
 
     useEffect(() => {
@@ -36,15 +43,66 @@ export default function AssociateErrorModal({
     useEffect(() => {
         if (!isOpen) {
         setMessage("");
-        setFile(null);
+        setDocuments([]);
+        setError("");
         }
     }, [isOpen]);
 
-    const handleDrop = (e: React.DragEvent) => {
-        e.preventDefault();
-        setIsDragging(false);
-        const dropped = e.dataTransfer.files[0];
-        if (dropped) setFile(dropped);
+    const handleSend = async () => {
+        const reason = message.trim();
+        if (reason.length < 8) {
+            setError("Describe el motivo de la revisión con al menos 8 caracteres.");
+            return;
+        }
+        setIsSending(true);
+        setError("");
+        try {
+            await onSend(reason, documents);
+        } catch (sendError) {
+            setError(sendError instanceof Error ? sendError.message : "No se pudo solicitar la revisión.");
+        } finally {
+            setIsSending(false);
+        }
+    };
+
+    const addDocuments = (selectedFiles: File[]) => {
+        const invalidType = selectedFiles.find((file) => !ACCEPTED_TYPES.has(file.type));
+        if (invalidType) {
+            setError(`El archivo ${invalidType.name} no es PDF, JPG, JPEG o PNG.`);
+            return;
+        }
+        const oversized = selectedFiles.find((file) => file.size > MAX_FILE_SIZE);
+        if (oversized) {
+            setError(`El archivo ${oversized.name} supera el límite de 10 MB.`);
+            return;
+        }
+
+        const nextFiles = [...documents];
+        selectedFiles.forEach((file) => {
+            const duplicated = nextFiles.some(
+                (current) =>
+                    current.name === file.name &&
+                    current.size === file.size &&
+                    current.lastModified === file.lastModified
+            );
+            if (!duplicated) nextFiles.push(file);
+        });
+        if (nextFiles.length > MAX_FILES) {
+            setError(`Puedes adjuntar un máximo de ${MAX_FILES} archivos.`);
+            return;
+        }
+        setDocuments(nextFiles);
+        setError("");
+    };
+
+    const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
+        addDocuments(Array.from(event.target.files ?? []));
+        event.target.value = "";
+    };
+
+    const handleDrop = (event: DragEvent<HTMLDivElement>) => {
+        event.preventDefault();
+        addDocuments(Array.from(event.dataTransfer.files));
     };
 
     if (!isOpen) return null;
@@ -64,11 +122,11 @@ export default function AssociateErrorModal({
             <div className={styles.errorIcon}>!</div>
 
             <h2 className={styles.title}>
-            Ha ocurrido un error al intentar asociar la placa
+            Solicitar revisión de la asociación
             </h2>
 
             <p className={styles.subtitle}>
-            Puede enviar una solicitud para que su caso sea revisado por EMETRA.
+            {description || "La validación automática no pudo completarse. Puedes solicitar que un analista revise el caso."}
             </p>
 
             <textarea
@@ -80,45 +138,57 @@ export default function AssociateErrorModal({
             />
 
             <div
-            className={`${styles.dropzone} ${isDragging ? styles.dragging : ""}`}
-            onDragOver={(e) => { e.preventDefault(); setIsDragging(true); }}
-            onDragLeave={() => setIsDragging(false)}
-            onDrop={handleDrop}
+            className={styles.dropzone}
+            role="button"
+            tabIndex={0}
             onClick={() => fileInputRef.current?.click()}
+            onKeyDown={(event) => {
+                if (event.key === "Enter" || event.key === " ") fileInputRef.current?.click();
+            }}
+            onDragOver={(event) => event.preventDefault()}
+            onDrop={handleDrop}
             >
             <input
                 ref={fileInputRef}
-                type="file"
                 className={styles.hiddenInput}
-                onChange={(e) => setFile(e.target.files?.[0] ?? null)}
+                type="file"
+                accept=".pdf,.jpg,.jpeg,.png,application/pdf,image/jpeg,image/png"
+                multiple
+                onChange={handleFileChange}
             />
-
-            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" className={styles.uploadIcon}>
-                <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8l-6-6z"
-                stroke="#1b2a6b" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-                <path d="M14 2v6h6M12 18v-6M9 15l3-3 3 3"
-                stroke="#1b2a6b" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-            </svg>
-
-            {file ? (
-                <p className={styles.fileName}>{file.name}</p>
-            ) : (
-                <>
-                <p className={styles.dropText}>
-                    Arrastra tu archivo aqui o{" "}
-                    <span className={styles.clickLink}>da click aqui</span>
-                </p>
-                <p className={styles.maxSize}>900 MB tamaño maximo del archivo</p>
-                </>
-            )}
+            <p className={styles.dropText}>
+                Arrastra tus documentos o <span className={styles.clickLink}>selecciónalos</span>
+            </p>
+            <p className={styles.maxSize}>PDF, JPG, JPEG o PNG. Máximo 5 archivos de 10 MB cada uno.</p>
             </div>
+
+            {documents.length > 0 && (
+            <ul className={styles.fileList} aria-label="Documentos seleccionados">
+                {documents.map((document, index) => (
+                <li key={`${document.name}-${document.lastModified}`} className={styles.fileItem}>
+                    <span>{document.name}</span>
+                    <button
+                    type="button"
+                    className={styles.removeFile}
+                    onClick={() => setDocuments((current) => current.filter((_, position) => position !== index))}
+                    aria-label={`Quitar ${document.name}`}
+                    >
+                    Quitar
+                    </button>
+                </li>
+                ))}
+            </ul>
+            )}
+
+            {error && <p role="alert" className={styles.subtitle}>{error}</p>}
 
             <button
             type="button"
             className={styles.sendButton}
-            onClick={() => onSend(message, file)}
+            onClick={handleSend}
+            disabled={isSending}
             >
-            Enviar Correo
+            {isSending ? "Enviando..." : "Solicitar revisión"}
             </button>
         </div>
         </div>

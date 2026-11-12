@@ -13,11 +13,12 @@ import { companyHomePath, useCompanyAccessStore } from "@/lib/casillero/company"
 
 type Props = {
   userName: string;
+  hasCompanyContext: boolean;
   sidebarOpen: boolean;
   onMenuClickAction: () => void;
 };
 
-export default function CasilleroDashboardTopbar({ userName, onMenuClickAction }: Props) {
+export default function CasilleroDashboardTopbar({ userName, hasCompanyContext, onMenuClickAction }: Props) {
   const router = useRouter();
   const { mode, setMode } = useModeStore();
   const { clearSession } = useSessionStore();
@@ -64,7 +65,7 @@ export default function CasilleroDashboardTopbar({ userName, onMenuClickAction }
   }, []);
 
   return (
-    <div className={styles.topbar}>
+    <div className={classNames(styles.topbar, { [styles.withoutCompany]: !hasCompanyContext })}>
       <button className={styles.menuButton} type="button" onClick={onMenuClickAction}>
         <Icon name="Menu" />
       </button>
@@ -73,7 +74,7 @@ export default function CasilleroDashboardTopbar({ userName, onMenuClickAction }
         <CasilleroSearchBox />
       </div>
 
-      <div className={styles.modeSwitcher}>
+      {hasCompanyContext && <div className={styles.modeSwitcher}>
         <button
           type="button"
           className={classNames(styles.modeBtn, { [styles.modeBtnActive]: mode === "personal" })}
@@ -88,7 +89,7 @@ export default function CasilleroDashboardTopbar({ userName, onMenuClickAction }
         >
           Empresa
         </button>
-      </div>
+      </div>}
 
       <h1>Casillero Electrónico</h1>
 
@@ -150,7 +151,7 @@ export default function CasilleroDashboardTopbar({ userName, onMenuClickAction }
         <Icon name="Home" />
       </button>
 
-      <div className={styles.mobileModeToggle}>
+      {hasCompanyContext && <div className={styles.mobileModeToggle}>
         <button
           type="button"
           className={classNames(styles.mobileModeBtn, { [styles.mobileModeBtnActive]: mode === "personal" })}
@@ -167,7 +168,7 @@ export default function CasilleroDashboardTopbar({ userName, onMenuClickAction }
         >
           E
         </button>
-      </div>
+      </div>}
       {/* Mobile notifications */}
       <button
         type="button"

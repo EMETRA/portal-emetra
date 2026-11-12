@@ -5,7 +5,7 @@ interface PlateCardProps {
     number: string;
     remisiones: number;
     showDetail?: boolean;
-    onDelete: () => void;
+    onDelete?: () => void;
     onViewDetail: () => void;
 }
 
@@ -22,7 +22,7 @@ export default function PlateCard({
         className={`${styles.card} ${!showDetail ? styles.clickable : ""}`}
         onClick={!showDetail ? onViewDetail : undefined} // only mobile
         >
-        <button
+        {onDelete && <button
             type="button"
             className={styles.deleteButton}
             onClick={(e) => {
@@ -40,7 +40,7 @@ export default function PlateCard({
                 strokeLinejoin="round"
             />
             </svg>
-        </button>
+        </button>}
 
         <p className={styles.plateCode}>
             {type} {number}

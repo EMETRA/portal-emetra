@@ -1,15 +1,12 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Image from "next/image";
 import CasilleroDashboardSidebar from "@/components/client/organisms/CasilleroDashboardSidebar/CasilleroDashboardSidebar";
 import CasilleroDashboardTopbar from "@/components/client/molecules/CasilleroDashboardTopbar/CasilleroDashboardTopbar";
 import { useCompanyAccess } from "@/lib/casillero/company";
 import styles from "./CasilleroDashboardLayout.module.scss";
-
-const dummyUser = {
-  name: "Daniel Esteban Morales Urizar",
-};
+import { useCasilleroProfileStore } from "@/store/useCasilleroProfileStore";
 
 type Props = {
   children: React.ReactNode;
@@ -17,7 +14,18 @@ type Props = {
 
 export default function CasilleroDashboardLayout({ children }: Props) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const profile = useCasilleroProfileStore((state) => state.profile);
+  const loadProfile = useCasilleroProfileStore((state) => state.load);
   useCompanyAccess();
+
+  useEffect(() => {
+    void loadProfile().catch(() => {});
+  }, [loadProfile]);
+
+  const person = profile?.person;
+  const userName = person
+    ? [person.firstName, person.secondName, person.firstLastName, person.secondLastName].filter(Boolean).join(" ")
+    : "";
 
   return (
     <main className={styles.shell}>
@@ -26,7 +34,8 @@ export default function CasilleroDashboardLayout({ children }: Props) {
       </header>
 
       <CasilleroDashboardTopbar
-        userName={dummyUser.name}
+        userName={userName}
+        hasCompanyContext={profile?.availableContexts?.some((context) => context.type === "COMPANY") ?? false}
         sidebarOpen={sidebarOpen}
         onMenuClickAction={() => setSidebarOpen((open) => !open)}
       />

@@ -7,13 +7,14 @@ import { ServiceItem } from "@/components/server/molecules/index";
 import { ServicesRowProps } from "./types";
 
 /**
- * Organismo ServicesRow: fila estática de 4 ServiceItem.
+ * Organismo ServicesRow: accesos a servicios institucionales.
  */
 export const ServicesRow: React.FC<ServicesRowProps> = ({
   className,
   ...rest
 }) => (
   <div className={classNames(styles.servicesRow, className)} {...rest}>
+    <ServiceItem iconA="Document" iconB="Vehiculo" label="Educación vial" href="/evial" className={styles.serviceItem} />
     <ServiceItem
       iconA="Document"
       iconB="DPI"

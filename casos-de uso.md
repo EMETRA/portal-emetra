@@ -2,6 +2,8 @@
 
 Código de referencia: `85ab07b216ef7cccafd28a47aba068520efec8be`; línea de integración revisada: `estado-recuperado`. Describe capacidades presentes en esa revisión; la configuración y las autorizaciones efectivas de un servidor se comprueban por separado. Esta edición se preparó sin conectarse a Oracle, SMTP ni servidores institucionales.
 
+La ampliación EVIAL de esta edición se documenta al final con su referencia de código propia.
+
 Los enlaces de código fijan esa revisión para que sigan siendo consultables cuando `main` excluya herramientas de desarrollo. Al modificar un comportamiento se deben actualizar su caso de uso, configuración y referencia de código.
 
 
@@ -20,6 +22,14 @@ Guía de arquitectura, configuración y cambios: [manual-técnico.md](manual-t%C
 - [CU-09 · Abrir enlace VIVI y consultar resumen del caso](#cu-09)
 - [CU-10 · Aceptar caso VIVI y conservar resultado al reabrir](#cu-10)
 - [CU-11 · Consultar formulario y documentos de defensa VIVI; compatibilidad heredada](#cu-11)
+
+- [CU-12 · Explorar capacitaciones EVIAL](#cu-12)
+- [CU-13 · Inscribirse y recuperar acceso al curso](#cu-13)
+- [CU-14 · Estudiar materiales y completar examen](#cu-14)
+- [CU-15 · Abrir comprobante y solicitar correo](#cu-15)
+- [CU-16 · Compartir formación y evaluar por enlace individual](#cu-16)
+- [CU-17 · Consultar participantes, QR y asistencia del personal](#cu-17)
+- [CU-18 · Editar capacitación y materiales](#cu-18)
 
 - [Índice de operaciones y rutas](#operaciones)
 - [Criterios de cobertura](#cobertura)
@@ -653,3 +663,195 @@ Las carpetas entre paréntesis agrupan rutas App Router sin añadirse a la URL; 
 Esta edición contiene **11 casos agrupados**. El inventario incluye 0 entradas Nest decoradas, 16 páginas Next y 32 manejadores BFF, según corresponda. Los procesos internos, servicios asíncronos y almacenamiento local se cubren en los casos aunque no expongan HTTP. Las operaciones heredadas se identifican como tales; una ruta conservada en código no implica que deba aparecer habilitada en el catálogo de aplicaciones. Las funciones pendientes no se presentan como implementadas.
 
 Para mantener la cobertura: al añadir o retirar una ruta, resolver, tarea programada o pantalla, actualizar su caso, su fila en este índice, los objetos usados y el diagrama. Si una función depende de otro repositorio, conservar explícito ese límite y actualizar también el contrato del receptor.
+
+
+## Ampliación EVIAL
+
+Referencia de código de los siguientes casos: `92173243e32ee550929fc1ea37e52e013f75fd7b`. Preparado sin conexión institucional; los flujos del API usan sus objetos existentes, sin crear ni migrar tablas.
+
+<a id="cu-12"></a>
+
+## CU-12 · Explorar capacitaciones EVIAL
+
+**Actor y alcance:** Visitante.
+
+**Flujo y resultado**
+
+1. Abrir Educación vial desde navegación/servicios.
+2. Consultar catálogo y detalle; revisar fechas, modalidad, requisitos, beneficios y programación.
+3. Elegir inscripción o acceso con código; conservar enlaces /events/:id existentes.
+
+```mermaid
+flowchart TD
+  A["Explorar capacitaciones EVIAL"] --> B{"Datos, configuración y autorización válidos"}
+  B -->|No| C["Mostrar excepción; conservar datos y estado"]
+  B -->|Sí| D["Consultar catálogo y detalle; revisar fechas, modalidad, requisitos, beneficios y programación"]
+  D --> E["Elegir inscripción o acceso con código; conservar enlaces /events/:id existentes"]
+```
+
+**Excepciones y alternativas:** Carga, catálogo vacío y error disponen de estados propios sin datos ficticios. Las rutas de IDs inválidos no abren expedientes. Los medios actuales necesitan conservar su alojamiento.
+
+**Objetos de datos:** TB_EVENTO_EVIAL; TB_REQUISITOS_EVENTO_EVIAL; TB_REGLAS_EVENTO_EVIAL; TB_BENEFICIOS_EVENTO_EVIAL; TB_ACTIVIDADES_EVENTO_EVIAL; TB_MARCAS_EVENTO_EVIAL; TB_VIDEOS_EVIAL; TB_PREGUNTAS_FRECUENTES_EVIAL; catálogos de geografía existentes. El frontend los utiliza a través de api-portal; no abre sesiones Oracle.
+
+**Archivos involucrados:** [src/components/client/evial/EvialHome.tsx](https://github.com/EMETRA/portal-emetra/blob/92173243e32ee550929fc1ea37e52e013f75fd7b/src/components/client/evial/EvialHome.tsx), [src/components/client/evial/EvialEventDetail.tsx](https://github.com/EMETRA/portal-emetra/blob/92173243e32ee550929fc1ea37e52e013f75fd7b/src/components/client/evial/EvialEventDetail.tsx), [src/app/events/[id]/page.tsx](https://github.com/EMETRA/portal-emetra/blob/92173243e32ee550929fc1ea37e52e013f75fd7b/src/app/events/[id]/page.tsx).
+
+<a id="cu-13"></a>
+
+## CU-13 · Inscribirse y recuperar acceso al curso
+
+**Actor y alcance:** Participante.
+
+**Flujo y resultado**
+
+1. Verificar disponibilidad antes de solicitar datos.
+2. Completar datos personales/residencia/placa; S usa datos de inscripción previa.
+3. Confirmar inscripción o entrar con código, DPI y teléfono.
+4. Recibir cookie HttpOnly de curso y abrir mi capacitación.
+
+```mermaid
+flowchart TD
+  A["Inscribirse y recuperar acceso al curso"] --> B{"Datos, configuración y autorización válidos"}
+  B -->|No| C["Mostrar excepción; conservar datos y estado"]
+  B -->|Sí| D["Completar datos personales/residencia/placa; S usa datos de inscripción previa"]
+  D --> E["Recibir cookie HttpOnly de curso y abrir mi capacitación"]
+```
+
+**Excepciones y alternativas:** Datos no válidos se señalan antes de enviar cuando es posible. Error del API conserva el formulario. Cupos y aprobación se comprueban en el servidor. Sin configuración se bloquea el proceso antes de llenarlo.
+
+**Objetos de datos:** TB_EVENTO_EVIAL; TB_PERSONAS_EVIAL; TB_INSCRIPCION_EVENTO_EVIAL; SEQ_PERSONA_EVIAL. El frontend los utiliza a través de api-portal; no abre sesiones Oracle.
+
+**Archivos involucrados:** [src/components/client/evial/EvialEventDetail.tsx](https://github.com/EMETRA/portal-emetra/blob/92173243e32ee550929fc1ea37e52e013f75fd7b/src/components/client/evial/EvialEventDetail.tsx), [src/lib/evial/proxy.ts](https://github.com/EMETRA/portal-emetra/blob/92173243e32ee550929fc1ea37e52e013f75fd7b/src/lib/evial/proxy.ts), [src/lib/evial/types.ts](https://github.com/EMETRA/portal-emetra/blob/92173243e32ee550929fc1ea37e52e013f75fd7b/src/lib/evial/types.ts).
+
+<a id="cu-14"></a>
+
+## CU-14 · Estudiar materiales y completar examen
+
+**Actor y alcance:** Participante con cookie de curso propia.
+
+**Flujo y resultado**
+
+1. Abrir materiales y marcarlos como revisados en la interfaz.
+2. Solicitar intento al API; recorrer preguntas con temporizador de dos minutos.
+3. Enviar respuestas del intento firmado y consultar nota/etapas desde el servidor.
+4. Continuar actividad o consultar al personal si agotó dos intentos.
+
+```mermaid
+flowchart TD
+  A["Estudiar materiales y completar examen"] --> B{"Datos, configuración y autorización válidos"}
+  B -->|No| C["Mostrar excepción; conservar datos y estado"]
+  B -->|Sí| D["Solicitar intento al API; recorrer preguntas con temporizador de dos minutos"]
+  D --> E["Continuar actividad o consultar al personal si agotó dos intentos"]
+```
+
+**Excepciones y alternativas:** No se revela banco de respuestas correctas. La marca local Revisado no prueba lectura. Error de envío conserva las respuestas para consultar/reintentar; la idempotencia se decide en el API. Sesión vencida pide acceso otra vez.
+
+**Objetos de datos:** TB_INSCRIPCION_EVENTO_EVIAL; TB_EVENTO_EVIAL; TB_ACTIVIDADES_EVENTO_EVIAL; TB_CONTENIDO_EVIAL; TB_ENCA_PREGUNTAS_EVIAL; TB_OPCIONES_PREGUNTA_EVIAL; TB_RESPUESTAS_PREGUNTA_EVIAL; TB_TESTS_PERSONA_EVIAL; TB_DETALLE_TEST_EVIAL. El frontend los utiliza a través de api-portal; no abre sesiones Oracle.
+
+**Archivos involucrados:** [src/components/client/evial/EvialCourse.tsx](https://github.com/EMETRA/portal-emetra/blob/92173243e32ee550929fc1ea37e52e013f75fd7b/src/components/client/evial/EvialCourse.tsx), [src/lib/evial/types.ts](https://github.com/EMETRA/portal-emetra/blob/92173243e32ee550929fc1ea37e52e013f75fd7b/src/lib/evial/types.ts), [src/lib/evial/proxy.ts](https://github.com/EMETRA/portal-emetra/blob/92173243e32ee550929fc1ea37e52e013f75fd7b/src/lib/evial/proxy.ts).
+
+<a id="cu-15"></a>
+
+## CU-15 · Abrir comprobante y solicitar correo
+
+**Actor y alcance:** Participante inscrito.
+
+**Flujo y resultado**
+
+1. Abrir PDF propio mediante BFF autenticado.
+2. Conservar comprobante y QR para la asistencia.
+3. Solicitar correo registrado solo cuando está habilitado; mostrar resultado SMTP.
+
+```mermaid
+flowchart TD
+  A["Abrir comprobante y solicitar correo"] --> B{"Datos, configuración y autorización válidos"}
+  B -->|No| C["Mostrar excepción; conservar datos y estado"]
+  B -->|Sí| D["Conservar comprobante y QR para la asistencia"]
+  D --> E["Solicitar correo registrado solo cuando está habilitado; mostrar resultado SMTP"]
+```
+
+**Excepciones y alternativas:** Sin correo/remitente no se puede enviar y el PDF sigue disponible. No se permite elegir otro destinatario desde el navegador. Descargar no envía y el comprobante no autoriza descuento.
+
+**Objetos de datos:** TB_INSCRIPCION_EVENTO_EVIAL; TB_PERSONAS_EVIAL; TB_EVENTO_EVIAL; almacenamiento en memoria para PDF y SMTP existente. El frontend los utiliza a través de api-portal; no abre sesiones Oracle.
+
+**Archivos involucrados:** [src/components/client/evial/EvialCourse.tsx](https://github.com/EMETRA/portal-emetra/blob/92173243e32ee550929fc1ea37e52e013f75fd7b/src/components/client/evial/EvialCourse.tsx), [src/lib/evial/proxy.ts](https://github.com/EMETRA/portal-emetra/blob/92173243e32ee550929fc1ea37e52e013f75fd7b/src/lib/evial/proxy.ts), [src/app/api/evial/[...path]/route.ts](https://github.com/EMETRA/portal-emetra/blob/92173243e32ee550929fc1ea37e52e013f75fd7b/src/app/api/evial/[...path]/route.ts).
+
+<a id="cu-16"></a>
+
+## CU-16 · Compartir formación y evaluar por enlace individual
+
+**Actor y alcance:** Participante aprobado y cinco alumnos.
+
+**Flujo y resultado**
+
+1. Registrar cinco alumnos y adjuntar foto/video por multipart.
+2. Copiar cada enlace firmado y compartirlo únicamente con su participante.
+3. Abrir enlace, retirar fragmento de la barra y responder preguntas de texto libre.
+4. Confirmar registro sin permitir modificar evaluaciones ya recibidas.
+
+```mermaid
+flowchart TD
+  A["Compartir formación y evaluar por enlace individual"] --> B{"Datos, configuración y autorización válidos"}
+  B -->|No| C["Mostrar excepción; conservar datos y estado"]
+  B -->|Sí| D["Copiar cada enlace firmado y compartirlo únicamente con su participante"]
+  D --> E["Confirmar registro sin permitir modificar evaluaciones ya recibidas"]
+```
+
+**Excepciones y alternativas:** No se guardan tokens en localStorage ni se envía correo automático a los cinco alumnos. Enlace inválido/vencido requiere regenerarlo desde el curso. Ausencia de evidencia configurada bloquea antes de completar datos. No aparecen alumnos de otra inscripción.
+
+**Objetos de datos:** TB_ALUMNOS_PERSONA_EVIAL; TB_PREGUNTA_EVALUA_EVIAL; TB_EVALUA_MAESTRO_EVIAL; TB_PERSONAS_EVIAL.RUTA_FOTO; TB_INSCRIPCION_EVENTO_EVIAL; volumen privado. El frontend los utiliza a través de api-portal; no abre sesiones Oracle.
+
+**Archivos involucrados:** [src/components/client/evial/EvialCourse.tsx](https://github.com/EMETRA/portal-emetra/blob/92173243e32ee550929fc1ea37e52e013f75fd7b/src/components/client/evial/EvialCourse.tsx), [src/components/client/evial/EvialEvaluation.tsx](https://github.com/EMETRA/portal-emetra/blob/92173243e32ee550929fc1ea37e52e013f75fd7b/src/components/client/evial/EvialEvaluation.tsx), [src/lib/evial/proxy.ts](https://github.com/EMETRA/portal-emetra/blob/92173243e32ee550929fc1ea37e52e013f75fd7b/src/lib/evial/proxy.ts).
+
+<a id="cu-17"></a>
+
+## CU-17 · Consultar participantes, QR y asistencia del personal
+
+**Actor y alcance:** Personal autorizado.
+
+**Flujo y resultado**
+
+1. Acceder con cuenta institucional y Turnstile.
+2. Ver capacidades antes de mostrar formularios y buscar mediante POST.
+3. Seleccionar participante manualmente o con cámara QR.
+4. Confirmar paso de asistencia y utilizar correcciones/retirada solo con permiso adicional.
+
+```mermaid
+flowchart TD
+  A["Consultar participantes, QR y asistencia del personal"] --> B{"Datos, configuración y autorización válidos"}
+  B -->|No| C["Mostrar excepción; conservar datos y estado"]
+  B -->|Sí| D["Ver capacidades antes de mostrar formularios y buscar mediante POST"]
+  D --> E["Confirmar paso de asistencia y utilizar correcciones/retirada solo con permiso adicional"]
+```
+
+**Excepciones y alternativas:** Una cuenta sin acceso no llena procesos administrativos. Cámara denegada ofrece búsqueda manual y se libera al cerrar. Leer QR no guarda. Cookies de curso/personal no se sustituyen entre sí. Errores muestran referencia sin SQL ni secretos.
+
+**Objetos de datos:** TB_PERSONAS_EVIAL; TB_INSCRIPCION_EVENTO_EVIAL; TB_TESTS_PERSONA_EVIAL; TB_EVENTO_EVIAL. Identidad/permisos en api-autenticacion; no se modifican sus catálogos desde EVIAL. El frontend los utiliza a través de api-portal; no abre sesiones Oracle.
+
+**Archivos involucrados:** [src/components/client/evial/EvialManagement.tsx](https://github.com/EMETRA/portal-emetra/blob/92173243e32ee550929fc1ea37e52e013f75fd7b/src/components/client/evial/EvialManagement.tsx), [src/components/client/evial/EvialCaptcha.tsx](https://github.com/EMETRA/portal-emetra/blob/92173243e32ee550929fc1ea37e52e013f75fd7b/src/components/client/evial/EvialCaptcha.tsx), [src/components/client/evial/EvialScanner.tsx](https://github.com/EMETRA/portal-emetra/blob/92173243e32ee550929fc1ea37e52e013f75fd7b/src/components/client/evial/EvialScanner.tsx), [src/lib/evial/proxy.ts](https://github.com/EMETRA/portal-emetra/blob/92173243e32ee550929fc1ea37e52e013f75fd7b/src/lib/evial/proxy.ts).
+
+<a id="cu-18"></a>
+
+## CU-18 · Editar capacitación y materiales
+
+**Actor y alcance:** Personal con capacidad administrativa.
+
+**Flujo y resultado**
+
+1. Abrir editor desde gestión o crear capacitación inactiva.
+2. Editar datos, fechas, cupo y modalidad; confirmar guardar.
+3. Agregar/editar material por módulo con URL HTTPS.
+4. Refrescar los datos confirmados del API.
+
+```mermaid
+flowchart TD
+  A["Editar capacitación y materiales"] --> B{"Datos, configuración y autorización válidos"}
+  B -->|No| C["Mostrar excepción; conservar datos y estado"]
+  B -->|Sí| D["Editar datos, fechas, cupo y modalidad; confirmar guardar"]
+  D --> E["Refrescar los datos confirmados del API"]
+```
+
+**Excepciones y alternativas:** No se ofrece edición sin permiso. No se publican bancos/preguntas inventados. Requisitos y otros catálogos Oracle siguen su mantenimiento existente. Error conserva datos y requiere consultar estado antes de repetir una creación.
+
+**Objetos de datos:** TB_EVENTO_EVIAL; TB_INSCRIPCION_EVENTO_EVIAL; TB_CONTENIDO_EVIAL; TB_EVENTO_EVIAL_SEQ; TB_CONTENIDO_EVIAL_SEQ. Referencias de módulo existentes. El frontend los utiliza a través de api-portal; no abre sesiones Oracle.
+
+**Archivos involucrados:** [src/components/client/evial/EvialEditor.tsx](https://github.com/EMETRA/portal-emetra/blob/92173243e32ee550929fc1ea37e52e013f75fd7b/src/components/client/evial/EvialEditor.tsx), [src/components/client/evial/EvialManagement.tsx](https://github.com/EMETRA/portal-emetra/blob/92173243e32ee550929fc1ea37e52e013f75fd7b/src/components/client/evial/EvialManagement.tsx), [src/lib/evial/proxy.ts](https://github.com/EMETRA/portal-emetra/blob/92173243e32ee550929fc1ea37e52e013f75fd7b/src/lib/evial/proxy.ts).

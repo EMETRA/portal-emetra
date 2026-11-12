@@ -19,7 +19,7 @@ const nextConfig = {
     ],
   },
   async headers() {
-    return ['/vivi/correo/:path*', '/tramite-reporte/:path*'].map(source => ({ source, headers: [
+    return ['/vivi/correo/:path*', '/tramite-reporte/:path*', '/evial/mi-curso', '/evial/evaluar', '/evial/gestion'].map(source => ({ source, headers: [
       { key: 'Cache-Control', value: 'private, no-store' },
       { key: 'Referrer-Policy', value: 'no-referrer' },
       { key: 'X-Robots-Tag', value: 'noindex, nofollow, noarchive' },

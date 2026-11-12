@@ -11,7 +11,7 @@ import VerifyEmailView from "./views/VerifyEmailView";
 import type { AccessView } from "./types";
 import styles from "./CasilleroAccess.module.scss";
 import TrackingView from "./views/TrackingView";
-import { AvailableFactor } from "@/lib/casillero/types";
+import type { AvailableFactor, PersonalRegistrationCreated } from "@/lib/casillero/types";
 
 const pageTitle: Record<AccessView, string> = {
   login: "Log In",
@@ -29,6 +29,7 @@ export default function CasilleroAccess() {
   const [verificationId, setVerificationId] = useState("");
   const [verificationEmail, setVerificationEmail] = useState("");
   const [verificationExpiresAt, setVerificationExpiresAt] = useState("");
+  const [registrationTrackingCode, setRegistrationTrackingCode] = useState("");
   const [challengeId, setChallengeId] = useState("");
   const [availableFactors, setAvailableFactors] = useState<AvailableFactor[]>([]);
   const [challengeExpiresAt, setChallengeExpiresAt] = useState("");
@@ -45,13 +46,13 @@ export default function CasilleroAccess() {
   };
 
   const handleRegisterSuccess = (
-    newVerificationId: string,
-    email: string,
-    expiresAt: string
+    result: PersonalRegistrationCreated,
+    email: string
   ) => {
-    setVerificationId(newVerificationId);
+    setVerificationId(result.verificationId);
     setVerificationEmail(email);
-    setVerificationExpiresAt(expiresAt);
+    setVerificationExpiresAt(result.verificationExpiresAt);
+    setRegistrationTrackingCode(result.trackingCode);
     changeView("verify-email");
   };
 
@@ -142,12 +143,13 @@ export default function CasilleroAccess() {
             email={verificationEmail}
             verificationId={verificationId}
             expiresAt={verificationExpiresAt}
-            onSuccess={() => changeView("login")}
+            trackingCode={registrationTrackingCode}
+            onSuccess={() => changeView("tracking")}
             onResend={handleResendVerification}
           />
         )}
         {view === "tracking" && (
-          <TrackingView onLogin={() => changeView("login")} />
+          <TrackingView onLogin={() => changeView("login")} initialCode={registrationTrackingCode} />
         )}
 
         </div>

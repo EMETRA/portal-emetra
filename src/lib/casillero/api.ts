@@ -113,14 +113,18 @@ export async function confirmContactVerification(
 
 // CREATE-PERSONAL-REGISTRATION API
 
-function errorFromRegistrationStatus(status: number): Error {
+function errorFromRegistrationStatus(status: number, code?: string): Error {
   const message =
-    status === 400
+    code === "INVALID_TERMS_VERSION"
+      ? "Los términos del registro no están vigentes. Contacta a soporte."
+      : code === "INVALID_IDENTITY_DOCUMENT"
+        ? "El documento de identidad no es válido. Revisa los datos y la imagen."
+      : status === 400
       ? "Solicitud inválida"
       : status === 409
         ? "Ya existe una solicitud con estos datos"
-        : status === 422
-          ? "Documento o NIT inválido"
+      : status === 422
+          ? "No se pudo validar la solicitud. Revisa tus datos e inténtalo de nuevo"
           : status === 429
             ? "Límite de solicitudes alcanzado"
             : `HTTP ${status}`;
@@ -130,14 +134,34 @@ function errorFromRegistrationStatus(status: number): Error {
 }
 
 export async function createPersonalRegistration(
-  body: PersonalRegistrationRequest
+  body: PersonalRegistrationRequest,
+  documentFile: File,
+  idempotencyKey: string
 ): Promise<PersonalRegistrationCreated> {
-  return postCasilleroJson<PersonalRegistrationCreated>(
-    "/api/casillero/registrations",
-    body,
-    errorFromRegistrationStatus,
-    true
-  );
+  const form = new FormData();
+  const fields = ["email", "nit", "phone", "firstName", "secondName", "firstLastName", "secondLastName", "dateOfBirth", "nationality", "residenceCountry", "termsVersionId"] as const;
+  for (const key of fields) {
+    const value = body[key];
+    if (value !== undefined) form.append(key, value);
+  }
+  form.append("documentType", body.document.type);
+  form.append("documentNumber", body.document.number);
+  if (body.document.country) form.append("documentCountry", body.document.country);
+  if (body.document.issuedOn) form.append("documentIssuedOn", body.document.issuedOn);
+  if (body.document.expiresOn) form.append("documentExpiresOn", body.document.expiresOn);
+  form.append("documentFile", documentFile);
+
+  const response = await fetch("/api/casillero/registrations", {
+    method: "POST",
+    headers: { Accept: "application/json", "Idempotency-Key": idempotencyKey },
+    body: form,
+    cache: "no-store",
+  });
+  if (!response.ok) {
+    const problem = await response.json().catch(() => null) as { code?: string } | null;
+    throw errorFromRegistrationStatus(response.status, problem?.code);
+  }
+  return response.json() as Promise<PersonalRegistrationCreated>;
 }
 
 // UPDATE ME API

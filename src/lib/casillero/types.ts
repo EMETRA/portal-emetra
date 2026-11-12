@@ -11,6 +11,7 @@ export type ContactVerificationVerified = {
   verificationId: string;
   contactId: string;
   verifiedAt: string;
+  registrationId: string;
 };
 
 /*
@@ -20,18 +21,15 @@ export type ContactVerificationVerified = {
 export type RegistrationDocument = {
   type: string;
   number: string;
-  country: string;
-  issuedOn: string;
-  expiresOn: string;
-  fileKey: string;
-  mimeType: string;
-  sizeBytes: number;
-  sha256: string;
+  country?: string;
+  issuedOn?: string;
+  expiresOn?: string;
 };
 
 export type PersonalRegistrationRequest = {
   email: string;
   nit: string;
+  phone: string;
   firstName: string;
   secondName?: string;
   firstLastName: string;
@@ -187,7 +185,7 @@ export type CasilleroEmailChangeCompleteRequest = {
   Consulta de estado de solicitud de registro.
 */
 
-export type RegistrationStatus = "PENDING" | "IN_REVIEW" | "APPROVED" | "REJECTED";
+export type RegistrationStatus = "PENDING" | "UNDER_REVIEW" | "OBSERVED" | "APPROVED" | "REJECTED";
 
 export interface RegistrationObservation {
   message: string;

@@ -1,23 +1,22 @@
 "use client";
 
-import { FormEvent, useState } from "react";
+import { FormEvent, useRef, useState } from "react";
 import * as yup from "yup";
 import { Button } from "@/components/server/atoms";
 import CasilleroPersonTypeSelector from "@/components/client/molecules/CasilleroPersonTypeSelector/CasilleroPersonTypeSelector";
-import { registroIndividualSchema, registroLegalSchema } from "@/schema/casillero-registro";
-import { createPersonalRegistration, requestContactVerification } from "@/lib/casillero/api";
+import { registroIndividualSchema } from "@/schema/casillero-registro";
+import { createIdempotencyKey, createPersonalRegistration } from "@/lib/casillero/api";
 import IndividualRegisterFields from "../fields/IndividualRegisterFields";
-import LegalRegisterFields from "../fields/LegalRegisterFields";
 import type { PersonType } from "../types";
 import styles from "../CasilleroAccess.module.scss";
-import { PersonalRegistrationRequest } from "@/lib/casillero/types";
+import type { PersonalRegistrationCreated, PersonalRegistrationRequest } from "@/lib/casillero/types";
 
 // Hardcoded terms and conditions version ID. This should be updated whenever the terms are updated.
-const TERMS_VERSION_ID = "3";
+const TERMS_VERSION_ID = "1";
 
 type Props = {
   onLogin: () => void;
-  onSuccess: (verificationId: string, email: string, expiresAt: string) => void;
+  onSuccess: (result: PersonalRegistrationCreated, email: string) => void;
 };
 
 function formValue(formData: FormData, key: string) {
@@ -28,6 +27,7 @@ export default function RegisterView({ onLogin, onSuccess }: Props) {
   const [personType, setPersonType] = useState<PersonType>("individual");
   const [message, setMessage] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const attempt = useRef<{ fingerprint: string; key: string } | null>(null);
 
   const changePersonType = (nextType: PersonType) => {
     setPersonType(nextType);
@@ -35,38 +35,20 @@ export default function RegisterView({ onLogin, onSuccess }: Props) {
   };
 
   const submitPersonalRegistration = async (
-    payload: PersonalRegistrationRequest
+    payload: PersonalRegistrationRequest,
+    documentFile: File
   ) => {
     setIsSubmitting(true);
     setMessage("");
     try {
-      const result = await createPersonalRegistration(payload);
-      onSuccess(result.registrationId, payload.email, result.verificationExpiresAt);
+      const fingerprint = JSON.stringify({ payload, file: [documentFile.name, documentFile.size, documentFile.lastModified] });
+      if (attempt.current?.fingerprint !== fingerprint) {
+        attempt.current = { fingerprint, key: createIdempotencyKey() };
+      }
+      const result = await createPersonalRegistration(payload, documentFile, attempt.current.key);
+      onSuccess(result, payload.email);
     } catch (err) {
-      // setMessage(
-      //   err instanceof Error
-      //     ? err.message
-      //     : "No se pudo crear la solicitud de registro."
-      // );
-      // REMOVE: This is a temporary workaround to allow the user to proceed to the verification step even if the registration fails. This should be removed once the backend is fixed to return a proper verification ID on success.
-      onSuccess("1", "user@example.com", "2026-09-03T16:07:22.382Z"); 
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
-
-  const requestVerification = async (email: string) => {
-    setIsSubmitting(true);
-    setMessage("");
-    try {
-      const result = await requestContactVerification(email);
-      onSuccess(result.verificationId, email, result.expiresAt);
-    } catch (err) {
-      setMessage(
-        err instanceof Error
-          ? err.message
-          : "No se pudo enviar el código de verificación."
-      );
+      setMessage(err instanceof Error ? err.message : "No se pudo crear la solicitud de registro.");
     } finally {
       setIsSubmitting(false);
     }
@@ -77,6 +59,11 @@ export default function RegisterView({ onLogin, onSuccess }: Props) {
     if (isSubmitting) return;
     const formData = new FormData(event.currentTarget);
 
+    if (personType === "legal") {
+      setMessage("Para registrar una empresa, crea primero tu cuenta personal y luego solicita el acceso empresarial desde el casillero.");
+      return;
+    }
+
     if (personType === "individual") {
       const data = {
         firstName: formValue(formData, "firstName"),
@@ -86,6 +73,7 @@ export default function RegisterView({ onLogin, onSuccess }: Props) {
         email: formValue(formData, "email"),
         confirmEmail: formValue(formData, "confirm-email"),
         nit: formValue(formData, "nit"),
+        phone: formValue(formData, "phone"),
         dateOfBirth: formValue(formData, "dateOfBirth"),
         nationality: formValue(formData, "nationality"),
         residenceCountry: formValue(formData, "residenceCountry"),
@@ -109,10 +97,15 @@ export default function RegisterView({ onLogin, onSuccess }: Props) {
         setMessage("Debes adjuntar el archivo de tu DPI.");
         return;
       }
+      if (documentFile.size > 10 * 1024 * 1024 || !["image/jpeg", "image/png"].includes(documentFile.type)) {
+        setMessage("Adjunta una imagen JPG, JPEG o PNG de hasta 10 MB.");
+        return;
+      }
 
       const payload: PersonalRegistrationRequest = {
         email: data.email,
         nit: data.nit,
+        phone: data.phone,
         firstName: data.firstName,
         secondName: data.secondName || undefined,
         firstLastName: data.firstLastName,
@@ -126,39 +119,13 @@ export default function RegisterView({ onLogin, onSuccess }: Props) {
           country: data.documentCountry,
           issuedOn: data.documentIssuedOn,
           expiresOn: data.documentExpiresOn,
-          fileKey: "",
-          mimeType: documentFile.type,
-          sizeBytes: documentFile.size,
-          sha256: "",
         },
         termsVersionId: TERMS_VERSION_ID,
       };
 
-      await submitPersonalRegistration(payload);
+      await submitPersonalRegistration(payload, documentFile);
       return;
     }
-
-    const legalData = {
-      dpi: formValue(formData, "dpi"),
-      nit: formValue(formData, "nit"),
-      email: formValue(formData, "email"),
-      confirmEmail: formValue(formData, "confirm-email"),
-      password: formValue(formData, "password"),
-      confirmPassword: formValue(formData, "confirm-password"),
-      rtuLink: formValue(formData, "rtu-link").trim(),
-      mandateLink: formValue(formData, "legal-mandate-link").trim(),
-    };
-
-    try {
-      await registroLegalSchema.validate(legalData, { abortEarly: true });
-    } catch (err) {
-      if (err instanceof yup.ValidationError) {
-        setMessage(err.message);
-        return;
-      }
-    }
-
-    await requestVerification(legalData.email);
   };
 
   return (
@@ -171,23 +138,23 @@ export default function RegisterView({ onLogin, onSuccess }: Props) {
       {personType === "individual" ? (
         <IndividualRegisterFields onFileTooLarge={setMessage} />
       ) : (
-        <LegalRegisterFields />
+        <p className={styles.formMessage}>Para registrar una empresa, crea primero tu cuenta personal. Después podrás solicitar el acceso empresarial desde el casillero.</p>
       )}
 
-      <label className={styles.terms}>
+      {personType === "individual" && <label className={styles.terms}>
         <input type="checkbox" required />
         <span>
           Declaro que la información proporcionada es verídica y acepto la
           responsabilidad legal sobre los datos registrados.
         </span>
-      </label>
+      </label>}
       <Button
         type="submit"
         variant="success"
         className={styles.submitButton}
-        disabled={isSubmitting}
+        disabled={isSubmitting || personType === "legal"}
       >
-        {isSubmitting ? "Enviando código..." : "Crear Cuenta"}
+        {isSubmitting ? "Creando solicitud..." : "Crear Cuenta"}
       </Button>
       <button
         type="button"

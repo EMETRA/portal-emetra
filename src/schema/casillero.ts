@@ -48,7 +48,7 @@ export const passwordSchema = yup
     .matches(/[A-Z]/, "La contraseña debe tener al menos una letra mayúscula")
     .matches(/[a-z]/, "La contraseña debe tener al menos una letra minúscula")
     .matches(/[0-9]/, "La contraseña debe tener al menos un número")
-    .matches(/[!@#$%^&*]/, "La contraseña debe tener al menos un carácter especial");
+    .matches(/[!@#$%^&*+]/, "La contraseña debe tener al menos un carácter especial");
 
 /**
  * **Esquema de validación para el teléfono**

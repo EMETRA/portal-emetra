@@ -15,6 +15,7 @@ type Props = {
   email: string;
   verificationId: string;
   expiresAt: string;
+  trackingCode: string;
   onSuccess: () => void;
   onResend: (newVerificationId: string, newExpiresAt: string) => void;
 };
@@ -30,7 +31,7 @@ function formatMMSS(totalSeconds: number): string {
   return `${minutes}:${String(seconds).padStart(2, "0")}`;
 }
 
-export default function VerifyEmailView({ email, verificationId, expiresAt, onSuccess, onResend, }: Props) {
+export default function VerifyEmailView({ email, verificationId, expiresAt, trackingCode, onSuccess, onResend, }: Props) {
   const [message, setMessage] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isResending, setIsResending] = useState(false);
@@ -53,8 +54,7 @@ export default function VerifyEmailView({ email, verificationId, expiresAt, onSu
     return () => clearInterval(timer);
   }, [resendCooldown]);
 
-  // const isExpired = secondsLeft <= 0;
-  const isExpired = false; // Temporarily disable expiration check for testing purposes
+  const isExpired = secondsLeft <= 0;
   
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -87,8 +87,6 @@ export default function VerifyEmailView({ email, verificationId, expiresAt, onSu
           ? error.message
           : "El código de verificación es incorrecto."
       );
-      // Temporarily disable expiration check for testing purposes
-      onSuccess(); // Allow proceeding even if verification fails, for testing
     } finally {
       setIsSubmitting(false);
     }
@@ -109,10 +107,6 @@ export default function VerifyEmailView({ email, verificationId, expiresAt, onSu
           ? error.message
           : "No se pudo reenviar el código."
       );
-      /// VERY IMPORTANT TO REMOVE: This is a temporary workaround to allow the user to proceed to the verification step even if the resend fails. This should be removed once the backend is fixed to return a proper verification ID on success.
-      onResend("1", "2026-09-02T19:07:22.382Z");
-      setMessage("Enviamos un nuevo código a tu correo.");
-      setResendCooldown(RESEND_COOLDOWN_SECONDS);
     } finally {
       setIsResending(false);
     }
@@ -122,8 +116,9 @@ export default function VerifyEmailView({ email, verificationId, expiresAt, onSu
   return (
     <form className={styles.loginForm} onSubmit={handleSubmit}>
       <div className={styles.twoFactorIntro}>
+        <Text variant="Small">Solicitud recibida. Guarda tu código de seguimiento: <strong>{trackingCode}</strong></Text>
         <Text>
-          La autenticación en dos pasos es una capa adicional de protección para tu cuenta.
+          Ingresa el código enviado a tu correo y crea una contraseña para continuar con tu solicitud de registro.
         </Text>
         <Text variant="Small">
           <strong>Nota:</strong> Recuerda revisar la carpeta de Spam

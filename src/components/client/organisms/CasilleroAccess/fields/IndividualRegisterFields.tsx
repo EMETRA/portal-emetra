@@ -41,6 +41,7 @@ export default function IndividualRegisterFields({ onFileTooLarge }: Props) {
         required
       />
       <AccessField id="nit" label="NIT" type="text" placeholder="12345678" required /> 
+      <AccessField id="phone" label="Teléfono" type="tel" placeholder="+50255551234" autoComplete="tel" required />
       <AccessField id="dateOfBirth" label="Fecha de nacimiento" type="date" required />
       <AccessField id="nationality" label="Nacionalidad" required>
         <CountrySelect id="nationality" name="nationality" required className={styles.input} />
@@ -60,14 +61,14 @@ export default function IndividualRegisterFields({ onFileTooLarge }: Props) {
       <AccessField
         id="documentFile"
         label="Archivo del DPI"
-        hint="(PDF, JPG, PNG · máx. 10 MB)"
+        hint="(JPG, JPEG o PNG · máx. 10 MB)"
         fullCol
       >
         <input
           id="documentFile"
           name="documentFile"
           type="file"
-          accept=".pdf,image/jpeg,image/png"
+          accept="image/jpeg,image/png"
           required
           className={styles.fileInput}
           onChange={handleDocumentFileChange}

@@ -20,6 +20,7 @@ export const registroIndividualSchema = yup.object({
   confirmEmail: emailSchema
     .oneOf([yup.ref("email")], "Los correos electrónicos no coinciden"),
   nit: nitSchema,
+  phone: yup.string().required("El teléfono es requerido").matches(/^\+[1-9]\d{7,14}$/, "Usa el formato internacional, por ejemplo +50255551234"),
 
   // Datos adicionales
   dateOfBirth: yup.string().required("La fecha de nacimiento es requerida"),

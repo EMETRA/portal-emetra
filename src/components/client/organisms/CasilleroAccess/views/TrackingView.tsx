@@ -1,6 +1,6 @@
 "use client";
 
-import { FormEvent, useState } from "react";
+import { FormEvent, useEffect, useState } from "react";
 import { Button } from "@/components/server/atoms";
 import AccessField from "../fields/AccessField";
 import styles from "../CasilleroAccess.module.scss";
@@ -9,18 +9,21 @@ import { RegistrationStatus, RegistrationStatusResponse } from "@/lib/casillero/
 
 type Props = {
     onLogin: () => void;
+    initialCode?: string;
 };
 
 const STATUS_LABEL: Record<RegistrationStatus, string> = {
-    PENDING: "Pendiente de revisión",
-    IN_REVIEW: "En revisión",
+    PENDING: "Pendiente",
+    UNDER_REVIEW: "En revisión",
+    OBSERVED: "Con observaciones",
     APPROVED: "Aprobada",
     REJECTED: "Rechazada",
 };
 
 const STATUS_CLASS: Record<RegistrationStatus, string> = {
     PENDING: styles.statusPending,
-    IN_REVIEW: styles.statusReview,
+    UNDER_REVIEW: styles.statusReview,
+    OBSERVED: styles.statusReview,
     APPROVED: styles.statusApproved,
     REJECTED: styles.statusRejected,
 };
@@ -35,52 +38,23 @@ function formatDate(iso: string) {
     });
 }
 
-// DELETE, ONLY FOR MOCKING PURPOSES. This is a temporary mock to simulate API responses for testing the UI.
-const MOCK_RESULTS: RegistrationStatusResponse[] = [
-    {
-        trackingCode: "n3x8kQ1pW2sR4tU6vY",
-        status: "PENDING",
-        submittedAt: "2026-08-21T17:00:00.000Z",
-        observations: [],
-    },
-    {
-        trackingCode: "m7pK9wXzQ2nR5tY8uL",
-        status: "IN_REVIEW",
-        submittedAt: "2026-08-20T14:30:00.000Z",
-        observations: [
-        {
-            message: "El escaneo del documento no es legible. Cargue una imagen nítida.",
-            recordedAt: "2026-08-21T10:00:00.000Z",
-        },
-        ],
-    },
-    {
-        trackingCode: "p4xV6bNcW8mT3kU1sJ",
-        status: "APPROVED",
-        submittedAt: "2026-08-19T09:00:00.000Z",
-        observations: [],
-    },
-    {
-        trackingCode: "q2yH5dPrE7nK4oI9aF",
-        status: "REJECTED",
-        submittedAt: "2026-08-18T11:00:00.000Z",
-        observations: [
-        {
-            message: "El DPI presentado está vencido. Presente un documento vigente.",
-            recordedAt: "2026-08-19T08:00:00.000Z",
-        },
-        {
-            message: "La fotografía del documento no coincide con los datos ingresados.",
-            recordedAt: "2026-08-20T09:30:00.000Z",
-        },
-        ],
-    },
-];
-
-export default function TrackingView({ onLogin }: Props) {
+export default function TrackingView({ onLogin, initialCode = "" }: Props) {
     const [loading, setLoading] = useState(false);
     const [message, setMessage] = useState("");
     const [result, setResult] = useState<RegistrationStatusResponse | null>(null);
+
+    useEffect(() => {
+        if (!initialCode) return;
+        let active = true;
+        setLoading(true);
+        void getRegistrationStatus(initialCode)
+            .then((data) => { if (active) setResult(data); })
+            .catch((error) => {
+                if (active) setMessage(error instanceof Error ? error.message : "No se pudo consultar la solicitud.");
+            })
+            .finally(() => { if (active) setLoading(false); });
+        return () => { active = false; };
+    }, [initialCode]);
 
     const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
         try {
@@ -98,11 +72,9 @@ export default function TrackingView({ onLogin }: Props) {
         setLoading(true);
         const data = await getRegistrationStatus(code);
         setResult(data);
-        } catch {
-            // setMessage(err.message ?? "Ocurrió un error al consultar. Intenta de nuevo.");
-            // TODO: quitar esto cuando el backend esté disponible
-            const random = MOCK_RESULTS[Math.floor(Math.random() * MOCK_RESULTS.length)];
-            setResult(random);
+        } catch (error) {
+            setMessage(error instanceof Error ? error.message : "No se pudo consultar la solicitud.");
+        } finally {
             setLoading(false);
         }
     };
@@ -110,7 +82,7 @@ export default function TrackingView({ onLogin }: Props) {
     return (
         <form className={styles.form} onSubmit={handleSubmit}>
         <p className={styles.description}>
-            Ingresa el código de seguimiento que recibiste al crear tu solicitud de registro.
+            {initialCode ? `Tu código de seguimiento es ${initialCode}. Guárdalo para consultar tu solicitud.` : "Ingresa tu código de seguimiento para consultar tu solicitud de registro."}
         </p>
 
         <AccessField
@@ -119,6 +91,7 @@ export default function TrackingView({ onLogin }: Props) {
             type="text"
             placeholder="n3x8kQ1pW2sR4tU6vY"
             autoComplete="off"
+            defaultValue={initialCode}
             required
         />
 

@@ -2,6 +2,8 @@
 
 Código de referencia: `85ab07b216ef7cccafd28a47aba068520efec8be`; línea de integración revisada: `estado-recuperado`. Describe capacidades presentes en esa revisión; la configuración y las autorizaciones efectivas de un servidor se comprueban por separado. Esta edición se preparó sin conectarse a Oracle, SMTP ni servidores institucionales.
 
+La ampliación EVIAL de esta edición se documenta al final con su referencia de código propia.
+
 Los enlaces de código fijan esa revisión para que sigan siendo consultables cuando `main` excluya herramientas de desarrollo. Al modificar un comportamiento se deben actualizar su caso de uso, configuración y referencia de código.
 
 
@@ -19,6 +21,7 @@ Los enlaces de código fijan esa revisión para que sigan siendo consultables cu
 - [10. Ramas y documentos de producción](#promocion)
 - [11. Índice de configuración](#variables)
 - [12. Índice de persistencia](#objetos)
+- [13. Integración EVIAL](#evial)
 
 Casos funcionales y recorridos: [casos-de uso.md](casos-de%20uso.md).
 
@@ -162,3 +165,23 @@ Referencias literales del código (tablas, vistas y paquetes). Los nombres sin p
 | `TB_NOTICIA_AUTOR` | [src/lib/content/types.ts](https://github.com/EMETRA/portal-emetra/blob/85ab07b216ef7cccafd28a47aba068520efec8be/src/lib/content/types.ts) |
 | `TB_RECURSO` | [src/lib/content/publishedNews.types.ts](https://github.com/EMETRA/portal-emetra/blob/85ab07b216ef7cccafd28a47aba068520efec8be/src/lib/content/publishedNews.types.ts) |
 | `TB_SECCION_NOTICIA` | [src/lib/content/publishedNews.types.ts](https://github.com/EMETRA/portal-emetra/blob/85ab07b216ef7cccafd28a47aba068520efec8be/src/lib/content/publishedNews.types.ts) |
+
+<a id="evial"></a>
+
+## 13. Educación vial: pantallas y BFF EVIAL
+
+Código de esta ampliación: `92173243e32ee550929fc1ea37e52e013f75fd7b`, sobre `estado-recuperado`. La documentación previa conserva su referencia histórica. Guía de pantallas, configuración, compatibilidad y pruebas: [EVIAL_PORTAL.md](https://github.com/EMETRA/portal-emetra/blob/92173243e32ee550929fc1ea37e52e013f75fd7b/docs/EVIAL_PORTAL.md).
+
+**Arquitectura y convenciones.** App Router expone `/evial`, detalle de evento, mi curso, evaluación individual y gestión. Los componentes cliente se agrupan en `src/components/client/evial`, con SCSS Modules y tipos/cliente HTTP en `src/lib/evial`. El diseño utiliza la tipografía y colores institucionales, tarjetas blancas, formularios explícitos y estados de carga/error/vacío. EvialCaptcha integra el widget institucional; EvialScanner carga html5-qrcode únicamente al abrir la cámara. El permiso de cámara se libera al cerrar la vista. Las pantallas se adaptan a escritorio y móvil sin desbordar el documento.
+
+**BFF y sesiones.** `/api/evial/[...path]` admite una lista cerrada de rutas y métodos, limita cuerpos, valida el origen de cambios y consulta el API con TLS normal. Las cookies HttpOnly de curso y personal están separadas y no usan BACKEND_TOKEN ni APP_AUTH_TOKEN. Las evaluaciones de participantes usan un token por enlace en fragmento, retirado de la barra al leerlo y mantenido solo en memoria. No persistir esos tokens en localStorage ni incorporarlos a query strings. Los datos de búsqueda de participantes se envían por POST.
+
+**Flujos y datos.** Catálogo y metadatos proceden del API. Inscripción y acceso llevan al curso propio. «Revisado» facilita recorrer materiales; la nota, cupo, intentos y autorización se deciden en el servidor. La pantalla de gestión comprueba capacidades antes de ofrecer procesos. El PDF/QR es comprobante de inscripción; leerlo no aprueba pasos automáticamente. Se copian enlaces individuales de evaluación para compartirlos manualmente. Se conservan datos del formulario al fallar. Ante 503 de una escritura se consulta el estado antes de repetir.
+
+**Configuración y dependencias.** API_BASE_URL debe apuntar al api-portal correcto; PORTAL_PUBLIC_ORIGIN identifica el origen externo exacto del sitio. Si hace falta CA interna, se monta mediante NODE_EXTRA_CA_CERTS. El secreto EVIAL, permisos, remitente, geografía y medios están en el API. Next y eslint-config-next se alinean en el parche 15.3.9 de la misma línea; html5-qrcode 2.3.8 añade cámara sin CDN nuevo. El lockfile fija esas dependencias. No cambiar DNS ni el enlace VIVI automáticamente.
+
+**Compatibilidad.** `/events/:id` redirige a `/evial/:id`. Las rutas viejas de curso/comprobante llevan a acceso seguro, y las administrativas a gestión. Los enlaces antiguos de alumno basados solo en IDs necesitan regenerarse. Conservar las imágenes y documentos estáticos del host anterior, ausentes de los repositorios. El frontend no accede directamente a tablas; las relaciones y privilegios Oracle se enumeran en la guía del API y en los casos.
+
+**Validación.** `pnpm run build`, `pnpm run test:evial` y recorrido Chromium local con fixture, CAPTCHA y autenticación simulados. Se comprueban flujos y tamaños 1440/390/320; estas pruebas no sustituyen Oracle, SMTP, cámara física ni Turnstile en el dominio real. La guía incluye los comandos reproducibles y el plan de transición. No se ha desplegado.
+
+Código: [componentes](https://github.com/EMETRA/portal-emetra/tree/92173243e32ee550929fc1ea37e52e013f75fd7b/src/components/client/evial), [BFF y tipos](https://github.com/EMETRA/portal-emetra/tree/92173243e32ee550929fc1ea37e52e013f75fd7b/src/lib/evial). Casos nuevos: CU-12 a CU-18.

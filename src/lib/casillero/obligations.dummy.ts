@@ -22,7 +22,7 @@ import type {
  * - "veh-3" (P222CCC): 23 obligaciones, para probar la paginación por cursor.
  * - cualquier otro id: 404, como un vehículo que no existe o no es del usuario.
  */
-export const SIMULAR_COBROS = true;
+export const SIMULAR_COBROS = false;
 
 // La placa ya trae el tipo ("P111BBB") y plateTypeCode es el nombre del tipo, como en la API.
 const vehiculoSimulado = (

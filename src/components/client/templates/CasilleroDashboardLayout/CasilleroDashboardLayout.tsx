@@ -4,7 +4,6 @@ import { useEffect, useState } from "react";
 import Image from "next/image";
 import CasilleroDashboardSidebar from "@/components/client/organisms/CasilleroDashboardSidebar/CasilleroDashboardSidebar";
 import CasilleroDashboardTopbar from "@/components/client/molecules/CasilleroDashboardTopbar/CasilleroDashboardTopbar";
-import { useCompanyAccess } from "@/lib/casillero/company";
 import styles from "./CasilleroDashboardLayout.module.scss";
 import { useCasilleroProfileStore } from "@/store/useCasilleroProfileStore";
 
@@ -16,8 +15,6 @@ export default function CasilleroDashboardLayout({ children }: Props) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const profile = useCasilleroProfileStore((state) => state.profile);
   const loadProfile = useCasilleroProfileStore((state) => state.load);
-  useCompanyAccess();
-
   useEffect(() => {
     void loadProfile().catch(() => {});
   }, [loadProfile]);
@@ -35,7 +32,6 @@ export default function CasilleroDashboardLayout({ children }: Props) {
 
       <CasilleroDashboardTopbar
         userName={userName}
-        hasCompanyContext={profile?.availableContexts?.some((context) => context.type === "COMPANY") ?? false}
         sidebarOpen={sidebarOpen}
         onMenuClickAction={() => setSidebarOpen((open) => !open)}
       />

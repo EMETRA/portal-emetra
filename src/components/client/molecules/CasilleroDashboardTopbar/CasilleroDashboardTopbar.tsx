@@ -6,40 +6,21 @@ import CasilleroSearchBox from "@/components/client/molecules/CasilleroSearchBox
 import styles from "./CasilleroDashboardTopbar.module.scss";
 import { useRouter } from "next/navigation";
 import classNames from "classnames";
-import { useModeStore } from "@/store/useModeStore";
 import { useSessionStore } from "@/store/useSessionStore";
 import { logout } from "@/lib/casillero/auth";
-import { companyHomePath, useCompanyAccessStore } from "@/lib/casillero/company";
 
 type Props = {
   userName: string;
-  hasCompanyContext: boolean;
   sidebarOpen: boolean;
   onMenuClickAction: () => void;
 };
 
-export default function CasilleroDashboardTopbar({ userName, hasCompanyContext, onMenuClickAction }: Props) {
+export default function CasilleroDashboardTopbar({ userName, onMenuClickAction }: Props) {
   const router = useRouter();
-  const { mode, setMode } = useModeStore();
   const { clearSession } = useSessionStore();
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [cerrandoSesion, setCerrandoSesion] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
-
-  const handleModeChange = async (newMode: "personal" | "empresa") => {
-    setMode(newMode);
-    if (newMode === "personal") {
-      router.push("/casillero/dashboard");
-      return;
-    }
-
-    try {
-      const access = await useCompanyAccessStore.getState().load();
-      router.push(companyHomePath(access));
-    } catch {
-      router.push("/casillero/empresa/solicitud");
-    }
-  };
 
   const handleLogout = async () => {
     if (cerrandoSesion) return;
@@ -65,7 +46,7 @@ export default function CasilleroDashboardTopbar({ userName, hasCompanyContext, 
   }, []);
 
   return (
-    <div className={classNames(styles.topbar, { [styles.withoutCompany]: !hasCompanyContext })}>
+    <div className={styles.topbar}>
       <button className={styles.menuButton} type="button" onClick={onMenuClickAction}>
         <Icon name="Menu" />
       </button>
@@ -73,23 +54,6 @@ export default function CasilleroDashboardTopbar({ userName, hasCompanyContext, 
       <div className={styles.searchSlot}>
         <CasilleroSearchBox />
       </div>
-
-      {hasCompanyContext && <div className={styles.modeSwitcher}>
-        <button
-          type="button"
-          className={classNames(styles.modeBtn, { [styles.modeBtnActive]: mode === "personal" })}
-          onClick={() => handleModeChange("personal")}
-        >
-          Personal
-        </button>
-        <button
-          type="button"
-          className={classNames(styles.modeBtn, { [styles.modeBtnActive]: mode === "empresa" })}
-          onClick={() => handleModeChange("empresa")}
-        >
-          Empresa
-        </button>
-      </div>}
 
       <h1>Casillero Electrónico</h1>
 
@@ -151,24 +115,6 @@ export default function CasilleroDashboardTopbar({ userName, hasCompanyContext, 
         <Icon name="Home" />
       </button>
 
-      {hasCompanyContext && <div className={styles.mobileModeToggle}>
-        <button
-          type="button"
-          className={classNames(styles.mobileModeBtn, { [styles.mobileModeBtnActive]: mode === "personal" })}
-          onClick={() => handleModeChange("personal")}
-          aria-label="Modo personal"
-        >
-          P
-        </button>
-        <button
-          type="button"
-          className={classNames(styles.mobileModeBtn, { [styles.mobileModeBtnActive]: mode === "empresa" })}
-          onClick={() => handleModeChange("empresa")}
-          aria-label="Modo empresa"
-        >
-          E
-        </button>
-      </div>}
       {/* Mobile notifications */}
       <button
         type="button"

@@ -3,6 +3,13 @@ import { Button } from "@/components/server/atoms";
 import styles from "./CasilleroCompany.module.scss";
 
 const STATUS_LABELS: Record<string, string> = {
+    PENDING: "Pendiente",
+    UNDER_REVIEW: "En revisión",
+    OBSERVED: "Observada",
+    APPROVED: "Aprobada",
+    REJECTED: "Rechazada",
+    ACTIVE: "Activa",
+    ACCEPTED: "Aceptada",
     PENDIENTE: "Pendiente",
     APROBADA: "Aprobada",
     RECHAZADA: "Rechazada",

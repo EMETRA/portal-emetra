@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { SectionTitle } from "@/components/server/molecules/SectionTitle";
 import CardGeneral from "@/components/client/atoms/CardGeneral/CardGeneral";
 import { Button } from "@/components/server/atoms";
@@ -55,6 +56,11 @@ export default function CasilleroCompanyInvitations() {
   return (
     <div className={styles.wrapper}>
       <SectionTitle>Invitaciones</SectionTitle>
+      <div className={styles.invitationsNavigation}>
+        <Link className={styles.secondaryCompanyButton} href="/casillero/empresa">
+          ← Volver a empresas
+        </Link>
+      </div>
       <CardGeneral className={styles.card} padding="lg">
         {status === "loading" ? <CompanyLoading label="Cargando tus invitaciones..." />
         : status === "error" ? <CompanyError message={error} onRetry={() => setAttempt((value) => value + 1)} />

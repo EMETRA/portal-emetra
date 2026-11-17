@@ -33,13 +33,14 @@ export default function CasilleroCompanyDetail({ companyId }: { companyId: strin
 
   const invite = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault(); setMessage(""); setError("");
-    const form = new FormData(event.currentTarget);
+    const formElement = event.currentTarget;
+    const form = new FormData(formElement);
     const email = String(form.get("email") ?? "").trim();
     const roleCode = String(form.get("roleCode") ?? "").trim() || undefined;
     try {
       await createCompanyInvitation(companyId, { email, roleCode });
       setMessage("Invitación enviada correctamente.");
-      event.currentTarget.reset();
+      formElement.reset();
     } catch (reason) { setError(reason instanceof Error ? reason.message : "No se pudo enviar la invitación."); }
   };
 

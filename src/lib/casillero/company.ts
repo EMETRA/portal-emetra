@@ -142,11 +142,15 @@ export async function activateCompanyContext(companyId: string): Promise<void> {
     method: "POST", headers: { "Content-Type": "application/json", Accept: "application/json" }, body: JSON.stringify({ companyId }),
   });
   if (!response.ok) throw new CompanyClientError(response.status, "No se pudo activar el contexto empresarial.");
+  const { useCasilleroProfileStore } = await import("@/store/useCasilleroProfileStore");
+  useCasilleroProfileStore.getState().clear();
   window.dispatchEvent(new CustomEvent("company-context-changed", { detail: { companyId } }));
 }
 
 export async function deactivateCompanyContext(): Promise<void> {
   await fetch("/api/casillero/company-context", { method: "DELETE" });
+  const { useCasilleroProfileStore } = await import("@/store/useCasilleroProfileStore");
+  useCasilleroProfileStore.getState().clear();
   window.dispatchEvent(new CustomEvent("company-context-changed", { detail: { companyId: null } }));
 }
 

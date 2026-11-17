@@ -67,7 +67,9 @@ export default function GestionPlacasPage() {
         try {
             const [vehicles, profile] = await Promise.all([
                 fetchAllVehicles({}, signal),
-                useCasilleroProfileStore.getState().load(),
+                // El NIT debe corresponder al contexto activo (personal o empresa),
+                // no a un perfil que pudo quedar en caché antes de cambiar de contexto.
+                useCasilleroProfileStore.getState().refresh(),
             ]);
             const withCounts = await Promise.all(
                 vehicles.map(async (vehicle) => {

@@ -4,6 +4,7 @@ import { FormEvent, useCallback, useEffect, useState } from "react";
 import Link from "next/link";
 import { SectionTitle } from "@/components/server/molecules/SectionTitle";
 import CardGeneral from "@/components/client/atoms/CardGeneral/CardGeneral";
+import CasilleroPopUp from "@/components/client/molecules/CasilleroPopUp/CasilleroPopUp";
 import { Button, Input } from "@/components/server/atoms";
 import { createCompanyInvitation, getCompany, getCompanyMembers, getCompanyRoles, updateMemberRoles, type CompanyMember, type CompanyRole, type CompanySummary } from "@/lib/casillero/company";
 import { CompanyError, CompanyLoading, companyLabel, formatCompanyDate } from "./CompanyState";
@@ -42,13 +43,17 @@ export default function CasilleroCompanyDetail({ companyId }: { companyId: strin
     } catch (reason) { setError(reason instanceof Error ? reason.message : "No se pudo enviar la invitación."); }
   };
 
-  const replaceRoles = async (member: CompanyMember, roleCodes: string[]) => {
+  const replaceRoles = async (member: CompanyMember, roleCodes: string[]): Promise<boolean> => {
     setError(""); setMessage("");
     try {
       await updateMemberRoles(companyId, member.membershipId, roleCodes, member.version, "Actualización desde Portal Casillero");
       setMessage("Roles actualizados correctamente.");
       await load();
-    } catch (reason) { setError(reason instanceof Error ? reason.message : "No se pudieron actualizar los roles."); }
+      return true;
+    } catch (reason) {
+      setError(reason instanceof Error ? reason.message : "No se pudieron actualizar los roles.");
+      return false;
+    }
   };
 
   if (status === "loading") return <CompanyLoading label="Cargando empresa..." />;
@@ -90,12 +95,57 @@ export default function CasilleroCompanyDetail({ companyId }: { companyId: strin
   );
 }
 
-function MemberEditor({ member, availableRoles, onSave }: { member: CompanyMember; availableRoles: CompanyRole[]; onSave: (member: CompanyMember, roles: string[]) => Promise<void> }) {
+function MemberEditor({ member, availableRoles, onSave }: { member: CompanyMember; availableRoles: CompanyRole[]; onSave: (member: CompanyMember, roles: string[]) => Promise<boolean> }) {
   const [selectedRoles, setSelectedRoles] = useState(member.roles.map((role) => role.code));
-  return (
+  const [isOpen, setIsOpen] = useState(false);
+  const [saving, setSaving] = useState(false);
+
+  const openEditor = () => {
+    setSelectedRoles(member.roles.map((role) => role.code));
+    setIsOpen(true);
+  };
+
+  const toggleRole = (code: string) => {
+    setSelectedRoles((current) => current.includes(code)
+      ? current.filter((role) => role !== code)
+      : [...current, code]);
+  };
+
+  const save = async () => {
+    if (saving) return;
+    const hadRepresentative = member.roles.some((role) => role.code === "REPRESENTANTE");
+    const keepsRepresentative = selectedRoles.includes("REPRESENTANTE");
+    if (hadRepresentative && !keepsRepresentative && !window.confirm("¿Seguro que deseas quitar el rol de Representante legal a este miembro?")) return;
+    setSaving(true);
+    const saved = await onSave(member, selectedRoles);
+    setSaving(false);
+    if (saved) setIsOpen(false);
+  };
+
+  return <>
     <article className={styles.memberItem}>
       <div className={styles.memberHeader}><div className={styles.memberInfo}><strong>{member.fullName}</strong><span>{member.position || "Sin puesto"}</span></div><span>{companyLabel(member.status)}</span></div>
-      <div className={styles.roleEditor}><select multiple value={selectedRoles} onChange={(event) => setSelectedRoles(Array.from(event.currentTarget.selectedOptions, (option) => option.value))} aria-label={`Roles de ${member.fullName}`} className={`${styles.select} ${styles.roleSelect}`}>{availableRoles.map((role) => <option key={role.code} value={role.code}>{role.name}</option>)}</select><Button type="button" variant="outline" onClick={() => void onSave(member, selectedRoles)}>Guardar roles</Button></div>
+      <div className={styles.memberRolesRow}>
+        <div className={styles.roleChips}>{member.roles.length ? member.roles.map((role) => <span className={styles.roleChip} key={role.code}>{role.name}</span>) : <span className={styles.noRoles}>Sin roles asignados</span>}</div>
+        <Button type="button" variant="outline" onClick={openEditor}>Administrar roles</Button>
+      </div>
     </article>
-  );
+    <CasilleroPopUp
+      isOpen={isOpen}
+      title="Editar roles y permisos"
+      description={`Selecciona los roles de ${member.fullName}.`}
+      onClose={() => { if (!saving) setIsOpen(false); }}
+      actions={[
+        { text: "Cancelar", variant: "outline", onClick: () => { if (!saving) setIsOpen(false); } },
+        { text: saving ? "Guardando..." : "Guardar cambios", variant: "success", onClick: () => void save() },
+      ]}
+    >
+      <div className={styles.roleChecklist}>
+        {availableRoles.map((role) => <label className={styles.roleOption} key={role.code}>
+          <input type="checkbox" checked={selectedRoles.includes(role.code)} onChange={() => toggleRole(role.code)} disabled={saving} />
+          <span><strong>{role.name}</strong><small>{role.code}</small></span>
+        </label>)}
+      </div>
+    </CasilleroPopUp>
+  </>;
 }

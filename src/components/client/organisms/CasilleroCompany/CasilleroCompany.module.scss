@@ -387,6 +387,68 @@
   min-height: 88px;
 }
 
+.memberRolesRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.roleChips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.roleChip {
+  border-radius: 999px;
+  padding: 0.4rem 0.75rem;
+  background: #eef2ff;
+  color: $quintary-text;
+  font-size: 0.82rem;
+  font-weight: 700;
+}
+
+.noRoles {
+  color: $sub-text;
+  font-size: 0.85rem;
+}
+
+.roleChecklist {
+  display: grid;
+  gap: 0.65rem;
+}
+
+.roleOption {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  padding: 0.75rem 0.9rem;
+  border: 1px solid #e1e5ef;
+  border-radius: 0.65rem;
+  cursor: pointer;
+
+  input {
+    width: 18px;
+    height: 18px;
+    accent-color: $verde-oscuro-1;
+  }
+
+  span {
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+  }
+
+  strong {
+    color: $secondary-text;
+  }
+
+  small {
+    color: $sub-text;
+  }
+}
+
 .tableWrap {
   display: none;
 }

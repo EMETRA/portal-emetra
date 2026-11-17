@@ -3,68 +3,77 @@
 import { useEffect, useMemo, useState } from "react";
 import { useMediaQuery } from "@/hooks/useMediaQuery";
 import SolicitudCard from "@/components/client/molecules/SolicitudCard/SolicitudCard";
-import { Solicitud } from "@/types/solicitudes";
-import styles from "./SolicitudesPage.module.scss";
 import PaginationArrows from "../../atoms/PaginationArrows/PaginationArrows";
-
-// TODO: replace with real query
-const MOCK_SOLICITUDES: Solicitud[] = [
-    { id: "1", code: "SOL-ID-2101", type: "desasociacion", plate: "P 111BBB", date: "15/05/2026", status: "en_proceso" },
-    { id: "2", code: "SOL-ID-2100", type: "asociacion",    plate: "P 111BBB", date: "15/05/2026", status: "recibido" },
-    { id: "3", code: "SOL-ID-2099", type: "desasociacion", plate: "P 111BBB", date: "15/05/2026", status: "resuelto" },
-    { id: "4", code: "SOL-ID-2098", type: "asociacion",    plate: "P 222CCC", date: "15/05/2026", status: "recibido" },
-    { id: "5", code: "SOL-ID-2097", type: "desasociacion", plate: "P 222CCC", date: "15/05/2026", status: "resuelto" },
-    { id: "6", code: "SOL-ID-2096", type: "asociacion",    plate: "P 222CCC", date: "15/05/2026", status: "en_proceso" },
-    { id: "7", code: "SOL-ID-2095", type: "desasociacion", plate: "P 333DDD", date: "14/05/2026", status: "recibido" },
-    { id: "8", code: "SOL-ID-2094", type: "asociacion",    plate: "P 333DDD", date: "14/05/2026", status: "resuelto" },
-    { id: "9", code: "SOL-ID-2093", type: "asociacion",    plate: "P 444EEE", date: "13/05/2026", status: "en_proceso" },
-    { id: "10", code: "SOL-ID-2092", type: "desasociacion", plate: "P 444EEE", date: "13/05/2026", status: "recibido" },
-];
+import { getCompanyRegistrationRequests, getMyCompanyInvitations, type CompanyRegistrationStatus } from "@/lib/casillero/company";
+import { getVehicleAssociationRequests, type VehicleAssociationStatus } from "@/lib/casillero/vehicleAssociations";
+import type { Solicitud, SolicitudStatus } from "@/types/solicitudes";
+import styles from "./SolicitudesPage.module.scss";
 
 export default function SolicitudesPage() {
-    const isMobile = useMediaQuery("(max-width: 768px)");
-    const isTablet = useMediaQuery("(max-width: 1400px)");
+  const isMobile = useMediaQuery("(max-width: 768px)");
+  const isTablet = useMediaQuery("(max-width: 1400px)");
+  const itemsPerPage = isMobile ? 6 : isTablet ? 8 : 5;
+  const [items, setItems] = useState<Solicitud[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [warnings, setWarnings] = useState<string[]>([]);
+  const [page, setPage] = useState(0);
 
-    // desktop=4, tablet=5, mobile=6
-    const itemsPerPage = isMobile ? 6 : isTablet ? 8 : 5;
+  useEffect(() => {
+    let cancelled = false;
+    setLoading(true);
+    Promise.allSettled([
+      getCompanyRegistrationRequests(),
+      getVehicleAssociationRequests(),
+      getMyCompanyInvitations(),
+    ]).then(([companies, vehicles, invitations]) => {
+      if (cancelled) return;
+      const combined: Solicitud[] = [];
+      const failed: string[] = [];
 
-    const [page, setPage] = useState(0);
-    const totalPages = Math.max(1, Math.ceil(MOCK_SOLICITUDES.length / itemsPerPage));
+      if (companies.status === "fulfilled") combined.push(...companies.value.map((request) => ({
+        id: `company-${request.id}`, code: `EMP-${request.id}`, type: "empresa" as const,
+        detail: `${request.razonSocial} · NIT ${request.nit}`, date: formatDate(request.submittedAt),
+        occurredAt: request.submittedAt, status: visualCompanyStatus(request.status),
+        statusLabel: companyStatusLabel(request.status),
+      }))); else failed.push("solicitudes empresariales");
 
-    // reset to page 0 when breakpoint changes
-    useEffect(() => {
-        setPage(0);
-    }, [itemsPerPage]);
+      if (vehicles.status === "fulfilled") combined.push(...vehicles.value.map((request) => ({
+        id: `vehicle-${request.linkRequestId}`, code: request.trackingCode, type: "vehiculo" as const,
+        detail: `Placa: ${[request.plateTypeCode, request.plateNumber].filter(Boolean).join(" ")}`,
+        date: formatDate(request.submittedAt), occurredAt: request.submittedAt,
+        status: visualVehicleStatus(request.status), statusLabel: vehicleStatusLabel(request.status),
+      }))); else failed.push("solicitudes de vehículos");
 
-    const visible = useMemo(
-        () => MOCK_SOLICITUDES.slice(page * itemsPerPage, (page + 1) * itemsPerPage),
-        [page, itemsPerPage]
-    );
+      if (invitations.status === "fulfilled") combined.push(...invitations.value.map((invitation) => ({
+        id: `invitation-${invitation.invitationId}`, code: `INV-${invitation.invitationId.slice(0, 8)}`,
+        type: "invitacion" as const, detail: `${invitation.companyName} · ${invitation.proposedRoleName || invitation.proposedRoleCode || "Miembro"}`,
+        date: formatDate(invitation.createdAt), occurredAt: invitation.createdAt,
+        status: "recibido" as const, statusLabel: "Pendiente",
+      }))); else failed.push("invitaciones empresariales");
 
-    // const start = page * itemsPerPage + 1;
-    const end = Math.min((page + 1) * itemsPerPage, MOCK_SOLICITUDES.length);
+      combined.sort((left, right) => right.occurredAt.localeCompare(left.occurredAt));
+      setItems(combined); setWarnings(failed); setPage(0); setLoading(false);
+    });
+    return () => { cancelled = true; };
+  }, []);
 
-    return (
-        <div className={styles.wrapper}>
-        <div className={styles.titleRow}>
-            <span className={styles.titleDivider} />
-            <h1 className={styles.title}>Mis solicitudes</h1>
-            <span className={styles.titleDivider} />
-        </div>
+  useEffect(() => setPage(0), [itemsPerPage]);
+  const totalPages = Math.max(1, Math.ceil(items.length / itemsPerPage));
+  const visible = useMemo(() => items.slice(page * itemsPerPage, (page + 1) * itemsPerPage), [items, page, itemsPerPage]);
+  const end = Math.min((page + 1) * itemsPerPage, items.length);
 
-        <div className={styles.list}>
-            {visible.map((sol) => (
-            <SolicitudCard key={sol.id} solicitud={sol} short={isMobile} />
-            ))}
-        </div>
-
-        <PaginationArrows
-            page={page}
-            totalPages={totalPages}
-            onPrev={() => setPage((p) => Math.max(0, p - 1))}
-            onNext={() => setPage((p) => Math.min(totalPages - 1, p + 1))}
-            label={`Mostrando ${end} de ${MOCK_SOLICITUDES.length}`}
-        />
-        </div>
-    );
+  return <div className={styles.wrapper}>
+    <div className={styles.titleRow}><span className={styles.titleDivider} /><h1 className={styles.title}>Mis solicitudes</h1><span className={styles.titleDivider} /></div>
+    {warnings.length ? <p className={styles.warning}>No se pudieron cargar: {warnings.join(", ")}. Los demás resultados sí están disponibles.</p> : null}
+    {loading ? <p className={styles.state}>Cargando solicitudes...</p>
+    : visible.length === 0 ? <p className={styles.state}>Todavía no tienes solicitudes ni invitaciones.</p>
+    : <div className={styles.list}>{visible.map((item) => <SolicitudCard key={item.id} solicitud={item} short={isMobile} />)}</div>}
+    {!loading && items.length > 0 ? <PaginationArrows page={page} totalPages={totalPages} onPrev={() => setPage((value) => Math.max(0, value - 1))} onNext={() => setPage((value) => Math.min(totalPages - 1, value + 1))} label={`Mostrando ${end} de ${items.length}`} /> : null}
+  </div>;
 }
+
+const formatDate = (value: string) => new Intl.DateTimeFormat("es-GT", { day: "2-digit", month: "2-digit", year: "numeric" }).format(new Date(value));
+const visualCompanyStatus = (status: CompanyRegistrationStatus): SolicitudStatus => status === "APPROVED" || status === "REJECTED" ? "resuelto" : status === "PENDING" ? "recibido" : "en_proceso";
+const companyStatusLabel = (status: CompanyRegistrationStatus) => ({ PENDING: "Pendiente", UNDER_REVIEW: "En revisión", OBSERVED: "Observada", APPROVED: "Aprobada", REJECTED: "Rechazada" })[status];
+const visualVehicleStatus = (status: VehicleAssociationStatus): SolicitudStatus => status === "APPROVED" || status === "REJECTED" ? "resuelto" : "en_proceso";
+const vehicleStatusLabel = (status: VehicleAssociationStatus) => ({ PENDING_SAT: "Validación SAT", APPROVED: "Aprobada", REJECTED: "Rechazada" })[status];

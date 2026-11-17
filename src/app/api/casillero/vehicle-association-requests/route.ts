@@ -7,3 +7,7 @@ export async function POST(req: NextRequest) {
     requireAuth: true,
   });
 }
+
+export async function GET(req: NextRequest) {
+  return proxyCasilleroRequest(req, { path: "/v1/vehicle-association-requests" });
+}

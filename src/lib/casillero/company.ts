@@ -43,6 +43,10 @@ export type CompanyRegistrationRequest = {
   documents: CompanyRegistrationDocument[];
 };
 
+export type CompanyRegistrationListItem = Omit<CompanyRegistrationRequest, "priority" | "documents"> & {
+  documentCount: number;
+};
+
 export type CompanyMembership = { id: string; position?: string; validFrom: string };
 export type CompanySummary = {
   companyId: string;
@@ -118,6 +122,10 @@ export async function createCompanyRegistrationRequest(input: {
 
 export function getCompanyRegistrationRequest(id: string): Promise<CompanyRegistrationRequest> {
   return companyRequest(`/api/casillero/company-registration-requests/${encodeURIComponent(id)}`);
+}
+
+export async function getCompanyRegistrationRequests(): Promise<CompanyRegistrationListItem[]> {
+  return (await companyRequest<{ items: CompanyRegistrationListItem[] }>("/api/casillero/company-registration-requests")).items;
 }
 
 export async function getCompanies(): Promise<CompanySummary[]> {

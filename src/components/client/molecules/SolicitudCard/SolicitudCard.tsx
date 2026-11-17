@@ -5,13 +5,15 @@ import SolicitudStatusBadge from "../../atoms/SolicitudStatusBadge/SolicitudStat
 import SolicitudIdBadge from "../../atoms/SolicitudIdBagde/SolicitudIdBadge";
 
 const FULL_LABELS: Record<SolicitudType, string> = {
-    asociacion: "Solicitud de asociación de placa",
-    desasociacion: "Solicitud de desasociación de placa",
+    empresa: "Solicitud de creación de empresa",
+    vehiculo: "Solicitud de asociación de vehículo",
+    invitacion: "Invitación para unirse a una empresa",
 };
 
 const SHORT_LABELS: Record<SolicitudType, string> = {
-    asociacion: "Solicitud de asociación",
-    desasociacion: "Solicitud de desasociación",
+    empresa: "Creación de empresa",
+    vehiculo: "Asociación de vehículo",
+    invitacion: "Invitación empresarial",
 };
 
 interface SolicitudCardProps {
@@ -32,9 +34,9 @@ export default function SolicitudCard({ solicitud, short = false }: SolicitudCar
         <div className={styles.bottomRow}>
             <div className={styles.info}>
             <p className={styles.title}>{label}</p>
-            <p className={styles.plate}>Placa: {solicitud.plate}</p>
+            <p className={styles.plate}>{solicitud.detail}</p>
             </div>
-            <SolicitudStatusBadge status={solicitud.status} />
+            <SolicitudStatusBadge status={solicitud.status} label={solicitud.statusLabel} />
         </div>
         </article>
     );

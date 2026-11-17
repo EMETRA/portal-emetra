@@ -7,10 +7,10 @@ const labels: Record<SolicitudStatus, string> = {
     resuelto: "Resuelto",
 };
 
-export default function SolicitudStatusBadge({ status }: { status: SolicitudStatus }) {
+export default function SolicitudStatusBadge({ status, label }: { status: SolicitudStatus; label?: string }) {
     return (
         <span className={`${styles.badge} ${styles[status]}`}>
-        {labels[status]}
+        {label ?? labels[status]}
         </span>
     );
 }

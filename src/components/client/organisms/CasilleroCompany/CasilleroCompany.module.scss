@@ -50,6 +50,26 @@
   cursor: pointer;
 }
 
+.invitationsPending {
+  gap: 0.55rem;
+  border-color: $quintary-text;
+  background: $quintary-text;
+  color: #fff;
+}
+
+.invitationBadge {
+  display: grid;
+  min-width: 22px;
+  height: 22px;
+  padding: 0 0.35rem;
+  place-items: center;
+  border-radius: 999px;
+  background: #fff;
+  color: $quintary-text;
+  font-size: 0.75rem;
+  font-weight: 800;
+}
+
 .companyGrid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));

@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { SectionTitle } from "@/components/server/molecules/SectionTitle";
 import CardGeneral from "@/components/client/atoms/CardGeneral/CardGeneral";
-import { activateCompanyContext, deactivateCompanyContext, getActiveCompanyContext, getCompanies, type CompanySummary } from "@/lib/casillero/company";
+import { activateCompanyContext, deactivateCompanyContext, getActiveCompanyContext, getCompanies, getMyCompanyInvitations, type CompanySummary } from "@/lib/casillero/company";
 import styles from "./CasilleroCompany.module.scss";
 
 const FIRST_COMPANY_PATH = "/casillero/empresa/solicitud";
@@ -19,14 +19,16 @@ export default function CasilleroCompanySummaryPage() {
   const [attempt, setAttempt] = useState(0);
   const [activeCompanyId, setActiveCompanyId] = useState<string | null>(null);
   const [activating, setActivating] = useState<string | null>(null);
+  const [pendingInvitations, setPendingInvitations] = useState(0);
 
   useEffect(() => {
     let cancelled = false;
     setStatus("loading");
-    Promise.all([getCompanies(), getActiveCompanyContext()]).then(([items, active]) => {
+    Promise.all([getCompanies(), getActiveCompanyContext(), getMyCompanyInvitations()]).then(([items, active, invitations]) => {
       if (cancelled) return;
       setCompanies(items);
       setActiveCompanyId(active);
+      setPendingInvitations(invitations.filter((invitation) => invitation.status === "PENDING").length);
       setStatus("ready");
     }).catch((reason: unknown) => {
       if (cancelled) return;
@@ -60,7 +62,10 @@ export default function CasilleroCompanySummaryPage() {
       <div className={styles.companiesHeader}>
         <SectionTitle>Empresas</SectionTitle>
         <div className={styles.companyHeaderActions}>
-          <Link className={styles.secondaryCompanyButton} href="/casillero/empresa/invitaciones">Invitaciones</Link>
+          <Link className={`${styles.secondaryCompanyButton} ${pendingInvitations > 0 ? styles.invitationsPending : ""}`} href="/casillero/empresa/invitaciones">
+            Invitaciones
+            {pendingInvitations > 0 ? <span className={styles.invitationBadge} aria-label={`${pendingInvitations} invitaciones pendientes`}>{pendingInvitations}</span> : null}
+          </Link>
           {activeCompanyId ? <button className={styles.secondaryCompanyButton} type="button" onClick={() => void usePersonalContext()}>Volver a personal</button> : null}
           {companies.length > 0 ? <Link className={styles.newCompanyButton} href={NEW_COMPANY_PATH}>Nueva empresa +</Link> : null}
         </div>

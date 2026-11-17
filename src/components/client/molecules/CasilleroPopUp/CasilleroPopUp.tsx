@@ -11,6 +11,7 @@ export const CasilleroPopUp = ({
     variant = "default",
     title,
     description,
+    children,
     actions,
     onClose,
 }: CasilleroPopUpProps) => {
@@ -29,6 +30,8 @@ export const CasilleroPopUp = ({
                         {description}
                     </Text>
                 </div>
+
+                {children ? <div className={styles.contentWrapper}>{children}</div> : null}
 
                 <div className={styles.actionsWrapper}>
                     {variant === 'success' || variant === 'error' || variant === 'warning' ? (

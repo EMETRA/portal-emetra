@@ -9,6 +9,21 @@
     gap: 0.6rem;
 }
 
+.clickable {
+    cursor: pointer;
+    transition: transform 0.18s ease, box-shadow 0.18s ease;
+
+    &:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 18px rgba(27, 42, 107, 0.14);
+    }
+
+    &:focus-visible {
+        outline: 2px solid #1b2a6b;
+        outline-offset: 3px;
+    }
+}
+
 .topRow {
     display: flex;
     justify-content: space-between;

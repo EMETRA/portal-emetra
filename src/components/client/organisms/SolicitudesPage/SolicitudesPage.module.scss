@@ -46,6 +46,36 @@
     text-align: center;
 }
 
+.detailGrid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.9rem 1.25rem;
+    margin: 0;
+}
+
+.detailItem,
+.detailWide {
+    min-width: 0;
+
+    dt {
+        color: #6b6b6b;
+        font-size: 0.78rem;
+        margin-bottom: 0.2rem;
+    }
+
+    dd {
+        color: #1b2a6b;
+        font-size: 0.9rem;
+        font-weight: 600;
+        margin: 0;
+        overflow-wrap: anywhere;
+    }
+}
+
+.detailWide {
+    grid-column: 1 / -1;
+}
+
 .warning {
     background: #fff7df;
     color: #765b00;
@@ -62,5 +92,13 @@
 @media (max-width: 768px) {
     .title {
         font-size: 1.3rem;
+    }
+
+    .detailGrid {
+        grid-template-columns: 1fr;
+    }
+
+    .detailWide {
+        grid-column: auto;
     }
 }

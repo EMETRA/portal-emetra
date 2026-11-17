@@ -29,6 +29,11 @@
     white-space: pre-line;
 }
 
+.contentWrapper {
+    width: 100%;
+    text-align: left;
+}
+
 .mainIcon {
     color: $secondary-text;
     cursor: pointer;

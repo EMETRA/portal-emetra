@@ -34,6 +34,17 @@ export type VehicleAssociationRequestListItem = {
   foreignPlate: boolean;
 };
 
+export type VehicleAssociationRequestDetail = {
+  linkRequestId: string;
+  trackingCode: string;
+  status: VehicleAssociationStatus;
+  submittedAt: string;
+  resolvedAt?: string;
+  nextAction: string;
+  canRequestReview?: boolean;
+  message?: string;
+};
+
 export class VehicleAssociationError extends Error {
   constructor(message: string, readonly status: number) {
     super(message);
@@ -84,6 +95,14 @@ export async function getVehicleAssociationRequests(): Promise<VehicleAssociatio
   });
   if (!response.ok) throw await errorFromResponse(response, "No se pudieron cargar las solicitudes de vehículos.");
   return ((await response.json()) as { items: VehicleAssociationRequestListItem[] }).items;
+}
+
+export async function getVehicleAssociationRequest(id: string): Promise<VehicleAssociationRequestDetail> {
+  const response = await fetch(`/api/casillero/vehicle-association-requests/${encodeURIComponent(id)}`, {
+    method: "GET", headers: { Accept: "application/json" }, cache: "no-store",
+  });
+  if (!response.ok) throw await errorFromResponse(response, "No se pudo cargar el detalle de la solicitud.");
+  return response.json() as Promise<VehicleAssociationRequestDetail>;
 }
 
 export async function requestVehicleAssociationReview(

@@ -19,13 +19,25 @@ const SHORT_LABELS: Record<SolicitudType, string> = {
 interface SolicitudCardProps {
     solicitud: Solicitud;
     short?: boolean; 
+    onClick?: () => void;
 }
 
-export default function SolicitudCard({ solicitud, short = false }: SolicitudCardProps) {
+export default function SolicitudCard({ solicitud, short = false, onClick }: SolicitudCardProps) {
     const label = short ? SHORT_LABELS[solicitud.type] : FULL_LABELS[solicitud.type];
 
     return (
-        <article className={styles.card}>
+        <article
+            className={`${styles.card} ${onClick ? styles.clickable : ""}`}
+            onClick={onClick}
+            onKeyDown={onClick ? (event) => {
+                if (event.key === "Enter" || event.key === " ") {
+                    event.preventDefault();
+                    onClick();
+                }
+            } : undefined}
+            role={onClick ? "button" : undefined}
+            tabIndex={onClick ? 0 : undefined}
+        >
         <div className={styles.topRow}>
             <SolicitudIdBadge code={solicitud.code} />
             <span className={styles.date}>{solicitud.date}</span>

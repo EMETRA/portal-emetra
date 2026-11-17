@@ -59,6 +59,7 @@ export type CompanySummary = {
   membership: CompanyMembership;
 };
 export type CompanyList = { items: CompanySummary[] };
+export type CompanyRole = { code: string; name: string };
 
 export type CompanyMemberRole = { code: string; name: string; validFrom: string; validUntil?: string };
 export type CompanyMember = {
@@ -130,6 +131,29 @@ export async function getCompanyRegistrationRequests(): Promise<CompanyRegistrat
 
 export async function getCompanies(): Promise<CompanySummary[]> {
   return (await companyRequest<CompanyList>("/api/casillero/companies")).items;
+}
+
+export async function getCompanyRoles(): Promise<CompanyRole[]> {
+  return (await companyRequest<{ items: CompanyRole[] }>("/api/casillero/company-roles")).items;
+}
+
+export async function activateCompanyContext(companyId: string): Promise<void> {
+  const response = await fetch("/api/casillero/company-context", {
+    method: "POST", headers: { "Content-Type": "application/json", Accept: "application/json" }, body: JSON.stringify({ companyId }),
+  });
+  if (!response.ok) throw new CompanyClientError(response.status, "No se pudo activar el contexto empresarial.");
+  window.dispatchEvent(new CustomEvent("company-context-changed", { detail: { companyId } }));
+}
+
+export async function deactivateCompanyContext(): Promise<void> {
+  await fetch("/api/casillero/company-context", { method: "DELETE" });
+  window.dispatchEvent(new CustomEvent("company-context-changed", { detail: { companyId: null } }));
+}
+
+export async function getActiveCompanyContext(): Promise<string | null> {
+  const response = await fetch("/api/casillero/company-context", { cache: "no-store" });
+  if (!response.ok) return null;
+  return ((await response.json()) as { companyId: string | null }).companyId;
 }
 
 export function getCompany(id: string): Promise<CompanySummary> {

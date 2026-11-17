@@ -46,6 +46,8 @@
   color: $quintary-text;
   font-weight: 700;
   text-decoration: none;
+  background: #fff;
+  cursor: pointer;
 }
 
 .companyGrid {
@@ -59,6 +61,45 @@
   display: flex;
   align-items: center;
   gap: 1rem;
+}
+
+.companyCardActions {
+  margin-left: auto;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.75rem;
+}
+
+.enterCompanyButton,
+.companyDetailLink,
+.activeContext {
+  border-radius: 999px;
+  padding: 0.65rem 1rem;
+  font-weight: 700;
+}
+
+.enterCompanyButton {
+  border: 0;
+  background: $verde-oscuro-1;
+  color: #fff;
+  cursor: pointer;
+}
+
+.companyDetailLink {
+  border: 1px solid $quintary-text;
+  color: $quintary-text;
+  text-decoration: none;
+}
+
+.activeContext {
+  background: #e9f7e7;
+  color: $verde-oscuro-1;
+}
+
+.detailNavigation {
+  margin-bottom: 1rem;
 }
 
 .companyCardLink {
@@ -340,6 +381,10 @@
   display: flex;
   flex-direction: column;
   gap: 0.75rem;
+}
+
+.roleSelect {
+  min-height: 88px;
 }
 
 .tableWrap {

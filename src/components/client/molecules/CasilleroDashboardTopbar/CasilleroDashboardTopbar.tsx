@@ -8,6 +8,7 @@ import { useRouter } from "next/navigation";
 import classNames from "classnames";
 import { useSessionStore } from "@/store/useSessionStore";
 import { logout } from "@/lib/casillero/auth";
+import { deactivateCompanyContext, getActiveCompanyContext, getCompanies } from "@/lib/casillero/company";
 
 type Props = {
   userName: string;
@@ -20,7 +21,28 @@ export default function CasilleroDashboardTopbar({ userName, onMenuClickAction }
   const { clearSession } = useSessionStore();
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [cerrandoSesion, setCerrandoSesion] = useState(false);
+  const [activeCompanyName, setActiveCompanyName] = useState<string | null>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const loadContext = async () => {
+      const companyId = await getActiveCompanyContext();
+      if (!companyId) return setActiveCompanyName(null);
+      const companies = await getCompanies().catch(() => []);
+      const company = companies.find((item) => item.companyId === companyId);
+      setActiveCompanyName(company?.commercialName || company?.legalName || "Empresa");
+    };
+    void loadContext();
+    window.addEventListener("company-context-changed", loadContext);
+    return () => window.removeEventListener("company-context-changed", loadContext);
+  }, []);
+
+  const usePersonalContext = async () => {
+    await deactivateCompanyContext();
+    setDropdownOpen(false);
+    router.push("/casillero/dashboard");
+    router.refresh();
+  };
 
   const handleLogout = async () => {
     if (cerrandoSesion) return;
@@ -55,7 +77,7 @@ export default function CasilleroDashboardTopbar({ userName, onMenuClickAction }
         <CasilleroSearchBox />
       </div>
 
-      <h1>Casillero Electrónico</h1>
+      <h1>Casillero Electrónico{activeCompanyName ? <small>{activeCompanyName}</small> : null}</h1>
 
       <div className={styles.actions}>
         <Icon name="Notification" onClick={() => router.push("/casillero/buzon")} />
@@ -80,6 +102,7 @@ export default function CasilleroDashboardTopbar({ userName, onMenuClickAction }
 
           {dropdownOpen && (
             <div className={styles.dropdown}>
+              {activeCompanyName ? <button type="button" className={styles.dropdownItem} onClick={() => void usePersonalContext()}>Usar contexto personal</button> : null}
               {/* <button
                 type="button"
                 className={styles.dropdownItem}

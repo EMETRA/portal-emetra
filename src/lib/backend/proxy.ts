@@ -87,6 +87,14 @@ export async function proxyUpstreamRequest(
     body,
     req
   );
+  if (config.id === "casillero") {
+    const companySubjectId = req.cookies.get("portal-company-context")?.value;
+    if (companySubjectId) headers.set("x-portal-company-subject-id", companySubjectId);
+  }
+  if (config.id === "casillero") {
+    const companySubjectId = req.cookies.get("portal-company-context")?.value;
+    if (companySubjectId) headers.set("x-portal-company-subject-id", companySubjectId);
+  }
   const targetUrl = buildUpstreamUrl(config, options.path);
 
   let backendResponse: Response;

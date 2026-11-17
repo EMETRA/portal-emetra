@@ -1,27 +1,32 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { SectionTitle } from "@/components/server/molecules/SectionTitle";
 import CardGeneral from "@/components/client/atoms/CardGeneral/CardGeneral";
-import { getCompanies, type CompanySummary } from "@/lib/casillero/company";
+import { activateCompanyContext, deactivateCompanyContext, getActiveCompanyContext, getCompanies, type CompanySummary } from "@/lib/casillero/company";
 import styles from "./CasilleroCompany.module.scss";
 
 const FIRST_COMPANY_PATH = "/casillero/empresa/solicitud";
 const NEW_COMPANY_PATH = "/casillero/empresa/solicitud?new=1";
 
 export default function CasilleroCompanySummaryPage() {
+  const router = useRouter();
   const [companies, setCompanies] = useState<CompanySummary[]>([]);
   const [status, setStatus] = useState<"loading" | "ready" | "error">("loading");
   const [error, setError] = useState("");
   const [attempt, setAttempt] = useState(0);
+  const [activeCompanyId, setActiveCompanyId] = useState<string | null>(null);
+  const [activating, setActivating] = useState<string | null>(null);
 
   useEffect(() => {
     let cancelled = false;
     setStatus("loading");
-    getCompanies().then((items) => {
+    Promise.all([getCompanies(), getActiveCompanyContext()]).then(([items, active]) => {
       if (cancelled) return;
       setCompanies(items);
+      setActiveCompanyId(active);
       setStatus("ready");
     }).catch((reason: unknown) => {
       if (cancelled) return;
@@ -31,12 +36,32 @@ export default function CasilleroCompanySummaryPage() {
     return () => { cancelled = true; };
   }, [attempt]);
 
+  const enterCompany = async (company: CompanySummary) => {
+    setActivating(company.companyId); setError("");
+    try {
+      await activateCompanyContext(company.companyId);
+      setActiveCompanyId(company.companyId);
+      router.push("/casillero/dashboard");
+      router.refresh();
+    } catch (reason) {
+      setError(reason instanceof Error ? reason.message : "No se pudo entrar a la empresa.");
+      setActivating(null);
+    }
+  };
+
+  const usePersonalContext = async () => {
+    await deactivateCompanyContext();
+    setActiveCompanyId(null);
+    router.refresh();
+  };
+
   return (
     <div className={styles.wrapper}>
       <div className={styles.companiesHeader}>
         <SectionTitle>Empresas</SectionTitle>
         <div className={styles.companyHeaderActions}>
           <Link className={styles.secondaryCompanyButton} href="/casillero/empresa/invitaciones">Invitaciones</Link>
+          {activeCompanyId ? <button className={styles.secondaryCompanyButton} type="button" onClick={() => void usePersonalContext()}>Volver a personal</button> : null}
           {companies.length > 0 ? <Link className={styles.newCompanyButton} href={NEW_COMPANY_PATH}>Nueva empresa +</Link> : null}
         </div>
       </div>
@@ -52,16 +77,16 @@ export default function CasilleroCompanySummaryPage() {
         </Link>
       ) : (
         <div className={styles.companyGrid}>
-          {companies.map((company) => <CompanyCard key={company.companyId} company={company} />)}
+          {companies.map((company) => <CompanyCard key={company.companyId} company={company} active={activeCompanyId === company.companyId} activating={activating === company.companyId} onEnter={() => void enterCompany(company)} />)}
         </div>
       )}
     </div>
   );
 }
 
-function CompanyCard({ company }: { company: CompanySummary }) {
+function CompanyCard({ company, active, activating, onEnter }: { company: CompanySummary; active: boolean; activating: boolean; onEnter: () => void }) {
   return (
-    <Link className={styles.companyCardLink} href={`/casillero/empresa/${encodeURIComponent(company.companyId)}`}>
+    <div className={styles.companyCardLink}>
       <CardGeneral className={styles.companyCard} padding="lg">
         <div className={styles.companyAvatar}>{company.legalName.trim().charAt(0).toUpperCase()}</div>
         <div className={styles.companyCardBody}>
@@ -69,7 +94,11 @@ function CompanyCard({ company }: { company: CompanySummary }) {
           <p>NIT: {company.nit}</p>
           <p>{company.registrationStatus}</p>
         </div>
+        <div className={styles.companyCardActions}>
+          {active ? <span className={styles.activeContext}>Contexto activo</span> : <button type="button" className={styles.enterCompanyButton} onClick={onEnter} disabled={activating}>{activating ? "Entrando..." : "Entrar a empresa"}</button>}
+          <Link className={styles.companyDetailLink} href={`/casillero/empresa/${encodeURIComponent(company.companyId)}`}>Ver detalle</Link>
+        </div>
       </CardGeneral>
-    </Link>
+    </div>
   );
 }

@@ -183,6 +183,20 @@
   gap: 1.5rem;
 }
 
+.companyFormGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1.5rem;
+}
+
+.companyFormGrid .field {
+  width: 100%;
+}
+
+.fullWidth {
+  grid-column: 1 / -1;
+}
+
 .field {
   display: grid;
   gap: 0.5rem;
@@ -381,5 +395,13 @@
 
   .memberList {
     display: none;
+  }
+
+  .companyFormGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .fullWidth {
+    grid-column: 1 / -1;
   }
 }

@@ -69,30 +69,141 @@ export default function CasilleroCompanyRequestPage() {
 
   return (
     <div className={styles.wrapper}>
-      <SectionTitle>{request ? "Mi solicitud empresarial" : "Solicitar empresa"}</SectionTitle>
+      <SectionTitle>
+        {request ? "Mi solicitud empresarial" : "Solicitar empresa"}
+      </SectionTitle>
+
       <CardGeneral className={styles.card} padding="lg">
-        {loading ? <p className={styles.status}>Cargando solicitud...</p>
-        : request ? (
+        {loading ? (
+          <p className={styles.status}>Cargando solicitud...</p>
+        ) : request ? (
           <>
             <dl className={styles.details}>
-              <div className={styles.detail}><dt>Estado</dt><dd>{companyLabel(request.status)}</dd></div>
-              <div className={styles.detail}><dt>Razón social</dt><dd>{request.razonSocial}</dd></div>
-              <div className={styles.detail}><dt>NIT</dt><dd>{request.nit}</dd></div>
-              <div className={styles.detail}><dt>Enviada</dt><dd>{formatCompanyDate(request.submittedAt)}</dd></div>
-              {request.observation ? <div className={styles.detail}><dt>Observación</dt><dd>{request.observation}</dd></div> : null}
-              <div className={styles.detail}><dt>Documentos</dt><dd>{request.documents.length}</dd></div>
+              <div className={styles.detail}>
+                <dt>Estado</dt>
+                <dd>{companyLabel(request.status)}</dd>
+              </div>
+
+              <div className={styles.detail}>
+                <dt>Razón social</dt>
+                <dd>{request.razonSocial}</dd>
+              </div>
+
+              <div className={styles.detail}>
+                <dt>NIT</dt>
+                <dd>{request.nit}</dd>
+              </div>
+
+              <div className={styles.detail}>
+                <dt>Enviada</dt>
+                <dd>{formatCompanyDate(request.submittedAt)}</dd>
+              </div>
+
+              {request.observation ? (
+                <div className={styles.detail}>
+                  <dt>Observación</dt>
+                  <dd>{request.observation}</dd>
+                </div>
+              ) : null}
+
+              <div className={styles.detail}>
+                <dt>Documentos</dt>
+                <dd>{request.documents.length}</dd>
+              </div>
             </dl>
-            <Button type="button" variant="outline" onClick={startAnother}>Registrar otra empresa</Button>
+
+            <Button
+              type="button"
+              variant="outline"
+              onClick={startAnother}
+            >
+              Registrar otra empresa
+            </Button>
           </>
         ) : (
           <form className={styles.form} onSubmit={handleSubmit}>
-            <p className={styles.hint}><strong>Nota:</strong> la solicitud quedará pendiente de revisión antes de crear la empresa.</p>
-            <label className={styles.field}><span className={styles.label}>NIT</span><Input name="nit" type="text" required className={styles.input} /></label>
-            <label className={styles.field}><span className={styles.label}>Razón social</span><Input name="razonSocial" type="text" required className={styles.input} /></label>
-            <label className={styles.field}><span className={styles.label}>Representación legal</span><input name="representationLegalFile" type="file" accept=".pdf,image/jpeg,image/png" required className={styles.fileInput} /></label>
-            <label className={styles.field}><span className={styles.label}>Documentos adicionales (opcional)</span><input name="otherFiles" type="file" accept=".pdf,image/jpeg,image/png" multiple className={styles.fileInput} /></label>
-            {error ? <p className={`${styles.message} ${styles.error}`} role="alert">{error}</p> : null}
-            <Button type="submit" variant="success" className={styles.submit} disabled={submitting}>{submitting ? "Enviando..." : "Enviar solicitud"}</Button>
+            <p className={styles.hint}>
+              <strong>Nota:</strong> La solicitud quedará pendiente de
+              revisión antes de crear la empresa.
+            </p>
+
+            <div className={styles.companyFormGrid}>
+              <label className={styles.field}>
+                <span className={styles.label}>NIT</span>
+                <Input
+                  name="nit"
+                  type="text"
+                  placeholder="1234567-8"
+                  required
+                  className={styles.input}
+                />
+              </label>
+
+              <label className={styles.field}>
+                <span className={styles.label}>Razón social</span>
+                <Input
+                  name="razonSocial"
+                  type="text"
+                  placeholder="Empresa de Ejemplo, S.A."
+                  required
+                  className={styles.input}
+                />
+              </label>
+
+              <label className={`${styles.field} ${styles.fullWidth}`}>
+                <span className={styles.label}>
+                  Documento de representación legal
+                </span>
+
+                <input
+                  name="representationLegalFile"
+                  type="file"
+                  accept=".pdf,image/jpeg,image/png"
+                  required
+                  className={styles.fileInput}
+                />
+
+                <span className={styles.hint}>
+                  PDF, JPG o PNG. Máximo 10 MB.
+                </span>
+              </label>
+
+              <label className={`${styles.field} ${styles.fullWidth}`}>
+                <span className={styles.label}>
+                  Documentos adicionales (opcional)
+                </span>
+
+                <input
+                  name="otherFiles"
+                  type="file"
+                  accept=".pdf,image/jpeg,image/png"
+                  multiple
+                  className={styles.fileInput}
+                />
+
+                <span className={styles.hint}>
+                  Puedes adjuntar hasta 9 archivos. Máximo 10 MB cada uno.
+                </span>
+              </label>
+            </div>
+
+            {error ? (
+              <p
+                className={`${styles.message} ${styles.error}`}
+                role="alert"
+              >
+                {error}
+              </p>
+            ) : null}
+
+            <Button
+              type="submit"
+              variant="success"
+              className={styles.submit}
+              disabled={submitting}
+            >
+              {submitting ? "Enviando..." : "Enviar solicitud"}
+            </Button>
           </form>
         )}
       </CardGeneral>

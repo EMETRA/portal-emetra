@@ -28,7 +28,7 @@ export default function CasilleroCompanySummaryPage() {
       if (cancelled) return;
       setCompanies(items);
       setActiveCompanyId(active);
-      setPendingInvitations(invitations.filter((invitation) => invitation.status === "PENDING").length);
+      setPendingInvitations(invitations.filter((invitation) => invitation.status === "PENDIENTE").length);
       setStatus("ready");
     }).catch((reason: unknown) => {
       if (cancelled) return;

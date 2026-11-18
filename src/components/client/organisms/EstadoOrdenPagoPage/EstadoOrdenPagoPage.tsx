@@ -12,26 +12,26 @@ import {
     CasilleroPaymentOrderError,
     SEGUNDOS_ENTRE_CONSULTAS,
     estadoVisualOrden,
+    continueNeoPayCheckout,
+    fetchNeoPayCheckout,
     fetchPaymentOrder,
     fetchPaymentReceipt,
     isSesionVencidaOrden,
+    type NeoPayCheckout,
+    type PaymentReceiptStatus,
 } from "@/lib/casillero/paymentOrders";
 import { formatearFechaCobro } from "@/lib/casillero/obligations";
 import { useSessionStore } from "@/store/useSessionStore";
 import styles from "./EstadoOrdenPagoPage.module.scss";
+import NeoPayThreeDsFrame from "./NeoPayThreeDsFrame";
 
 const MULTAS = "/casillero/dashboard/multas";
-/** Tiempo antes de liberar la URL del PDF (la pestaña o la descarga ya la usaron). */
-const LIBERAR_URL_MS = 60_000;
-
-type AccionComprobante = "ver" | "descargar";
-
 /**
  * Estado de una orden de pago. Mientras el pago está en proceso se vuelve a consultar
  * sola unas veces; si no se confirma, pide volver a consultar más tarde. Solo una orden
  * CONFIRMADA se muestra como pago hecho.
  */
-export default function EstadoOrdenPagoPage({ orderId }: { orderId: string }) {
+export default function EstadoOrdenPagoPage({ orderId, attemptId }: { orderId: string; attemptId?: string }) {
     const router = useRouter();
     const clearSession = useSessionStore((state) => state.clearSession);
 
@@ -41,7 +41,10 @@ export default function EstadoOrdenPagoPage({ orderId }: { orderId: string }) {
     // Consultas hechas desde la última vez que el usuario pidió consultar.
     const [consultas, setConsultas] = useState(0);
     const [intento, setIntento] = useState(0);
-    const [cargandoComprobante, setCargandoComprobante] = useState<AccionComprobante | null>(null);
+    const [checkout, setCheckout] = useState<NeoPayCheckout | null>(null);
+    const [continuingThreeDs, setContinuingThreeDs] = useState(false);
+    const [receipt, setReceipt] = useState<PaymentReceiptStatus | null>(null);
+    const [cargandoComprobante, setCargandoComprobante] = useState(false);
     const [errorComprobante, setErrorComprobante] = useState("");
 
     // 401 del backend: la sesión venció o fue revocada; se limpia y se vuelve al login.
@@ -81,6 +84,17 @@ export default function EstadoOrdenPagoPage({ orderId }: { orderId: string }) {
         };
     }, [orderId, intento, irAlLoginPorSesionVencida]);
 
+    useEffect(() => {
+        if (!attemptId) return;
+        let cancelled = false;
+        fetchNeoPayCheckout(orderId, attemptId).then((result) => {
+            if (!cancelled) setCheckout(result);
+        }).catch((err) => {
+            if (!cancelled) setError({ mensaje: err instanceof Error ? err.message : "No se pudo consultar el intento de pago.", noEncontrada: false });
+        });
+        return () => { cancelled = true; };
+    }, [orderId, attemptId]);
+
     const estado = orden ? estadoVisualOrden(orden.status, consultas) : null;
 
     // Pago en proceso: se vuelve a consultar sola hasta CONSULTAS_AUTOMATICAS veces.
@@ -90,45 +104,37 @@ export default function EstadoOrdenPagoPage({ orderId }: { orderId: string }) {
         return () => clearTimeout(id);
     }, [estado, consultando, error]);
 
-    /**
-     * El PDF se pide al endpoint autenticado cada vez y se usa como Blob. Para "ver", la
-     * pestaña se abre antes de la petición: si se abre después de esperar, el navegador la
-     * bloquea como ventana emergente.
-     */
-    const abrirComprobante = async (accion: AccionComprobante) => {
+    const consultarComprobante = async () => {
         if (cargandoComprobante) return;
         setErrorComprobante("");
-        setCargandoComprobante(accion);
-        const pestana = accion === "ver" ? window.open("", "_blank") : null;
-        if (accion === "ver" && !pestana) {
-            setErrorComprobante("El navegador bloqueó la nueva pestaña. Permite las ventanas emergentes o descarga el comprobante.");
-            setCargandoComprobante(null);
-            return;
-        }
-
+        setCargandoComprobante(true);
         try {
-            const { blob, fileName } = await fetchPaymentReceipt(orderId);
-            const url = URL.createObjectURL(blob);
-            if (pestana) {
-                pestana.location.href = url;
-            } else {
-                const enlace = document.createElement("a");
-                enlace.href = url;
-                enlace.download = fileName;
-                enlace.click();
-            }
-            window.setTimeout(() => URL.revokeObjectURL(url), LIBERAR_URL_MS);
+            setReceipt(await fetchPaymentReceipt(orderId));
         } catch (err) {
-            pestana?.close();
             if (isSesionVencidaOrden(err)) {
                 irAlLoginPorSesionVencida();
                 return;
             }
             setErrorComprobante(err instanceof Error ? err.message : "No se pudo cargar el comprobante. Intenta más tarde");
         } finally {
-            setCargandoComprobante(null);
+            setCargandoComprobante(false);
         }
     };
+
+    const completeThreeDs = useCallback(async () => {
+        if (!attemptId || continuingThreeDs) return;
+        setContinuingThreeDs(true);
+        setError(null);
+        try {
+            const result = await continueNeoPayCheckout(orderId, attemptId);
+            setCheckout(result);
+            if (!result.nextAction) setIntento((value) => value + 1);
+        } catch (err) {
+            setError({ mensaje: err instanceof Error ? err.message : "No se pudo continuar la verificación 3DS.", noEncontrada: false });
+        } finally {
+            setContinuingThreeDs(false);
+        }
+    }, [attemptId, continuingThreeDs, orderId]);
 
     const consultarDeNuevo = () => {
         setConsultas(0);
@@ -153,6 +159,11 @@ export default function EstadoOrdenPagoPage({ orderId }: { orderId: string }) {
         ) : (
             <LoadingSpinner variant="inline" />
         );
+    } else if (checkout?.nextAction) {
+        contenido = <>
+            <h2 className={styles.titulo}>Verificación de seguridad</h2>
+            <NeoPayThreeDsFrame action={checkout.nextAction} continuing={continuingThreeDs} onComplete={completeThreeDs} />
+        </>;
     } else {
         const resumen = (
             <dl className={styles.resumen}>
@@ -173,7 +184,6 @@ export default function EstadoOrdenPagoPage({ orderId }: { orderId: string }) {
                         Falta completar el pago
                         {orden.expiresAt ? ` antes del ${formatearFechaCobro(orden.expiresAt)}` : ""}.
                     </Text>
-                    {/* TODO [CASILLERO-BACKEND] (pieza F): botón para pagar con Neonet (checkout). */}
                     {volverAMultas}
                     </>
                 );
@@ -207,14 +217,7 @@ export default function EstadoOrdenPagoPage({ orderId }: { orderId: string }) {
                     <>
                     <h2 className={styles.titulo}>Pago confirmado</h2>
                     {resumen}
-                    <div className={styles.acciones}>
-                        <Button variant="outline" onClick={() => abrirComprobante("ver")} disabled={cargandoComprobante !== null}>
-                            {cargandoComprobante === "ver" ? "Cargando..." : "Ver comprobante"}
-                        </Button>
-                        <Button variant="success" onClick={() => abrirComprobante("descargar")} disabled={cargandoComprobante !== null}>
-                            {cargandoComprobante === "descargar" ? "Descargando..." : "Descargar comprobante"}
-                        </Button>
-                    </div>
+                    {receipt?.receiptNumber ? <div className={styles.receipt}><span>Comprobante 7B1</span><strong>{receipt.receiptNumber}</strong></div> : <Button variant="success" onClick={consultarComprobante} disabled={cargandoComprobante}>{cargandoComprobante ? "Consultando..." : "Consultar comprobante 7B1"}</Button>}
                     {errorComprobante && <Text variant="Medium">{errorComprobante}</Text>}
                     {volverAMultas}
                     </>
@@ -240,6 +243,7 @@ export default function EstadoOrdenPagoPage({ orderId }: { orderId: string }) {
         <CardGeneral padding="lg" className={styles.card}>
             <div className={styles.estado} aria-live="polite">
                 {contenido}
+                {orden && error ? <Text variant="Medium">{error.mensaje}</Text> : null}
             </div>
         </CardGeneral>
         </>

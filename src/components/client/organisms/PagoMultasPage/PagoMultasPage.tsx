@@ -3,10 +3,10 @@
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import FinesSummaryCard from "@/components/client/molecules/FinesSummaryCard/FinesSummaryCard";
-import CardPaymentForm from "@/components/client/molecules/CardPaymentForm/CardPaymentForm";
+import CardPaymentForm, { type CardPaymentData } from "@/components/client/molecules/CardPaymentForm/CardPaymentForm";
 import { Text } from "@/components/atoms/Text";
 import { createIdempotencyKey } from "@/lib/casillero/api";
-import { createPaymentOrder, isSesionVencidaOrden } from "@/lib/casillero/paymentOrders";
+import { createPaymentOrder, isSesionVencidaOrden, startNeoPayCheckout } from "@/lib/casillero/paymentOrders";
 import { useSessionStore } from "@/store/useSessionStore";
 import styles from "./PagoMultasPage.module.scss";
 import { useSelectedFinesStore } from "@/store/useSelectedFineStore";
@@ -23,6 +23,7 @@ export default function PagoMultasPage() {
 
     // Misma llave para los reintentos de un mismo pago; cambia si cambian los cobros.
     const llavePago = useRef<{ ids: string; key: string } | null>(null);
+    const llaveCheckout = useRef<string | null>(null);
 
     useEffect(() => {
         if (selected.length === 0 && !ordenCreada.current) {
@@ -30,10 +31,7 @@ export default function PagoMultasPage() {
         }
     }, [selected, router]);
 
-    // TODO [CASILLERO-BACKEND] (pieza F): los datos de la tarjeta no se envían. Falta saber
-    // con Jenny si el pago se hace en la página de Neonet (entonces este formulario sobra)
-    // o en el portal; por ahora "Pagar" solo crea la orden.
-    const handlePagar = async () => {
+    const handlePagar = async (cardData: CardPaymentData) => {
         if (loading) return;
         setLoading(true);
         setError("");
@@ -44,9 +42,22 @@ export default function PagoMultasPage() {
         }
         try {
             const orden = await createPaymentOrder(ids, llavePago.current.key);
+            const expiry = /^(\d{2})\/(\d{2})$/.exec(cardData.expiracion.trim());
+            if (!expiry) throw new Error("Ingresa el vencimiento con formato MM/YY.");
+            llaveCheckout.current ??= createIdempotencyKey();
+            const checkout = await startNeoPayCheckout(orden.id, {
+                card: { number: cardData.numero, expiration: `${expiry[2]}${expiry[1]}`, cvv: cardData.cvv },
+                billTo: {
+                    firstName: cardData.firstName, lastName: cardData.lastName,
+                    addressOne: cardData.addressOne, addressTwo: cardData.addressTwo || undefined,
+                    locality: cardData.locality, administrativeArea: cardData.administrativeArea,
+                    postalCode: cardData.postalCode, country: cardData.country,
+                    email: cardData.email, phoneNumber: cardData.phoneNumber,
+                },
+            }, llaveCheckout.current);
             ordenCreada.current = true;
             clear();
-            router.push(`/casillero/dashboard/multas/orden/${encodeURIComponent(orden.id)}`);
+            router.push(`/casillero/dashboard/multas/orden/${encodeURIComponent(orden.id)}?attempt=${encodeURIComponent(checkout.attemptId)}`);
         } catch (err) {
             if (isSesionVencidaOrden(err)) {
                 clearSession();

@@ -1,5 +1,4 @@
 import { getCasilleroJson } from "./api";
-import { fileNameFromContentDisposition } from "./notifications";
 import type {
     CasilleroCreatePaymentOrderRequest,
     CasilleroPaymentOrder,
@@ -19,6 +18,28 @@ export class CasilleroPaymentOrderError extends Error {
 }
 
 const SESION_VENCIDA = "Tu sesión venció. Vuelve a iniciar sesión";
+
+type PaymentOrderApi = {
+    id: string; status: string; currency: string; subtotal: string; total: string;
+    createdAt: string; expiresAt: string;
+    items: Array<{ obligationId: string }>;
+};
+
+export type NeoPayCheckoutInput = {
+    card: { number: string; expiration: string; cvv: string };
+    billTo: {
+        firstName: string; lastName: string; addressOne: string; addressTwo?: string;
+        locality: string; administrativeArea: string; postalCode: string;
+        country: string; email: string; phoneNumber: string;
+    };
+};
+
+export type NeoPayCheckout = {
+    orderId: string; attemptId: string; attemptNumber: number; status: string; provider: "NEONET";
+    nextAction: { kind: "DEVICE_DATA" | "CHALLENGE"; url: string; accessToken: string } | null;
+};
+
+export type PaymentReceiptStatus = { orderId: string; status: "PENDIENTE" | "FALLIDA" | "COMPLETADA"; receiptNumber: string | null };
 
 export const isSesionVencidaOrden = (error: unknown): boolean =>
     error instanceof CasilleroPaymentOrderError && error.status === 401;
@@ -58,7 +79,7 @@ export async function createPaymentOrder(
         throw errorFromCreateStatus(response.status);
     }
 
-    return response.json() as Promise<CasilleroPaymentOrder>;
+    return normalizeOrder(await response.json() as PaymentOrderApi);
 }
 
 // ── CONSULTAR ORDEN ───────────────────────────────────────────────────────
@@ -72,10 +93,51 @@ function errorFromOrderStatus(status: number): Error {
 }
 
 export async function fetchPaymentOrder(id: string): Promise<CasilleroPaymentOrder> {
-    return getCasilleroJson<CasilleroPaymentOrder>(
+    const order = await getCasilleroJson<PaymentOrderApi>(
         `/api/casillero/payment-orders/${encodeURIComponent(id)}`,
         errorFromOrderStatus
     );
+    return normalizeOrder(order);
+}
+
+function normalizeOrder(order: PaymentOrderApi): CasilleroPaymentOrder {
+    const status: CasilleroPaymentOrderStatus = order.status === "PENDIENTE" || order.status === "PENDIENTE_PASARELA"
+        ? "EN_PROCESO"
+        : order.status === "PROCESANDO" || order.status === "INCIDENTE" ? "EN_PROCESO"
+        : order.status === "COMPLETADA" ? "CONFIRMADA"
+        : order.status === "EXPIRADA" ? "VENCIDA"
+        : order.status === "FALLIDA" ? "RECHAZADA"
+        : order.status as CasilleroPaymentOrderStatus;
+    return {
+        id: order.id, status, totalAmount: Number(order.total),
+        obligationIds: order.items.map((item) => item.obligationId),
+        createdAt: order.createdAt, expiresAt: order.expiresAt,
+    };
+}
+
+async function checkoutRequest(path: string, init?: RequestInit): Promise<NeoPayCheckout> {
+    const response = await fetch(path, { ...init, cache: "no-store", headers: { Accept: "application/json", ...init?.headers } });
+    if (!response.ok) {
+        const body = await response.json().catch(() => null) as { message?: string; detail?: string } | null;
+        throw new CasilleroPaymentOrderError(body?.detail || body?.message || "No se pudo procesar el pago.", response.status);
+    }
+    return response.json() as Promise<NeoPayCheckout>;
+}
+
+export function startNeoPayCheckout(orderId: string, input: NeoPayCheckoutInput, idempotencyKey: string): Promise<NeoPayCheckout> {
+    return checkoutRequest(`/api/casillero/payment-orders/${encodeURIComponent(orderId)}/checkout`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "Idempotency-Key": idempotencyKey },
+        body: JSON.stringify(input),
+    });
+}
+
+export function fetchNeoPayCheckout(orderId: string, attemptId: string): Promise<NeoPayCheckout> {
+    return checkoutRequest(`/api/casillero/payment-orders/${encodeURIComponent(orderId)}/checkout/${encodeURIComponent(attemptId)}`);
+}
+
+export function continueNeoPayCheckout(orderId: string, attemptId: string): Promise<NeoPayCheckout> {
+    return checkoutRequest(`/api/casillero/payment-orders/${encodeURIComponent(orderId)}/checkout/${encodeURIComponent(attemptId)}`, { method: "POST" });
 }
 
 // ── COMPROBANTE ───────────────────────────────────────────────────────────
@@ -88,37 +150,17 @@ function errorFromReceiptStatus(status: number): Error {
     return new CasilleroPaymentOrderError(message, status);
 }
 
-export type CasilleroPaymentReceipt = {
-    blob: Blob;
-    fileName: string;
-};
-
-/**
- * Pide el PDF del comprobante al endpoint autenticado (cada vez; no hay URL pública).
- * Devuelve el Blob para mostrarlo o descargarlo desde el navegador.
- */
-export async function fetchPaymentReceipt(id: string): Promise<CasilleroPaymentReceipt> {
+export async function fetchPaymentReceipt(id: string): Promise<PaymentReceiptStatus> {
     const response = await fetch(
         `/api/casillero/payment-orders/${encodeURIComponent(id)}/receipt`,
-        { method: "GET", headers: { Accept: "application/pdf" }, cache: "no-store" }
+        { method: "GET", headers: { Accept: "application/json" }, cache: "no-store" }
     );
 
     if (!response.ok) {
         throw errorFromReceiptStatus(response.status);
     }
 
-    const contentType = response.headers.get("content-type") ?? "";
-    if (!contentType.toLowerCase().includes("application/pdf")) {
-        throw new CasilleroPaymentOrderError("El comprobante recibido no es un PDF válido", response.status);
-    }
-
-    return {
-        blob: await response.blob(),
-        fileName: fileNameFromContentDisposition(
-            response.headers.get("content-disposition"),
-            `comprobante-${id}.pdf`
-        ),
-    };
+    return response.json() as Promise<PaymentReceiptStatus>;
 }
 
 // ── CÓMO SE MUESTRA EL ESTADO ─────────────────────────────────────────────

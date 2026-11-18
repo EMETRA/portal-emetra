@@ -1,26 +1,41 @@
 "use client";
 
-import { useState } from "react";
+import { useState, type FormEvent } from "react";
 import styles from "./CardPaymentForm.module.scss";
 import SecurityLogos from "../../atoms/SecurityLogos/SecurityLogos";
 
+export type CardPaymentData = {
+        firstName: string; lastName: string; numero: string; expiracion: string; cvv: string;
+        addressOne: string; addressTwo: string; locality: string; administrativeArea: string;
+        postalCode: string; country: string; email: string; phoneNumber: string;
+};
+
 interface CardPaymentFormProps {
-    onPagar: (data: { nombre: string; numero: string; expiracion: string; cvv: string }) => void;
+    onPagar: (data: CardPaymentData) => void;
     loading?: boolean;
 }
 
 export default function CardPaymentForm({ onPagar, loading }: CardPaymentFormProps) {
-    const [nombre, setNombre] = useState("");
+    const [firstName, setFirstName] = useState("");
+    const [lastName, setLastName] = useState("");
     const [numero, setNumero] = useState("");
     const [expiracion, setExpiracion] = useState("");
     const [cvv, setCvv] = useState("");
 
-    const handleSubmit = () => {
-        onPagar({ nombre, numero, expiracion, cvv });
+    const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
+        event.preventDefault();
+        const form = new FormData(event.currentTarget);
+        onPagar({
+            firstName, lastName, numero: numero.replace(/\s/g, ""), expiracion, cvv,
+            addressOne: String(form.get("addressOne") ?? ""), addressTwo: String(form.get("addressTwo") ?? ""),
+            locality: String(form.get("locality") ?? ""), administrativeArea: String(form.get("administrativeArea") ?? "").toUpperCase(),
+            postalCode: String(form.get("postalCode") ?? ""), country: String(form.get("country") ?? "GT").toUpperCase(),
+            email: String(form.get("email") ?? ""), phoneNumber: String(form.get("phoneNumber") ?? "").replace(/\D/g, ""),
+        });
     };
 
     return (
-        <div className={styles.card}>
+        <form className={styles.card} onSubmit={handleSubmit}>
         <h2 className={styles.title}>DATOS DE LA TARJETA</h2>
 
         <div className={styles.field}>
@@ -29,9 +44,15 @@ export default function CardPaymentForm({ onPagar, loading }: CardPaymentFormPro
             type="text"
             className={styles.input}
             placeholder="Nombre en la tarjeta"
-            value={nombre}
-            onChange={(e) => setNombre(e.target.value)}
+            value={firstName}
+            onChange={(e) => setFirstName(e.target.value)}
+            required
             />
+        </div>
+
+        <div className={styles.field}>
+            <label className={styles.label}>Apellido:</label>
+            <input type="text" className={styles.input} value={lastName} onChange={(e) => setLastName(e.target.value)} required />
         </div>
 
         <div className={styles.field}>
@@ -43,6 +64,8 @@ export default function CardPaymentForm({ onPagar, loading }: CardPaymentFormPro
             maxLength={19}
             value={numero}
             onChange={(e) => setNumero(e.target.value)}
+            inputMode="numeric"
+            required
             />
         </div>
 
@@ -56,6 +79,7 @@ export default function CardPaymentForm({ onPagar, loading }: CardPaymentFormPro
                 maxLength={5}
                 value={expiracion}
                 onChange={(e) => setExpiracion(e.target.value)}
+                required
             />
             </div>
             <div className={styles.field}>
@@ -67,6 +91,8 @@ export default function CardPaymentForm({ onPagar, loading }: CardPaymentFormPro
                 maxLength={4}
                 value={cvv}
                 onChange={(e) => setCvv(e.target.value)}
+                inputMode="numeric"
+                required
             />
             </div>
         </div>
@@ -106,14 +132,29 @@ export default function CardPaymentForm({ onPagar, loading }: CardPaymentFormPro
 
         <SecurityLogos />
 
+        <h2 className={styles.title}>DATOS DE FACTURACIÓN</h2>
+        <div className={styles.field}><label className={styles.label}>Dirección:</label><input name="addressOne" className={styles.input} required /></div>
+        <div className={styles.field}><label className={styles.label}>Complemento de dirección (opcional):</label><input name="addressTwo" className={styles.input} /></div>
+        <div className={styles.row}>
+            <div className={styles.field}><label className={styles.label}>Municipio/Ciudad:</label><input name="locality" className={styles.input} required /></div>
+            <div className={styles.field}><label className={styles.label}>Departamento:</label><input name="administrativeArea" className={styles.input} maxLength={2} placeholder="GT" required /></div>
+        </div>
+        <div className={styles.row}>
+            <div className={styles.field}><label className={styles.label}>Código postal:</label><input name="postalCode" className={styles.input} maxLength={10} required /></div>
+            <div className={styles.field}><label className={styles.label}>País:</label><input name="country" className={styles.input} defaultValue="GT" maxLength={2} required /></div>
+        </div>
+        <div className={styles.row}>
+            <div className={styles.field}><label className={styles.label}>Correo:</label><input name="email" type="email" className={styles.input} required /></div>
+            <div className={styles.field}><label className={styles.label}>Teléfono:</label><input name="phoneNumber" inputMode="tel" className={styles.input} placeholder="50255555555" required /></div>
+        </div>
+
         <button
-            type="button"
+            type="submit"
             className={styles.payButton}
-            onClick={handleSubmit}
             disabled={loading}
         >
             {loading ? "Procesando..." : "PAGAR"}
         </button>
-        </div>
+        </form>
     );
 }

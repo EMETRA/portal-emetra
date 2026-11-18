@@ -254,7 +254,7 @@ function conVigenciaActual(obligacion: CasilleroObligation): CasilleroObligation
 export function obligacionSimulada(id: string): CasilleroObligationDetail | null {
   for (const items of Object.values(obligacionesPorVehiculo)) {
     const obligacion = items.find((item) => item.id === id);
-    if (obligacion) return conVigenciaActual(obligacion);
+    if (obligacion) return { ...conVigenciaActual(obligacion), remissionDetail: null };
   }
   return null;
 }

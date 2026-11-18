@@ -7,7 +7,6 @@ import FineDetailHeader from "@/components/client/organisms/FineDetailHeader/Fin
 import InfoCard from "@/components/client/molecules/InfoCard/InfoCard";
 import InfoField from "../../atoms/InfoField/InfoField";
 import PendienteApi from "../../atoms/PendienteApi/PendienteApi";
-import EvidenceModal from "@/components/client/organisms/EvidenceModal/EvidenceModal";
 import { DATOS_DE_EJEMPLO } from "@/lib/casillero/datosDeEjemplo";
 import { Button } from "@/components/server/atoms";
 import { LoadingSpinner } from "@/components/server/atoms/LoadingSpinner";
@@ -29,11 +28,7 @@ import { useSessionStore } from "@/store/useSessionStore";
 import { useSelectedFinesStore } from "@/store/useSelectedFineStore";
 
 /*
-  TODO [CASILLERO-BACKEND]: el detalle de la API de Cobros trae concepto, tipo de cobro,
-  montos (base, recargo, descuento, total), fechas (emisión, consulta, validUntil) y si se
-  puede pagar, además de serie y número. Lugar, artículo, numeral, evidencia, conductor, licencia,
-  persona notificada, impugnación, última fecha de pago y descripción larga se muestran con
-  datos de ejemplo (PendienteApi) hasta saber si vendrán y con qué nombres.
+  La evidencia, persona notificada, impugnación y última fecha de pago siguen pendientes.
   `validUntil` NO es la última fecha de pago: es hasta cuándo vale el monto calculado
   (Daniel, 2026-11-11), por eso no se usa en ese campo.
 */
@@ -46,7 +41,6 @@ export default function FineDetailPage({ fineId }: { fineId: string }) {
     const [detalle, setDetalle] = useState<CasilleroObligationDetail | null>(null);
     const [error, setError] = useState<{ mensaje: string; noEncontrado: boolean } | null>(null);
     const [intento, setIntento] = useState(0);
-    const [isModalOpen, setIsModalOpen] = useState(false);
 
     // 401 del backend: la sesión venció o fue revocada; se limpia y se vuelve al login.
     const irAlLoginPorSesionVencida = useCallback(() => {
@@ -129,6 +123,8 @@ export default function FineDetailPage({ fineId }: { fineId: string }) {
 
     const fine = obligacionAMulta(detalle);
     const pagable = esCobroPagable(fine);
+    const remision = detalle.remissionDetail;
+    const primeraRegla = remision?.violations?.[0];
 
     const handlePayThis = () => {
         if (!pagable) return;
@@ -155,40 +151,38 @@ export default function FineDetailPage({ fineId }: { fineId: string }) {
             }
             unavailableReason={fine.unavailableReason}
             description={fine.description}
-            date={formatearFechaLargaCobro(detalle.issuedAt) || undefined}
+            date={formatearFechaLargaCobro(remision?.occurredAt ?? detalle.issuedAt) || undefined}
+            location={remision?.location ?? undefined}
+            article={primeraRegla?.article}
+            numeral={primeraRegla?.numeral ?? undefined}
             onPayThis={handlePayThis}
             canPay={pagable}
-            onVerImagen={() => setIsModalOpen(true)}
-            evidenciaDeEjemplo
         />
 
         <div className={styles.infoGrid}>
             <InfoCard title="Información Adicional" icon="idCard">
-            <InfoField label="Conductor" value={<PendienteApi campo="conductor" ejemplo={EJEMPLO.conductor} />} />
-            <InfoField label="Licencia" value={<PendienteApi campo="licencia" ejemplo={EJEMPLO.licencia} />} />
-            <InfoField label="Tipo de licencia" value={<PendienteApi campo="tipo de licencia" ejemplo={EJEMPLO.tipoLicencia} />} />
+            <InfoField label="Conductor" value={remision?.driverName ?? <PendienteApi campo="conductor" />} />
+            <InfoField label="Licencia" value={remision?.licenseNumber ?? <PendienteApi campo="licencia" />} />
+            <InfoField label="Tipo de licencia" value={remision?.licenseType ?? <PendienteApi campo="tipo de licencia" />} />
             </InfoCard>
 
             <InfoCard title="Información Legal" icon="legal">
-            <InfoField label="Persona notificada" value={<PendienteApi campo="persona notificada" ejemplo={EJEMPLO.personaNotificada} />} />
+            <InfoField label="Persona notificada" value={remision?.notifiedPerson ?? <PendienteApi campo="persona notificada" />} />
             <InfoField label="Fecha de impugnación" value={<PendienteApi campo="fecha de impugnación" ejemplo={EJEMPLO.fechaImpugnacion} />} />
-            <InfoField label="Última fecha de pago" value={<PendienteApi campo="última fecha de pago" ejemplo={EJEMPLO.ultimaFechaPago} />} />
+            <InfoField
+                label="Última fecha para pagar"
+                value={
+                    remision?.paymentDeadline
+                        ? formatearFechaLargaCobro(remision.paymentDeadline)
+                        : <PendienteApi campo="última fecha para pagar" />
+                }
+            />
             </InfoCard>
         </div>
 
         <InfoCard title="Descripción" icon="document" className={styles.descriptionCard}>
-            <p className={styles.descriptionText}><PendienteApi campo="descripción" ejemplo={EJEMPLO.descripcion} /></p>
+            <p className={styles.descriptionText}>{remision?.observations ?? <PendienteApi campo="descripción" />}</p>
         </InfoCard>
-
-        {/* TODO [CASILLERO-BACKEND]: imagen y descargas de ejemplo hasta que la API mande la evidencia. */}
-        <EvidenceModal
-            isOpen={isModalOpen}
-            onClose={() => setIsModalOpen(false)}
-            imageUrl={EJEMPLO.evidenciaUrl}
-            onDownloadImage={() => {}}
-            onDownloadNotificacion={() => {}}
-            onDownloadRemisionPdf={() => {}}
-        />
         </>
     );
 }

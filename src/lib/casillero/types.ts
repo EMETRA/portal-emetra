@@ -406,8 +406,36 @@ export type CasilleroObligationList = {
   nextCursor?: string | null;
 };
 
-/** GET /v1/obligations/{id}: mismos campos que el listado. Ajena o inexistente = 404. */
-export type CasilleroObligationDetail = CasilleroObligation;
+export type CasilleroRemissionViolation = {
+  article: string;
+  numeral: string | null;
+  amount: CasilleroMonto | null;
+};
+
+export type CasilleroRemissionDetail = {
+  occurredAt: string | null;
+  paymentDeadline: string | null;
+  location: string | null;
+  observations: string | null;
+  notifiedPerson: string | null;
+  notifiedAt: string | null;
+  driverName: string | null;
+  licenseNumber: string | null;
+  licenseType: string | null;
+  plate: string | null;
+  brand: string | null;
+  color: string | null;
+  model: string | null;
+  chassis: string | null;
+  vin: string | null;
+  agentNumber: string | null;
+  violations: CasilleroRemissionViolation[];
+};
+
+/** GET /v1/obligations/{id}: agrega el detalle legacy cuando el cobro es una remisión EMT. */
+export type CasilleroObligationDetail = CasilleroObligation & {
+  remissionDetail: CasilleroRemissionDetail | null;
+};
 
 /*
   Órdenes de pago (CAS-132)

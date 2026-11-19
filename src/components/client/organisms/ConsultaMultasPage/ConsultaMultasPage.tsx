@@ -42,6 +42,11 @@ export default function ConsultaMultasPage() {
     const clearSelectedFines = useSelectedFinesStore((state) => state.clear);
     const syncSelectedFines = useSelectedFinesStore((state) => state.sync);
 
+    // La selección solo vive durante la visita actual a esta pantalla.
+    useEffect(() => {
+        clearSelectedFines();
+    }, [clearSelectedFines]);
+
     // "todas" o un tipo de cobro (texto libre de la API).
     const [filter, setFilter] = useState<string>("todas");
 

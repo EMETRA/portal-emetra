@@ -7,6 +7,8 @@ import { Text } from "@/components/atoms/Text";
 import { Button } from "@/components/server/atoms";
 import {
     CasilleroNotificationError,
+    asuntoNotificacion,
+    descripcionNotificacion,
     fetchNotificationDetail,
     fetchNotificationDocument,
     formatearFechaNotificacion,
@@ -86,7 +88,10 @@ export const CasilleroNotificationModal = ({
 
         fetchNotificationDetail(id)
             .then((detalle) => {
-                if (!cancelado) setNotification(detalle);
+                if (!cancelado) {
+                    setNotification(detalle);
+                    window.dispatchEvent(new Event("notifications-updated"));
+                }
             })
             .catch((err) => {
                 if (cancelado) return;
@@ -116,7 +121,7 @@ export const CasilleroNotificationModal = ({
                         <div className={styles.header}>
                             <div className={styles.detailsWrapper}>
                                 <h2 className={styles.title}>
-                                    {notification.subject}
+                                    {asuntoNotificacion(notification)}
                                 </h2>
                                 <div className={styles.dateTimeWrapper}>
                                     <Text variant="Small" className={styles.date}>
@@ -134,7 +139,7 @@ export const CasilleroNotificationModal = ({
 
                         <div className={styles.descriptionWrapper}>
                             <Text variant="Medium" className={styles.description}>
-                                {notification.content || notification.summary}
+                                {descripcionNotificacion(notification)}
                             </Text>
                         </div>
 

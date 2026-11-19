@@ -7,10 +7,8 @@ import type {
 } from "@/lib/casillero/types";
 
 /**
- * TODO [CASILLERO-BACKEND]: simulación del buzón mientras no existan los endpoints
- * /v1/notifications (los tiene Rudy). true = las rutas del BFF del buzón responden con
- * datos de prueba sin llamar al backend; igual exigen la cookie de sesión (401 sin ella).
- * Debe quedar en false en lo que se sube.
+ * Simulación conservada únicamente para desarrollo aislado. En el flujo integrado
+ * permanece en false y las rutas del BFF consultan /v1/notifications.
  *
  * Casos: cada cuarta notificación no tiene documento (404 al pedirlo) y un id que no
  * existe responde 404, como propuso backend para no revelar notificaciones ajenas.
@@ -28,15 +26,22 @@ const notificacionesSimuladas: CasilleroNotificationDetail[] = Array.from(
     const emitida = new Date(Date.UTC(2026, 9, 14, 15, 0) - index * 26 * 60 * 60 * 1000);
     return {
       id: `notif-${numero}`,
-      subject: `Notificación simulada ${numero}`,
-      summary: `Resumen de la notificación simulada ${numero}.`,
-      status: index < 5 ? "NO_LEIDA" : "LEIDA",
+      status: index < 5 ? "DISPONIBLE" : "NOTIFICADA",
+      remission: { city: 1, series: "A", number: String(numero) },
       issuedAt: emitida.toISOString(),
-      context: "PERSONAL",
+      availableAt: emitida.toISOString(),
       hasDocument: numero % 4 !== 0,
-      content:
-        `Contenido de la notificación simulada ${numero}. ` +
-        "Este texto reemplaza al detalle que enviará el backend.",
+      recipient: { name: "Persona de prueba", nit: "1234567K" },
+      obligations: [{ order: 1, amount: "100" }],
+      document:
+        numero % 4 !== 0
+          ? {
+              version: 1,
+              mime: "application/pdf",
+              sizeBytes: 1,
+              generatedAt: emitida.toISOString(),
+            }
+          : undefined,
     };
   }
 );
@@ -54,11 +59,11 @@ export function noEncontradaSimulada(): NextResponse {
 
 const sinContenido = (detalle: CasilleroNotificationDetail): CasilleroNotificationItem => ({
   id: detalle.id,
-  subject: detalle.subject,
-  summary: detalle.summary,
   status: detalle.status,
+  remission: detalle.remission,
   issuedAt: detalle.issuedAt,
-  context: detalle.context,
+  availableAt: detalle.availableAt,
+  legalNotificationAt: detalle.legalNotificationAt,
   hasDocument: detalle.hasDocument,
 });
 

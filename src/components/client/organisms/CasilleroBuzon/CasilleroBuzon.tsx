@@ -21,15 +21,24 @@ import { CasilleroNotification } from '@/components/client/molecules/CasilleroNo
 import { CasilleroPopUp } from "@/components/client/molecules/CasilleroPopUp";
 import {
   fetchNotifications,
+  asuntoNotificacion,
   formatearFechaNotificacion,
   formatearHoraNotificacion,
+  isNewNotification,
   isSesionVencida,
 } from "@/lib/casillero/notifications";
-import type { CasilleroNotificationList } from "@/lib/casillero/types";
+import { fetchMyContacts } from "@/lib/casillero/api";
+import type { CasilleroContact, CasilleroNotificationList } from "@/lib/casillero/types";
+import {
+  changeWhatsAppSubscription,
+  createWhatsAppSubscription,
+  fetchWhatsAppSubscriptions,
+  WhatsAppSubscriptionError,
+  type WhatsAppSubscription,
+} from "@/lib/casillero/whatsappSubscriptions";
+import { useCasilleroProfileStore } from "@/store/useCasilleroProfileStore";
 import { useSessionStore } from "@/store/useSessionStore";
 import styles from "./CasilleroBuzon.module.scss";
-
-const cellphoneMuck = "1234-5678"
 
 const NOTIFICACIONES_POR_PAGINA = 20;
 const COLUMNAS = 3;
@@ -96,27 +105,101 @@ export default function CasilleroBuzon() {
   const mostrarPaginacion = !error && (pagina > 0 || hayMasPaginas);
 
   const [whatsappSuscription, setWhatsappSuscription] = useState(false);
+  const [whatsappSubscription, setWhatsappSubscription] = useState<WhatsAppSubscription | null>(null);
+  const [whatsappPhone, setWhatsappPhone] = useState<CasilleroContact | null>(null);
+  const [whatsappLoading, setWhatsappLoading] = useState(true);
+  const [whatsappSaving, setWhatsappSaving] = useState(false);
+  const [whatsappError, setWhatsappError] = useState("");
+  const [desiredWhatsappState, setDesiredWhatsappState] = useState<boolean | null>(null);
   const [selectedNotification, setSelectedNotification] = useState<string | undefined>(undefined);
 
   const [isPopUpOpen, setIsPopUpOpen] = useState(false);
   const [whatsAppModalTitle, setWhatsAppModalTitle] = useState("");
   const [whatsAppModalDescription, setWhatsAppModalDescription] = useState("");
 
+  useEffect(() => {
+    let cancelled = false;
+    setWhatsappLoading(true);
+    Promise.all([
+      useCasilleroProfileStore.getState().load(),
+      fetchMyContacts(),
+      fetchWhatsAppSubscriptions(),
+    ])
+      .then(([profile, contacts, subscriptions]) => {
+        if (cancelled) return;
+        if (profile.currentContext.type !== "PERSONAL") {
+          setWhatsappError("La suscripción de WhatsApp está disponible únicamente en el contexto personal.");
+          return;
+        }
+        const phones = (contacts.items ?? []).filter(
+          (contact) => contact.type === "PHONE" && contact.status === "ACTIVE" && contact.verified
+        );
+        const phone = phones.find((contact) => contact.primary) ?? phones[0] ?? null;
+        const current = subscriptions.find((subscription) =>
+          ["PENDING", "ACTIVE", "PAUSED"].includes(subscription.status)
+        ) ?? null;
+        setWhatsappPhone(phone);
+        setWhatsappSubscription(current);
+        setWhatsappSuscription(current?.status === "PENDING" || current?.status === "ACTIVE");
+        setWhatsappError(phone ? "" : "Necesitas un teléfono activo y verificado para activar WhatsApp.");
+      })
+      .catch((err) => {
+        if (cancelled) return;
+        if (err instanceof WhatsAppSubscriptionError && err.status === 401) {
+          irAlLoginPorSesionVencida();
+          return;
+        }
+        setWhatsappError(err instanceof Error ? err.message : "No se pudo consultar la suscripción de WhatsApp.");
+      })
+      .finally(() => {
+        if (!cancelled) setWhatsappLoading(false);
+      });
+    return () => { cancelled = true; };
+  }, [irAlLoginPorSesionVencida]);
+
 
   const handleSuscriptionToggle = (checked: boolean) => {
+    if (whatsappLoading || whatsappSaving || (!whatsappPhone && checked)) return;
+    setDesiredWhatsappState(checked);
     if (checked) {
       setWhatsAppModalTitle("Recibir notificaciones a mi WhatsApp")
-      setWhatsAppModalDescription(`¿Estás seguro de recibir las notificaciones a tu número ${cellphoneMuck}?
+      setWhatsAppModalDescription(`¿Estás seguro de recibir las notificaciones a tu número ${whatsappPhone?.value ?? "verificado"}?
                     \nPodrás desuscribirte en cualquier momento.
                     \nNo se realizará ningún cobro por este servicio de mensajería.`)
     } else {
       setWhatsAppModalTitle("Dejar de recibir notificaciones a mi WhatsApp")
-      setWhatsAppModalDescription(`¿Estás seguro de CANCELAR las notificaciones a tu número ${cellphoneMuck}?
+      setWhatsAppModalDescription(`¿Estás seguro de CANCELAR las notificaciones a tu número ${whatsappPhone?.value ?? "verificado"}?
                     \nPodrás suscribirte de nuevo en cualquier momento.`)
     }
 
     setIsPopUpOpen(true);
   }
+
+  const confirmWhatsappChange = async () => {
+    if (desiredWhatsappState === null || whatsappSaving) return;
+    setWhatsappSaving(true);
+    setWhatsappError("");
+    try {
+      const updated = desiredWhatsappState
+        ? whatsappSubscription?.status === "PAUSED"
+          ? await changeWhatsAppSubscription(whatsappSubscription, "RESUME")
+          : await createWhatsAppSubscription(whatsappPhone!.contactId)
+        : await changeWhatsAppSubscription(whatsappSubscription!, "UNSUBSCRIBE");
+      setWhatsappSubscription(updated.status === "UNSUBSCRIBED" ? null : updated);
+      setWhatsappSuscription(updated.status === "PENDING" || updated.status === "ACTIVE");
+      setIsPopUpOpen(false);
+      setDesiredWhatsappState(null);
+    } catch (err) {
+      if (err instanceof WhatsAppSubscriptionError && err.status === 401) {
+        irAlLoginPorSesionVencida();
+        return;
+      }
+      setWhatsappError(err instanceof Error ? err.message : "No se pudo actualizar la suscripción de WhatsApp.");
+      setIsPopUpOpen(false);
+    } finally {
+      setWhatsappSaving(false);
+    }
+  };
 
   return (
     <div className={styles.wrapper}>
@@ -133,19 +216,19 @@ export default function CasilleroBuzon() {
           </div>
           <Switch
             checked={whatsappSuscription}
-            label={whatsappSuscription ? "Desuscribir" : "Suscribir"}
+            label={whatsappLoading ? "Cargando..." : whatsappSuscription ? "Desuscribir" : "Suscribir"}
+            state={whatsappLoading || whatsappSaving || (!whatsappPhone && !whatsappSuscription) ? "disabled" : "default"}
             onChange={(e) => {
               handleSuscriptionToggle(e.target.checked)
             }}
           />
+          {whatsappError && <Text variant="Small">{whatsappError}</Text>}
         </CardGeneral>
         <div className={styles.listado}>
         <Table>
           <TableHead>
             <TableRow>
-              <TableHeaderCell>Buzón</TableHeaderCell>
-              <TableHeaderCell />
-              <TableHeaderCell />
+              <TableHeaderCell colSpan={COLUMNAS}>Buzón</TableHeaderCell>
             </TableRow>
           </TableHead>
           <TableBody>
@@ -179,7 +262,18 @@ export default function CasilleroBuzon() {
                 <TableRow key={notification.id} onClick={() => setSelectedNotification(notification.id)} className={styles.row}>
                   <TableCell>{formatearFechaNotificacion(notification.issuedAt)}</TableCell>
                   <TableCell>
-                    <span className={styles.asunto}>{notification.subject}</span>
+                    <span className={styles.asuntoWrapper}>
+                      <span
+                        className={`${styles.readIndicator} ${
+                          isNewNotification(notification.status)
+                            ? styles.unreadIndicator
+                            : styles.readIndicatorDone
+                        }`}
+                        title={isNewNotification(notification.status) ? "Notificación nueva" : "Notificación leída"}
+                        aria-label={isNewNotification(notification.status) ? "Notificación nueva" : "Notificación leída"}
+                      />
+                      <span className={styles.asunto}>{asuntoNotificacion(notification)}</span>
+                    </span>
                     {/* En móvil la fecha y la hora van bajo el asunto (una sola columna). */}
                     <span className={styles.fechaMovil}>
                       {formatearFechaNotificacion(notification.issuedAt)} • {formatearHoraNotificacion(notification.issuedAt)}
@@ -217,10 +311,7 @@ export default function CasilleroBuzon() {
             {
               text: "Sí, estoy seguro",
               variant: "success",
-              onClick: () => {
-                setWhatsappSuscription(!whatsappSuscription)
-                setIsPopUpOpen(false)
-              }
+              onClick: () => { void confirmWhatsappChange(); }
           },{
               text: "No, en otra ocasión",
               variant: "danger",
@@ -228,7 +319,11 @@ export default function CasilleroBuzon() {
           }
           ]
         }
-        onClose={() => setIsPopUpOpen(false)}
+        onClose={() => {
+          if (whatsappSaving) return;
+          setDesiredWhatsappState(null);
+          setIsPopUpOpen(false);
+        }}
       />
     </div>
   );

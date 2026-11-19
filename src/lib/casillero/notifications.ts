@@ -1,6 +1,7 @@
 import { getCasilleroJson } from "./api";
 import type {
     CasilleroNotificationDetail,
+    CasilleroNotificationItem,
     CasilleroNotificationList,
 } from "./types";
 
@@ -36,6 +37,26 @@ export function formatearHoraNotificacion(iso: string): string {
         : fecha.toLocaleTimeString("es-GT", { hour: "2-digit", minute: "2-digit" });
 }
 
+export function asuntoNotificacion(notification: CasilleroNotificationItem): string {
+    const remission = notification.remission;
+    return remission
+        ? `Remisión ${remission.series}-${remission.number}`
+        : "Notificación legal";
+}
+
+export function descripcionNotificacion(notification: CasilleroNotificationDetail): string {
+    const recipient = notification.recipient.name?.trim();
+    const obligations = notification.obligations.length;
+    const parts = [
+        recipient ? `Destinatario: ${recipient}.` : "Notificación dirigida al titular del contexto actual.",
+        obligations === 1
+            ? "Incluye 1 obligación."
+            : `Incluye ${obligations} obligaciones.`,
+        `Estado: ${notification.status}.`,
+    ];
+    return parts.join(" ");
+}
+
 // ── LISTADO ───────────────────────────────────────────────────────────────
 function errorFromListStatus(status: number): Error {
     const message =
@@ -56,6 +77,23 @@ export async function fetchNotifications(
         `/api/casillero/notifications?${query}`,
         errorFromListStatus
     );
+}
+
+/** Una notificación deja de ser nueva cuando se fija su notificación legal. */
+export function isNewNotification(status: string): boolean {
+    return status.trim().toUpperCase() !== "NOTIFICADA";
+}
+
+/** Recorre los cursores para que el indicador represente el total real del buzón. */
+export async function countNewNotifications(): Promise<number> {
+    let cursor: string | null | undefined;
+    let total = 0;
+    do {
+        const page = await fetchNotifications(50, cursor);
+        total += page.items.filter((notification) => isNewNotification(notification.status)).length;
+        cursor = page.nextCursor;
+    } while (cursor);
+    return total;
 }
 
 // ── DETALLE ───────────────────────────────────────────────────────────────

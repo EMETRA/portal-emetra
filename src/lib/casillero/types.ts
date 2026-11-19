@@ -233,21 +233,21 @@ export interface ResendResponse {
   destinationMasked: string;
 }
 
-/*
-  Buzón de notificaciones (CAS-133)
-  TODO [CASILLERO-BACKEND]: contrato provisional (Daniel, 2026-10-14). Confirmados:
-  `items`, `nextCursor` y `hasDocument`. El resto de nombres (subject, summary, status,
-  issuedAt, context, content) son provisionales hasta que se publique el contrato.
-*/
+/* Buzón de notificaciones legales emitidas para el sujeto del contexto actual. */
+
+export type CasilleroNotificationRemission = {
+  city: number;
+  series: string;
+  number: string;
+};
 
 export type CasilleroNotificationItem = {
   id: string;
-  subject: string;
-  summary: string;
   status: string;
-  /** Fecha de emisión/disponibilidad (ISO 8601). */
+  remission?: CasilleroNotificationRemission;
   issuedAt: string;
-  context: CasilleroContextType;
+  availableAt: string;
+  legalNotificationAt?: string;
   hasDocument: boolean;
 };
 
@@ -257,9 +257,16 @@ export type CasilleroNotificationList = {
   nextCursor: string | null;
 };
 
-/** GET /v1/notifications/{id}: los datos del listado más el contenido. */
+/** GET /v1/notifications/{id}: detalle legal y metadatos del documento. */
 export type CasilleroNotificationDetail = CasilleroNotificationItem & {
-  content: string;
+  recipient: { name?: string; nit?: string };
+  obligations: Array<{ order: number; amount?: string }>;
+  document?: {
+    version: number;
+    mime: string;
+    sizeBytes: number;
+    generatedAt: string;
+  };
 };
 
 /*

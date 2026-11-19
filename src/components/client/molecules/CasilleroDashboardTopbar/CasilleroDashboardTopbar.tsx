@@ -9,6 +9,7 @@ import classNames from "classnames";
 import { useSessionStore } from "@/store/useSessionStore";
 import { logout } from "@/lib/casillero/auth";
 import { deactivateCompanyContext, getActiveCompanyContext, getCompanies } from "@/lib/casillero/company";
+import { countNewNotifications } from "@/lib/casillero/notifications";
 
 type Props = {
   userName: string;
@@ -22,6 +23,7 @@ export default function CasilleroDashboardTopbar({ userName, onMenuClickAction }
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [cerrandoSesion, setCerrandoSesion] = useState(false);
   const [activeCompanyName, setActiveCompanyName] = useState<string | null>(null);
+  const [newNotifications, setNewNotifications] = useState(0);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -35,6 +37,26 @@ export default function CasilleroDashboardTopbar({ userName, onMenuClickAction }
     void loadContext();
     window.addEventListener("company-context-changed", loadContext);
     return () => window.removeEventListener("company-context-changed", loadContext);
+  }, []);
+
+  useEffect(() => {
+    let cancelled = false;
+    const loadNotifications = async () => {
+      try {
+        const total = await countNewNotifications();
+        if (!cancelled) setNewNotifications(total);
+      } catch {
+        if (!cancelled) setNewNotifications(0);
+      }
+    };
+    void loadNotifications();
+    window.addEventListener("notifications-updated", loadNotifications);
+    window.addEventListener("focus", loadNotifications);
+    return () => {
+      cancelled = true;
+      window.removeEventListener("notifications-updated", loadNotifications);
+      window.removeEventListener("focus", loadNotifications);
+    };
   }, []);
 
   const usePersonalContext = async () => {
@@ -80,7 +102,15 @@ export default function CasilleroDashboardTopbar({ userName, onMenuClickAction }
       <h1>Casillero Electrónico{activeCompanyName ? <small>{activeCompanyName}</small> : null}</h1>
 
       <div className={styles.actions}>
-        <Icon name="Notification" onClick={() => router.push("/casillero/buzon")} />
+        <button
+          type="button"
+          className={styles.notificationButton}
+          onClick={() => router.push("/casillero/buzon")}
+          aria-label={newNotifications ? `${newNotifications} notificaciones nuevas` : "Ir a buzón"}
+        >
+          <Icon name="Notification" />
+          {newNotifications > 0 && <span className={styles.notificationBadge}>{newNotifications > 99 ? "99+" : newNotifications}</span>}
+        </button>
         <Icon name="Home" onClick={() => router.push("/casillero/dashboard")} />
         <Icon name="User" onClick={() => router.push("/casillero/user-profile")} />
 
@@ -146,6 +176,7 @@ export default function CasilleroDashboardTopbar({ userName, onMenuClickAction }
         aria-label="Ir a buzón"
       >
         <Icon name="Notification" />
+        {newNotifications > 0 && <span className={styles.notificationBadge}>{newNotifications > 99 ? "99+" : newNotifications}</span>}
       </button>
 
       {/* Mobile user profile */}

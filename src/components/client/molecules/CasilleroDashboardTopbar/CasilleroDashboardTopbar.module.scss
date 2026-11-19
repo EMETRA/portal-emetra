@@ -66,6 +66,40 @@
   }
 }
 
+.notificationButton,
+.mobileNotificationButton {
+  position: relative;
+}
+
+.notificationButton {
+  display: inline-flex;
+  align-items: center;
+  border: 0;
+  padding: 0;
+  background: transparent;
+  color: #fff;
+  cursor: pointer;
+}
+
+.notificationBadge {
+  position: absolute;
+  top: -8px;
+  right: -9px;
+  display: flex;
+  min-width: 15px;
+  height: 15px;
+  padding: 0 3px;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid #fff;
+  border-radius: 999px;
+  background: #e53935;
+  color: #fff;
+  font-size: 0.58rem;
+  font-weight: 700;
+  line-height: 1;
+}
+
 // Desktop/tablet mode switcher
 .modeSwitcher {
   display: flex;

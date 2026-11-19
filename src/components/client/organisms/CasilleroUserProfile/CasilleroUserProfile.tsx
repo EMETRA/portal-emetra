@@ -167,6 +167,10 @@ export default function CasilleroUserProfile() {
     router.push("/casillero/change-password");
   };
 
+  const handleAuthenticationMethods = () => {
+    router.push("/casillero/authentication-methods");
+  };
+
   return (
     <div className={styles.wrapper}>
       <SectionTitle>Perfil de usuario</SectionTitle>
@@ -395,6 +399,14 @@ export default function CasilleroUserProfile() {
               onClick={handleChangePassword}
             >
               Cambiar contraseña
+            </Button>
+            <Button
+              type="button"
+              variant="default"
+              className={styles.changePasswordBtn}
+              onClick={handleAuthenticationMethods}
+            >
+              Métodos de autenticación
             </Button>
             <Button
               type="button"

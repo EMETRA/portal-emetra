@@ -62,6 +62,29 @@
   
 }
 
+.asuntoWrapper {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+}
+
+.readIndicator {
+  width: 0.65rem;
+  height: 0.65rem;
+  flex: 0 0 auto;
+  border-radius: 50%;
+}
+
+.unreadIndicator {
+  background: #86d600;
+  box-shadow: 0 0 0 2px rgba(134, 214, 0, 0.18);
+}
+
+.readIndicatorDone {
+  box-sizing: border-box;
+  border: 2px solid #a8a8a8;
+}
+
 @media (max-width: 520px) {
   // Una sola columna: asunto y, debajo, fecha • hora. Solo en filas de notificación
   // (.row); las filas de carga, error y vacío usan una celda con colSpan.

@@ -41,8 +41,30 @@ export type NeoPayCheckout = {
 
 export type PaymentReceiptStatus = { orderId: string; status: "PENDIENTE" | "FALLIDA" | "COMPLETADA"; receiptNumber: string | null };
 
+export type PaymentHistoryItem = {
+    orderId: string;
+    receiptNumber: string;
+    issuedAt: string;
+    totalAmount: string;
+    currency: string;
+};
+
+export type PaymentHistory = { items: PaymentHistoryItem[] };
+
 export const isSesionVencidaOrden = (error: unknown): boolean =>
     error instanceof CasilleroPaymentOrderError && error.status === 401;
+
+function errorFromHistoryStatus(status: number): Error {
+    const message = status === 401 ? SESION_VENCIDA : "No se pudo cargar el historial de pagos.";
+    return new CasilleroPaymentOrderError(message, status);
+}
+
+export function fetchPaymentHistory(): Promise<PaymentHistory> {
+    return getCasilleroJson<PaymentHistory>(
+        "/api/casillero/payment-orders/history?limit=100",
+        errorFromHistoryStatus,
+    );
+}
 
 // ── CREAR ORDEN ───────────────────────────────────────────────────────────
 function errorFromCreateStatus(status: number): Error {

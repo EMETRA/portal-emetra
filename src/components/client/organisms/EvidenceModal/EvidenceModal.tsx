@@ -9,8 +9,8 @@ interface EvidenceModalProps {
     onClose: () => void;
     imageUrl: string;
     onDownloadImage: () => void;
-    onDownloadNotificacion: () => void;
-    onDownloadRemisionPdf: () => void;
+    onDownloadNotificacion?: () => void;
+    onDownloadRemisionPdf?: () => void;
 }
 
 export default function EvidenceModal({
@@ -58,21 +58,23 @@ export default function EvidenceModal({
             </h2>
 
             <div className={styles.imageContainer}>
-                <Image src={imageUrl} alt="Evidencia de la infracción" width={0} height={0} sizes="100vw" style={{ width: "100%", height: "auto" }} />
+                <Image unoptimized src={imageUrl} alt="Evidencia de la infracción" width={0} height={0} sizes="100vw" style={{ width: "100%", height: "auto" }} />
             </div>
 
             <button type="button" className={styles.downloadImageLink} onClick={onDownloadImage}>
             descargar imagen ↓
             </button>
 
-            <div className={styles.actions}>
+            {(onDownloadNotificacion || onDownloadRemisionPdf) && <div className={styles.actions}>
+            {onDownloadNotificacion &&
             <button type="button" className={styles.actionButton} onClick={onDownloadNotificacion}>
                 Descargar notificación
-            </button>
+            </button>}
+            {onDownloadRemisionPdf &&
             <button type="button" className={styles.actionButton} onClick={onDownloadRemisionPdf}>
                 Descargar remisión PDF
-            </button>
-            </div>
+            </button>}
+            </div>}
         </div>
         </div>
     );

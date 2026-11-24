@@ -10,10 +10,10 @@ import {
   completeEmailChangeSchema,
   editEmailSchema,
 } from "./editEmail.schema";
-// import {
-//   completeEmailChange,
-//   requestEmailChange,
-// } from "@/lib/casillero/api";
+import {
+  completeEmailChange,
+  requestEmailChange,
+} from "@/lib/casillero/api";
 import type { CasilleroEmailChangeCreated } from "@/lib/casillero/types";
 
 export const CasilleroCambioCorreo = ({
@@ -69,33 +69,18 @@ export const CasilleroCambioCorreo = ({
 
     setIsSubmitting(true);
     setMessage(null);
-    const created: CasilleroEmailChangeCreated = {
-      requestId: "req_dummy_001",
-      status: "PENDING_EMAIL_VERIFICATION",
-      verificationId: "ver_dummy_001",
-      verificationExpiresAt: "2026-12-31T23:59:59.000Z",
-      currentEmailMasked: "daniel.morales@muniguate.com",
-      newEmailMasked: newEmail,
-      stepUpRequired: true,
-      sessionPolicyOnCompletion: "KEEP",
-      nextSteps: ["VERIFY_NEW_EMAIL", "COMPLETE_STEP_UP_2FA"],
-      setUpChallengeId: "chal_dummy_001",
-    };
-    setRequest(created);
-    setIsSubmitting(false);
-
-    // try {
-    //   const created = await requestEmailChange(newEmail);
-    //   setRequest(created);
-    // } catch (error) {
-    //   setMessage(
-    //     error instanceof Error
-    //       ? error.message
-    //       : "No se pudo solicitar el cambio de correo."
-    //   );
-    // } finally {
-    //   setIsSubmitting(false);
-    // }
+    try {
+      const created = await requestEmailChange(newEmail);
+      setRequest(created);
+    } catch (error) {
+      setMessage(
+        error instanceof Error
+          ? error.message
+          : "No se pudo solicitar el cambio de correo."
+      );
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const handleCodesSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
@@ -120,32 +105,32 @@ export const CasilleroCambioCorreo = ({
       return;
     }
 
+    if (!request.setUpChallengeId) {
+      setMessage("La solicitud no incluyó el desafío de seguridad requerido.");
+      return;
+    }
+
     setIsSubmitting(true);
     setMessage(null);
-    resetState();
-    onCompleted?.();
-    onClose();
-    setIsSubmitting(false);
-
-    // try {
-    //   await completeEmailChange(request.requestId, {
-    //     verificationId: request.verificationId,
-    //     newEmailCode,
-    //     setUpChallengeId: request.setUpChallengeId ?? "",
-    //     stepUpCode,
-    //   });
-    //   resetState();
-    //   onCompleted?.();
-    //   onClose();
-    // } catch (error) {
-    //   setMessage(
-    //     error instanceof Error
-    //       ? error.message
-    //       : "No se pudieron validar los códigos."
-    //   );
-    // } finally {
-    //   setIsSubmitting(false);
-    // }
+    try {
+      await completeEmailChange(request.requestId, {
+        verificationId: request.verificationId,
+        newEmailCode,
+        setUpChallengeId: request.setUpChallengeId,
+        stepUpCode,
+      });
+      resetState();
+      onCompleted?.();
+      onClose();
+    } catch (error) {
+      setMessage(
+        error instanceof Error
+          ? error.message
+          : "No se pudieron validar los códigos."
+      );
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (

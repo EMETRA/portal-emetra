@@ -14,8 +14,8 @@ const EJEMPLO = DATOS_DE_EJEMPLO.multa;
 /**
  * Serie, número, categoría y fecha vienen de la API; si llegan vacíos se muestra el dato
  * de ejemplo, sin marca de pendiente.
- * Lugar, artículo, numeral y evidencia la API todavía no los manda: en su lugar queda una
- * marca de pendiente (TODO [CASILLERO-BACKEND]).
+ * Cuando la remisión tiene detalle, la evidencia se consulta bajo demanda y sin exponer
+ * al navegador la ubicación del archivo en el sistema origen.
  */
 interface FineDetailHeaderProps {
     series?: string;
@@ -38,8 +38,6 @@ interface FineDetailHeaderProps {
     numeral?: string;
     /** Sin evidencia no se muestra el botón "Ver imagen". */
     onVerImagen?: () => void;
-    /** true = "Ver imagen" abre una imagen de ejemplo; se marca como pendiente. */
-    evidenciaDeEjemplo?: boolean;
     onPayThis: () => void;
     /** false = la API dice que no se puede pagar: el botón de pagar queda deshabilitado. */
     canPay?: boolean;
@@ -60,7 +58,6 @@ export default function FineDetailHeader({
     article,
     numeral,
     onVerImagen,
-    evidenciaDeEjemplo,
     onPayThis,
     canPay = true,
 }: FineDetailHeaderProps) {
@@ -120,7 +117,7 @@ export default function FineDetailHeader({
         <button type="button" className={className} onClick={onVerImagen} disabled={!onVerImagen}>
             Ver imagen
         </button>
-        {(!onVerImagen || evidenciaDeEjemplo) && <PendienteApi campo="evidencia (imagen)" />}
+        {!onVerImagen && <PendienteApi campo="evidencia (imagen)" />}
         </>
     );
 

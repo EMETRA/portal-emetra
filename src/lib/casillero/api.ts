@@ -5,6 +5,7 @@ import type {
   PersonalRegistrationCreated,
   CasilleroUpdateMeRequest,
   CasilleroUser,
+  CasilleroContact,
   CasilleroContactList,
   CasilleroEmailChangeCreated,
   CasilleroEmailChangeCompleteRequest,
@@ -238,6 +239,36 @@ export async function fetchMyContacts(): Promise<CasilleroContactList> {
     "/api/casillero/me/contacts",
     errorFromMeReadStatus
   );
+}
+
+function errorFromPhoneContactStatus(status: number): Error {
+  const message =
+    status === 400
+      ? "El teléfono no es válido"
+      : status === 401
+        ? "Sesión ausente o inválida"
+        : `HTTP ${status}`;
+  const error = new Error(message);
+  error.name = "ApiResponseError";
+  return error;
+}
+
+export async function updateMyPhone(phone: string): Promise<CasilleroContact> {
+  const response = await fetch("/api/casillero/me/contacts", {
+    method: "PATCH",
+    headers: {
+      "Content-Type": "application/json",
+      Accept: "application/json",
+    },
+    body: JSON.stringify({ phone }),
+    cache: "no-store",
+  });
+
+  if (!response.ok) {
+    throw errorFromPhoneContactStatus(response.status);
+  }
+
+  return response.json() as Promise<CasilleroContact>;
 }
 
 function errorFromEmailChangeStatus(status: number): Error {

@@ -8,3 +8,18 @@ export async function GET(req: NextRequest) {
     requireAuth: true,
   });
 }
+
+export async function PATCH(req: NextRequest) {
+  return proxyCasilleroRequest(req, {
+    path: "/v1/me/contacts/phone",
+    requireAuth: true,
+  });
+}
+
+export async function DELETE(req: NextRequest) {
+  return proxyCasilleroRequest(req, {
+    path: "/v1/me/contacts/phone",
+    forwardBody: false,
+    requireAuth: true,
+  });
+}

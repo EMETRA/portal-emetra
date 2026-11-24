@@ -6,6 +6,7 @@ import { SectionTitle } from "@/components/server/molecules/SectionTitle";
 import CardGeneral from "@/components/client/atoms/CardGeneral/CardGeneral";
 import { Button, Input } from "@/components/server/atoms";
 import { passwordSchema } from "@/schema/casillero";
+import { requestPasswordReset, resetPassword } from "@/lib/casillero/auth";
 import styles from "./CasilleroChangePassword.module.scss";
 
 type View = "email" | "code" | "password";
@@ -14,17 +15,36 @@ export default function CasilleroChangePassword() {
   const router = useRouter();
   const [view, setView] = useState<View>("email");
   const [error, setError] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [resetToken, setResetToken] = useState("");
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
     if (view === "email") {
-      setView("code");
+      const formData = new FormData(event.currentTarget);
+      const email = String(formData.get("change-email") ?? "").trim();
+      setIsSubmitting(true);
       setError("");
+      try {
+        await requestPasswordReset(email);
+        setView("code");
+      } catch (error) {
+        setError(error instanceof Error ? error.message : "No se pudo enviar el código.");
+      } finally {
+        setIsSubmitting(false);
+      }
       return;
     }
 
     if (view === "code") {
+      const formData = new FormData(event.currentTarget);
+      const token = String(formData.get("change-code") ?? "").trim();
+      if (!token) {
+        setError("Ingresa el código que recibiste por correo.");
+        return;
+      }
+      setResetToken(token);
       setView("password");
       setError("");
       return;
@@ -46,9 +66,16 @@ export default function CasilleroChangePassword() {
       return;
     }
 
-    alert("La contraseña fue cambiada correctamente.");
-
-    router.push("/casillero/dashboard");
+    setIsSubmitting(true);
+    setError("");
+    try {
+      await resetPassword(resetToken, password);
+      router.push("/casillero/login");
+    } catch (error) {
+      setError(error instanceof Error ? error.message : "No se pudo cambiar la contraseña.");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const renderFields = () => {
@@ -126,12 +153,12 @@ export default function CasilleroChangePassword() {
           {renderFields()}
 
           <div className={styles.actions}>
-            <Button type="submit" variant="success" className={styles.submitButton}>
+            <Button type="submit" variant="success" className={styles.submitButton} disabled={isSubmitting}>
               {view === "email"
-                ? "Enviar código"
+                ? isSubmitting ? "Enviando..." : "Enviar código"
                 : view === "code"
-                  ? "Validar"
-                  : "Restablecer"}
+                  ? "Continuar"
+                  : isSubmitting ? "Restableciendo..." : "Restablecer"}
             </Button>
           </div>
 

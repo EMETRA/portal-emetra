@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { SectionTitle } from "@/components/server/molecules/SectionTitle";
 import PlateSearchCard from "@/components/client/molecules/PlateSearchCard/PlateSearchCard";
 import VehicleSolvencyCard from "@/components/client/molecules/VehicleSolvencyCard/VehicleSolvencyCard";
@@ -13,6 +13,8 @@ import styles from "./HistorialRemisionesPage.module.scss";
 import FilterTabs from "../../atoms/FilterTabs/FilterTabs";
 import DateFilterInput from "../../atoms/DateFilterInput/DateFilterInput";
 import DownloadConfirmModal from "../../molecules/DownloadConfirmModal/DownloadConfirmModal";
+import { fetchPaymentHistory, isSesionVencidaOrden } from "@/lib/casillero/paymentOrders";
+import { useSessionStore } from "@/store/useSessionStore";
 
 const vehicle = {
     plate: "P111BBB",
@@ -21,18 +23,6 @@ const vehicle = {
     year: 2020,
     isSolvente: false,
 };
-
-function buildMockRecords(count: number): HistoryRecord[] {
-    return Array.from({ length: count }, (_, i) => {
-        const isRecibo = i % 3 !== 0;
-        if (isRecibo) {
-            return { id: String(i + 1), type: "recibo", code: `N51${2650 + i}`, date: "21/05/2026", amount: 500 } as HistoryRecord;
-        }
-        return { id: String(i + 1), type: "solvencia", code: `${5126480 + i}`, date: "21/05/2026", amount: 25, status: i % 2 === 0 ? "activa" : "inactiva" } as HistoryRecord;
-    });
-}
-
-const allRecords = buildMockRecords(78);
 
 type FilterValue = "todas" | "recibo" | "solvencia";
 
@@ -44,15 +34,42 @@ const filterOptions: { value: FilterValue; label: string }[] = [
 
 export default function HistorialRemisionesPage() {
     const isMobile = useMediaQuery("(max-width: 768px)");
+    const clearSession = useSessionStore((state) => state.clearSession);
 
     const [selectedPlate, setSelectedPlate] = useState(vehicle.plate);
     const [pendingRecord, setPendingRecord] = useState<HistoryRecord | null>(null);
     const [filter, setFilter] = useState<FilterValue>("todas");
     const [dateFilter, setDateFilter] = useState("");
-    // const [pendingId, setPendingId] = useState<string | null>(null); // <- added here
+    const [records, setRecords] = useState<HistoryRecord[]>([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState("");
+
+    useEffect(() => {
+        let active = true;
+        fetchPaymentHistory()
+            .then(({ items }) => {
+                if (!active) return;
+                setRecords(items.map((item) => ({
+                    id: item.orderId,
+                    type: "recibo" as const,
+                    code: item.receiptNumber,
+                    date: new Date(item.issuedAt).toLocaleDateString("es-GT"),
+                    amount: Number(item.totalAmount),
+                })));
+            })
+            .catch((requestError: unknown) => {
+                if (!active) return;
+                if (isSesionVencidaOrden(requestError)) clearSession();
+                setError(requestError instanceof Error ? requestError.message : "No se pudo cargar el historial.");
+            })
+            .finally(() => {
+                if (active) setLoading(false);
+            });
+        return () => { active = false; };
+    }, [clearSession]);
 
     const filteredRecords = useMemo(() => {
-        let result = allRecords;
+        let result = records;
         if (filter !== "todas") {
             result = result.filter((r) => r.type === filter);
         }
@@ -62,7 +79,7 @@ export default function HistorialRemisionesPage() {
             result = result.filter((r) => r.date === normalized);
         }
         return result;
-    }, [filter, dateFilter, isMobile]);
+    }, [records, filter, dateFilter, isMobile]);
 
     const handleCardClick = (record: HistoryRecord) => {
         setPendingRecord(record);
@@ -106,7 +123,10 @@ export default function HistorialRemisionesPage() {
                     <DateFilterInput value={dateFilter} onChange={setDateFilter} />
                 )}
 
-                {isMobile ? (
+                {loading && <p>Cargando historial...</p>}
+                {!loading && error && <p role="alert">{error}</p>}
+
+                {!loading && !error && (isMobile ? (
                     <HistoryRecordsGrid
                         records={filteredRecords}
                         onCardClick={handleCardClick} // <- passes click up from grid
@@ -116,7 +136,7 @@ export default function HistorialRemisionesPage() {
                         records={filteredRecords}
                         onDownload={() => {}}
                     />
-                )}
+                ))}
             </div>
 
             {/* Modal lives at page level, only reachable from mobile grid */}

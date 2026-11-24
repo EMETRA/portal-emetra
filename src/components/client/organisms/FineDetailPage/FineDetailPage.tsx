@@ -4,6 +4,7 @@ import { useCallback, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { SectionTitle } from "@/components/server/molecules/SectionTitle";
 import FineDetailHeader from "@/components/client/organisms/FineDetailHeader/FineDetailHeader";
+import EvidenceModal from "@/components/client/organisms/EvidenceModal/EvidenceModal";
 import InfoCard from "@/components/client/molecules/InfoCard/InfoCard";
 import InfoField from "../../atoms/InfoField/InfoField";
 import PendienteApi from "../../atoms/PendienteApi/PendienteApi";
@@ -27,11 +28,7 @@ import {
 import { useSessionStore } from "@/store/useSessionStore";
 import { useSelectedFinesStore } from "@/store/useSelectedFineStore";
 
-/*
-  La evidencia, persona notificada, impugnación y última fecha de pago siguen pendientes.
-  `validUntil` NO es la última fecha de pago: es hasta cuándo vale el monto calculado
-  (Daniel, 2026-11-11), por eso no se usa en ese campo.
-*/
+/* `validUntil` es la vigencia del monto calculado, no la fecha límite legal de pago. */
 const EJEMPLO = DATOS_DE_EJEMPLO.multa;
 export default function FineDetailPage({ fineId }: { fineId: string }) {
     const router = useRouter();
@@ -41,6 +38,14 @@ export default function FineDetailPage({ fineId }: { fineId: string }) {
     const [detalle, setDetalle] = useState<CasilleroObligationDetail | null>(null);
     const [error, setError] = useState<{ mensaje: string; noEncontrado: boolean } | null>(null);
     const [intento, setIntento] = useState(0);
+    const [evidenceUrl, setEvidenceUrl] = useState<string | null>(null);
+    const [evidenceExtension, setEvidenceExtension] = useState<"jpg" | "png">("jpg");
+    const [evidenceLoading, setEvidenceLoading] = useState(false);
+    const [evidenceError, setEvidenceError] = useState<string | null>(null);
+
+    useEffect(() => () => {
+        if (evidenceUrl) URL.revokeObjectURL(evidenceUrl);
+    }, [evidenceUrl]);
 
     // 401 del backend: la sesión venció o fue revocada; se limpia y se vuelve al login.
     const irAlLoginPorSesionVencida = useCallback(() => {
@@ -132,6 +137,40 @@ export default function FineDetailPage({ fineId }: { fineId: string }) {
         router.push("/casillero/dashboard/multas/pagar");
     };
 
+    const handleViewEvidence = async () => {
+        if (evidenceLoading) return;
+        setEvidenceLoading(true);
+        setEvidenceError(null);
+        try {
+            const response = await fetch(`/api/casillero/obligations/${encodeURIComponent(fineId)}/evidence/1`, {
+                credentials: "same-origin",
+                cache: "no-store",
+            });
+            if (response.status === 401) { irAlLoginPorSesionVencida(); return; }
+            if (!response.ok) throw new Error(response.status === 404 ? "Esta remisión no tiene imagen disponible." : "No se pudo consultar la imagen.");
+            const blob = await response.blob();
+            if (!blob.type.startsWith("image/")) throw new Error("La evidencia recibida no es una imagen válida.");
+            setEvidenceExtension(blob.type === "image/png" ? "png" : "jpg");
+            setEvidenceUrl(URL.createObjectURL(blob));
+        } catch (err) {
+            setEvidenceError(err instanceof Error ? err.message : "No se pudo consultar la imagen.");
+        } finally {
+            setEvidenceLoading(false);
+        }
+    };
+
+    const closeEvidence = () => {
+        setEvidenceUrl(null);
+    };
+
+    const downloadEvidence = () => {
+        if (!evidenceUrl) return;
+        const link = document.createElement("a");
+        link.href = evidenceUrl;
+        link.download = `remision-${detalle.series ?? ""}${detalle.number ?? fineId}.${evidenceExtension}`;
+        link.click();
+    };
+
     return (
         <>
         <SectionTitle>Detalle de Multa</SectionTitle>
@@ -157,6 +196,20 @@ export default function FineDetailPage({ fineId }: { fineId: string }) {
             numeral={primeraRegla?.numeral ?? undefined}
             onPayThis={handlePayThis}
             canPay={pagable}
+            onVerImagen={remision ? handleViewEvidence : undefined}
+        />
+
+        {(evidenceLoading || evidenceError) && (
+            <div className={styles.estado} role="status">
+                {evidenceLoading ? <LoadingSpinner variant="inline" /> : <Text variant="Medium">{evidenceError}</Text>}
+            </div>
+        )}
+
+        <EvidenceModal
+            isOpen={Boolean(evidenceUrl)}
+            onClose={closeEvidence}
+            imageUrl={evidenceUrl ?? ""}
+            onDownloadImage={downloadEvidence}
         />
 
         <div className={styles.infoGrid}>

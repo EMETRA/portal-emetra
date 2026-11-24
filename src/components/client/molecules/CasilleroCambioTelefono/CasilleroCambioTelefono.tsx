@@ -6,13 +6,16 @@ import { PopOver } from "../../atoms/PopOver";
 import { Text } from "@/components/atoms/Text";
 import styles from "./CasilleroCambioTelefono.module.scss";
 import { editPhoneSchema } from "./editPhone.schema";
+import { updateMyPhone } from "@/lib/casillero/api";
 
 export const CasilleroCambioTelefono = ({
     isOpen,
     onClose,
+    onCompleted,
     oldPhone,
 }: CasilleroCambioTelefonoProps) => {
     const [message, setMessage] = useState<string | null>(null);
+    const [isSubmitting, setIsSubmitting] = useState(false);
 
     const handleClose = () => {
         setMessage(null);
@@ -33,10 +36,17 @@ export const CasilleroCambioTelefono = ({
         );
         return;
         }
-        // TODO: Implementar la lógica para cambiar el teléfono
-        // TODO: Implementar la lógica para notificar al usuario que el cambio de teléfono fue exitoso
+        setIsSubmitting(true);
         setMessage(null);
-        handleClose();
+        try {
+            await updateMyPhone(newPhone);
+            onCompleted?.();
+            handleClose();
+        } catch (error) {
+            setMessage(error instanceof Error ? error.message : "No se pudo actualizar el teléfono.");
+        } finally {
+            setIsSubmitting(false);
+        }
     };
 
     return (
@@ -59,8 +69,8 @@ export const CasilleroCambioTelefono = ({
                     <Input id="newPhone" name="newPhone" type="tel" className={styles.input} placeholder="12345678" pattern="[0-9]*" inputMode="numeric" required />
                 </label>
                 {message && <Text variant="Small" className={styles.errorMessage}>{message}</Text>}
-                <Button variant="success" className={styles.submitButton} type="submit">
-                    Cambiar teléfono
+                <Button variant="success" className={styles.submitButton} type="submit" disabled={isSubmitting}>
+                    {isSubmitting ? "Guardando..." : "Cambiar teléfono"}
                 </Button>
             </form>
         </PopOver>

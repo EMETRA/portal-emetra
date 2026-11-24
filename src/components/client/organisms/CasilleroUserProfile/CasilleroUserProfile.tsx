@@ -159,10 +159,6 @@ export default function CasilleroUserProfile() {
     }
   };
 
-  const handleDeactivate = () => {
-    router.push("/casillero/delete-account");
-  };
-
   const handleChangePassword = () => {
     router.push("/casillero/change-password");
   };
@@ -177,15 +173,6 @@ export default function CasilleroUserProfile() {
 
       <CardGeneral className={styles.card} padding="lg">
         <div className={styles.layout}>
-          <Button
-            type="button"
-            variant="danger"
-            className={styles.deactivateBtn}
-            onClick={handleDeactivate}
-          >
-            Darse de baja
-          </Button>
-
           <CardGeneral className={styles.infoUserContainer} padding="sm">
             <div className={styles.infoUserBanner}>
               <Image
@@ -439,7 +426,15 @@ export default function CasilleroUserProfile() {
           void loadProfile({ silent: true });
         }}
       />
-      <CasilleroCambioTelefono isOpen={isChangePhoneOpen} onClose={() => setIsChangePhoneOpen(false)} oldPhone={primaryPhone} />
+      <CasilleroCambioTelefono
+        isOpen={isChangePhoneOpen}
+        onClose={() => setIsChangePhoneOpen(false)}
+        onCompleted={() => {
+          setIsChangePhoneOpen(false);
+          void loadProfile({ silent: true });
+        }}
+        oldPhone={primaryPhone}
+      />
     </div>
   );
 }

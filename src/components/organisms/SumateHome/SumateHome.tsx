@@ -2,6 +2,7 @@
 import styles from './SumateHome.module.scss';
 import bgImage from '@assets/images/bg-autopista.jpg'; 
 import logo from '@assets/images/logos.png';
+
 import acmo from '@assets/logos/ACMO.png';
 import asim from '@assets/logos/ASIM.png';
 import avanti from '@assets/logos/Avanti.png';
@@ -18,7 +19,7 @@ import indiaan from '@assets/logos/Indiaan.png';
 import inelac from '@assets/logos/INELAC.png';
 import milano from '@assets/logos/Milano.png';
 import presto from '@assets/logos/Presto.png';
-import royal from  '@assets/logos/RoyalEnfield.png'
+// import royal from  '@assets/logos/RoyalEnfield.png'
 import suzuki from '@assets/logos/Suzuki.png';
 import tvs from '@assets/logos/TVS.png';
 import url from '@assets/logos/URL.png';
@@ -29,6 +30,18 @@ import camarain from '@assets/logos/CamaraIndustria.png';
 import shell from '@assets/logos/Shell.png';
 import uber from '@assets/logos/Uber.png';
 import LogoSumate from '@assets/images/sumateLogo.png'
+import akt from '@assets/logos/AKT.png';
+import argo from '@assets/logos/ArgoMotos.png';
+import freedom from '@assets/logos/Freedom.png';
+import italika from '@assets/logos/Italika.png';
+import kawasaki from '@assets/logos/Kawasaki.png';
+import masesa from '@assets/logos/Masesa.png';
+import moauto from '@assets/logos/Moauto.png';
+import motoracing from '@assets/logos/Motoracing.png';
+import serpeto from '@assets/logos/Serpeto.png';
+import triumph from '@assets/logos/Triumph.png';
+import uma from '@assets/logos/UMA.png';
+import vespa from '@assets/logos/Vespa.png';
 import {LogoWall} from '@molecules/LogosWall';
 
 type ImportedImg = string | { src: string };
@@ -54,7 +67,7 @@ const logos: Logo[] = [
     { src: toUrl(inelac), alt: 'Inelac' },
     { src: toUrl(milano), alt: 'Milano' },
     { src: toUrl(presto), alt: 'Presto' },
-    { src: toUrl(royal), alt: 'Royal Enfield' },
+    // { src: toUrl(royal), alt: 'Royal Enfield' },
     { src: toUrl(suzuki), alt: 'Suzuki' },
     { src: toUrl(tvs), alt: 'TVS' },
     { src: toUrl(url), alt: 'URL' },
@@ -63,7 +76,19 @@ const logos: Logo[] = [
     { src: toUrl(yamaha), alt: 'Yamaha' },
     { src: toUrl(camarain), alt: 'Cámara de Industria' },
     { src: toUrl(shell), alt: 'Shell' },
-    { src: toUrl(uber), alt: 'Uber' }    
+    { src: toUrl(uber), alt: 'Uber' },
+    { src: toUrl(akt), alt: 'AKT' },
+    { src: toUrl(argo), alt: 'Argo Motos' },
+    { src: toUrl(freedom), alt: 'Freedom' },
+    { src: toUrl(italika), alt: 'Italika' },
+    { src: toUrl(kawasaki), alt: 'Kawasaki' },
+    { src: toUrl(masesa), alt: 'Masesa' },
+    { src: toUrl(moauto), alt: 'Moauto' },
+    { src: toUrl(motoracing), alt: 'Motoracing' },
+    { src: toUrl(serpeto), alt: 'Serpeto' },
+    { src: toUrl(triumph), alt: 'Triumph' },
+    { src: toUrl(uma), alt: 'UMA' },
+    { src: toUrl(vespa), alt: 'Vespa' },    
 ];
 
 const SumateHome: React.FC = () => {

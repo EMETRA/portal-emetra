@@ -11,7 +11,8 @@
     "build-storybook": "storybook build",
     "docker:build": "pnpm install --frozen-lockfile && docker compose build",
     "docker:up": "pnpm install --frozen-lockfile && docker compose up -d --build",
-    "test:integracion": "node --test test/integracion/vivi.test.cjs"
+    "test:integracion": "node --test test/integracion/vivi.test.cjs",
+    "test:evial": "node test/integracion/evial.test.cjs && node test/integracion/evial-upstream.cjs"
   },
   "dependencies": {
     "@emotion/react": "^11.14.0",
@@ -26,7 +27,7 @@
     "handlebars": "^4.7.8",
     "leaflet": "^1.9.4",
     "lucide-react": "^0.552.0",
-    "next": "15.3.5",
+    "next": "15.3.9",
     "pdf-lib": "^1.17.1",
     "puppeteer": "^24.28.0",
     "qrcode": "^1.5.4",
@@ -39,7 +40,8 @@
     "server-only": "^0.0.1",
     "simplify-js": "^1.2.4",
     "yup": "^1.7.0",
-    "zod": "^4.0.14"
+    "zod": "^4.0.14",
+    "html5-qrcode": "2.3.8"
   },
   "devDependencies": {
     "@chromatic-com/storybook": "^4.0.1",
@@ -57,7 +59,7 @@
     "@vitest/browser": "^3.2.4",
     "@vitest/coverage-v8": "^3.2.4",
     "eslint": "^9",
-    "eslint-config-next": "15.3.5",
+    "eslint-config-next": "15.3.9",
     "eslint-plugin-storybook": "^9.0.15",
     "playwright": "^1.53.2",
     "sass-embedded": "^1.89.2",

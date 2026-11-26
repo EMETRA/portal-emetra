@@ -10,6 +10,7 @@ import { useState, useEffect, useRef } from "react";
 const navItems: { name: string; icon: IconType; href: string }[] = [
   { name: "INICIO", icon: "DPI", href: "/" },
   { name: "REMISIONES", icon: "Multa", href: "https://especiales.muniguate.com/remisiones.htm" },
+  { name: "EVIAL", icon: "Vehiculo", href: "/evial" },
   { name: "SERVICIOS", icon: "Files", href: "/#servicios" },
   { name: "VIDEOS", icon: "DPI", href: "/videos" },
   { name: "FAQ", icon: "Info", href: "/#ayuda" },
